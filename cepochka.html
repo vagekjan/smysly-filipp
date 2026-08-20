@@ -480,7 +480,7 @@ TH.forEach(t=>{
     const sup=a[1].map(s=>`<div class="s"><em>${s[0]}</em>${s[1]}</div>`).join('');
     return `<div class="arg"><div class="a">${a[0]}</div>${sup}</div>`;
   }).join('');
-  const note=t.note?`<div class="note"><b>оговорка</b>${t.note}</div>`:'';
+  const note=t.note?`<div class="note"><b>важно</b>${t.note}</div>`:'';
   const bt=BT[t.btype];
   const pills=t.ids.map(i=>`<span class="pill">${i}</span>`).join('');
   thc.insertAdjacentHTML('beforeend',`<div class="th" id="${t.n}">
