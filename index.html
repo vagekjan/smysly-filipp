@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Смыслы · Филипп</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A9%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF; --ink:#17161A; --ink2:#4A4D52; --muted:#8C8677;
+    --accent:#F2B600; --accent-ink:#8A5A12; --rule:#EAE6DC; --surface:#FBFAF7;
+    --disp:'Oswald',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  .bar{flex:none;display:flex;align-items:center;gap:18px;padding:0 22px;height:52px;border-bottom:1px solid var(--rule);background:var(--surface)}
+  .bar .brand{font-family:var(--disp);font-size:.9rem;letter-spacing:.03em;text-transform:uppercase;color:var(--ink);margin-right:8px}
+  .tabs{display:flex;gap:4px}
+  .tabs button{font-family:var(--disp);font-size:.92rem;letter-spacing:.02em;padding:7px 18px;background:transparent;border:1px solid var(--rule);border-radius:2px;color:var(--ink2);cursor:pointer;transition:all .15s}
+  .tabs button:hover{color:var(--ink)}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tabs button .n{font-family:var(--mono);font-size:.66rem;color:var(--accent);margin-right:7px}
+  .tabs button[aria-selected="true"] .n{color:var(--accent)}
+  .stage{flex:1;position:relative;min-height:0}
+  iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+  iframe[hidden]{display:none}
+  .hint{margin-left:auto;font-size:.72rem;color:var(--muted)}
+  .help-btn{margin-left:auto;font-family:var(--disp);font-size:.85rem;letter-spacing:.02em;padding:7px 16px;background:var(--accent);border:0;border-radius:2px;color:var(--ink);cursor:pointer}
+  .help-btn:hover{filter:brightness(.96)}
+  .overlay{position:fixed;inset:0;background:rgba(23,22,26,.55);display:none;align-items:flex-start;justify-content:center;z-index:50;padding:40px 20px;overflow-y:auto}
+  .overlay.on{display:flex}
+  .sheet{background:#fff;max-width:720px;width:100%;border-radius:4px;padding:34px 38px 40px;box-shadow:0 20px 60px rgba(0,0,0,.25);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Golos Text',sans-serif;line-height:1.6;color:var(--ink)}
+  .sheet h2{font-family:var(--disp);font-weight:500;font-size:1.5rem;margin:0 0 6px}
+  .sheet .sub{color:var(--muted);font-size:.9rem;margin:0 0 24px}
+  .sheet h3{font-family:var(--disp);font-weight:500;font-size:1.05rem;letter-spacing:.02em;margin:24px 0 8px;padding-top:16px;border-top:1px solid var(--rule)}
+  .sheet dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 16px}
+  .sheet dt{font-family:var(--mono);font-size:.8rem;color:var(--accent-ink);background:#FBF3D6;padding:2px 8px;border-radius:2px;height:fit-content;white-space:nowrap}
+  .sheet dd{margin:0;font-size:.94rem;color:var(--ink2)}
+  .sheet dd b{color:var(--ink);font-weight:600}
+  .sheet .close{float:right;font-family:var(--mono);font-size:.8rem;color:var(--muted);background:none;border:1px solid var(--rule);border-radius:2px;padding:4px 10px;cursor:pointer;margin-top:-4px}
+</style>
+</head>
+<body>
+  <div class="bar">
+    <span class="brand">Смыслы · Филипп</span>
+    <div class="tabs" id="tabs">
+      <button data-i="0" aria-selected="true"><span class="n">01</span>Мастер-каркас</button>
+      <button data-i="1" aria-selected="false"><span class="n">02</span>Доказательная цепочка</button>
+    </div>
+    <button class="help-btn" id="helpBtn">Как читать?</button>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="sheet">
+      <button class="close" id="closeBtn">закрыть ✕</button>
+      <h2>Как читать эти документы</h2>
+      <p class="sub">Короткая расшифровка всех кодов и меток. Два документа: «Мастер-каркас» это склад всех смыслов, «Доказательная цепочка» это собранная из них логика презентации.</p>
+
+      <h3>Коды смыслов</h3>
+      <dl>
+        <dt>S01 … S75</dt><dd><b>Смыслы (единицы).</b> Каждая отдельная мысль проекта пронумерована. S = «смысл». Номер нужен, чтобы на смысл можно было сослаться. Живут в «Мастер-каркасе».</dd>
+        <dt>Т1 … Т20</dt><dd><b>Тезисы презентации.</b> Т = «тезис». Это порядок, в котором мысли подаются зрителю. Живут в «Доказательной цепочке».</dd>
+      </dl>
+
+      <h3>Откуда взят смысл</h3>
+      <dl>
+        <dt>И</dt><dd><b>Из источника.</b> Так реально говорил Филипп на созвоне.</dd>
+        <dt>В</dt><dd><b>Вывод.</b> Прямо не сказано, но однозначно следует из его слов.</dd>
+        <dt>П</dt><dd><b>Предложение.</b> Редакторская идея (моя), а не слова автора. Чтобы не путать своё с авторским.</dd>
+      </dl>
+
+      <h3>Типы переходов между тезисами</h3>
+      <dl>
+        <dt>логическое следствие</dt><dd>Следующий тезис <b>строго вытекает</b> из предыдущего.</dd>
+        <dt>нарративный переход</dt><dd>Идём дальше <b>по ходу истории</b>, жёсткой логической связи нет (и это честно помечено).</dd>
+        <dt>возражение аудитории</dt><dd>У зрителя <b>возникает вопрос</b>, и следующий тезис на него отвечает.</dd>
+        <dt>продуктовый мост</dt><dd>Переход <b>к следующему шагу</b>: запись, консультация, продукт.</dd>
+      </dl>
+
+      <h3>Статусы в «Контроле смыслов»</h3>
+      <dl>
+        <dt>сохранён</dt><dd>Смысл вошёл в работу без потерь.</dd>
+        <dt>объединён</dt><dd>Слит с другим близким смыслом.</dd>
+        <dt>требует источника</dt><dd>Цифра или цитата не подтверждена, нельзя давать как факт (например, статистика по уровням, цитата Эйнштейна).</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="stage">
+    <iframe data-i="0" src="karkas.html"></iframe>
+    <iframe data-i="1" src="cepochka.html" hidden></iframe>
+  </div>
+<script>
+  const tabs=document.getElementById('tabs');
+  const frames=[...document.querySelectorAll('.stage iframe')];
+  tabs.addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b)return;
+    const i=b.dataset.i;
+    tabs.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected', x.dataset.i===i));
+    frames.forEach(f=>f.hidden = f.dataset.i!==i);
+  });
+  const overlay=document.getElementById('overlay');
+  document.getElementById('helpBtn').addEventListener('click',()=>overlay.classList.add('on'));
+  document.getElementById('closeBtn').addEventListener('click',()=>overlay.classList.remove('on'));
+  overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.classList.remove('on'); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') overlay.classList.remove('on'); });
+</script>
+</body>
+</html>
