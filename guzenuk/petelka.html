@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Твоя траектория развития · канвас по книге Филиппа Гузенюка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:#F4EFE7;color:#1B1B1B;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:"cv11","ss01"}
+textarea::placeholder,input::placeholder{color:#bbb}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes fadeInSlow{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes pulseSoft{0%,100%{opacity:.4}50%{opacity:.7}}
+@keyframes drawLine{from{stroke-dashoffset:1200}to{stroke-dashoffset:0}}
+#root{min-height:100vh}
+.bg-petelka{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.06;display:flex;align-items:center;justify-content:center}
+.bg-petelka svg{width:140%;height:140%}
+.content{position:relative;z-index:1}
+.kb-hint{display:block}
+@media (hover: none) and (pointer: coarse){.kb-hint{display:none}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="lib/react.min.js"></script>
+<script src="lib/react-dom.min.js"></script>
+<script src="lib/babel.min.js"></script>
+<script src="lib/html-to-image.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useRef, useEffect } = React;
+
+const T = "#B14A2E";
+const T2 = "#7a2e14";
+const BG = "#F4EFE7";
+const PAPER = "#FBF7F0";
+const INK = "#1B1B1B";
+const MUTED = "#8B7E73";
+
+/* ───────────────── DATA ───────────────── */
+
+const LOGICS = {
+  D: {key:"D", name:"Достигатель", color:"#C8651B", mantra:"Невозможное возможно"},
+  I: {key:"I", name:"Индивидуалист", color:"#2B7A4B", mantra:"Найти себя"},
+  S: {key:"S", name:"Стратег", color:"#946B15", mantra:"Оставить наследие"},
+};
+
+const LOGIC_Q = [
+  {
+    q: "Когда тебе говорят «расслабься, отдохни» — что внутри?",
+    a: [
+      {t:"Раздражение, у меня ещё дофига работы", v:"D"},
+      {t:"Пустота, не знаю кто я без работы", v:"I"},
+      {t:"Спокойствие, я делаю важное и могу долго", v:"S"},
+    ]
+  },
+  {
+    q: "Что для тебя важнее в команде?",
+    a: [
+      {t:"Результаты, метрики, скорость", v:"D"},
+      {t:"Атмосфера, искренность, отношения", v:"I"},
+      {t:"Развитие лидеров и наследие", v:"S"},
+    ]
+  },
+  {
+    q: "Когда что-то идёт не так:",
+    a: [
+      {t:"Беру на себя, проще доделать самому", v:"D"},
+      {t:"Сижу с этим, иду к коучу/терапевту", v:"I"},
+      {t:"Спрашиваю — о чём это сообщение системы?", v:"S"},
+    ]
+  },
+  {
+    q: "Твоя главная боль сейчас:",
+    a: [
+      {t:"Не успеваю, всё на мне", v:"D"},
+      {t:"Потерял смысл, не понимаю зачем", v:"I"},
+      {t:"Одиноко на этой высоте", v:"S"},
+    ]
+  },
+  {
+    q: "Что тебя пугает?",
+    a: [
+      {t:"Что не достигну", v:"D"},
+      {t:"Что выберу не то и потеряю годы", v:"I"},
+      {t:"Что наследие не случится", v:"S"},
+    ]
+  },
+  {
+    q: "Тебе сейчас приходится:",
+    a: [
+      {t:"Микроменеджить, контролировать", v:"D"},
+      {t:"Перестраивать себя, искать", v:"I"},
+      {t:"Удерживать смысл для всех", v:"S"},
+    ]
+  },
+];
+
+const ZOV_LABELS = ["", "Вдохновение и интерес", "Негативные эмоции", "Неуспехи", "Разрушение отношений", "Соматика"];
+const ZOV_Q = [
+  {
+    q: "Что у тебя сейчас внутри?",
+    a: [
+      {t:"Вдохновение, хочу нового", v:1},
+      {t:"Скука, апатия, плоско", v:2},
+      {t:"Тревога, не могу собраться", v:3},
+      {t:"Раздражение, всё бесит", v:4},
+      {t:"Пустота, ничего не чувствую", v:5},
+    ]
+  },
+  {
+    q: "Что с твоими отношениями (семья, партнёры, команда)?",
+    a: [
+      {t:"Всё хорошо, поддерживают", v:1},
+      {t:"Спокойно, но скучновато", v:2},
+      {t:"Появилось расстояние", v:3},
+      {t:"Конфликты, напряжение", v:4},
+      {t:"Расставание, развод или близко к этому", v:5},
+    ]
+  },
+  {
+    q: "Что с телом и здоровьем?",
+    a: [
+      {t:"Бодрость, тренируюсь, хорошо сплю", v:1},
+      {t:"Норм, без жалоб", v:2},
+      {t:"Усталость, плохой сон", v:3},
+      {t:"Хроническое напряжение, что-то болит регулярно", v:4},
+      {t:"Серьёзные проблемы — болезнь, скорая, лечение", v:5},
+    ]
+  },
+];
+
+const SHADOWS = {
+  // Достигатель — 5 теней
+  D1: {key:"D1", name:"Гиперконтроль", logic:"D", phrase:"«Хочешь хорошо — сделай сам»", desc:"Микроменеджмент, никому не доверяешь, всё на тебе", through:"Овчинников до Додо", antidote:"Практика «Полёты» — разбор полётов раз в неделю"},
+  D2: {key:"D2", name:"Люди-винтики", logic:"D", phrase:"«Выжал → заменил»", desc:"Команда = ресурс, атмосфера страха, текучка", through:"Чарльз Шваб до перелома", antidote:"Практика «Мой учитель» — увидеть в каждом человеке учителя"},
+  D3: {key:"D3", name:"Отложенное счастье", logic:"D", phrase:"«Настоящая жизнь будет потом»", desc:"Не позволяешь себе радоваться, всё ради будущего", through:"Хартман в самолёте", antidote:"Практика «Три вида счастья» — иметь, достигать, быть"},
+  D4: {key:"D4", name:"Парад эго", logic:"D", phrase:"Здоровая конкуренция → токсичная", desc:"Меряешься со всеми, сравниваешь, не можешь радоваться чужому", through:"Многие топ-менеджеры до 40", antidote:"Практика «Транспонирование» — встать на место другого"},
+  D5: {key:"D5", name:"Триумфальный путь в тупик", logic:"D", phrase:"«Я = мои достижения»", desc:"Победы затмевают суть жизни, после крупной сделки — пустота", through:"Хартман, Овчинников", antidote:"Дневник энергии (E+ и E-) — отделить себя от достижений"},
+  // Индивидуалист — 4 тени переходного состояния
+  I1: {key:"I1", name:"Хаос метаний", logic:"I", phrase:"«Бросаю одно ради другого, ничего не довожу»", desc:"Каждые 6 месяцев новая идея/проект/направление. Снаружи — поиск, внутри — бегство от завершения", through:"Сергей до «служения», Мария-«эксель»", antidote:"Практика «Полёты» — еженедельный разбор: что довёл, что бросил, и почему именно сейчас"},
+  I2: {key:"I2", name:"Затянутый поиск", logic:"I", phrase:"«Уже несколько лет ищу себя — страшно остановиться»", desc:"Поиск стал отдельной идентичностью. Остановиться = признать, что не нашёл. Выбор любого пути = страх «а вдруг не то»", through:"Многие топы 40+ после продажи компании", antidote:"Сделать выбор на 12 месяцев и закрыть остальные двери. Не на всю жизнь — на год"},
+  I3: {key:"I3", name:"Эзотеризация", logic:"I", phrase:"«Знаки, медитации, ретриты заменяют действие»", desc:"Внутреннее путешествие как способ не сталкиваться с внешним. Расстановки, тантра, дизайн человека — вместо конкретных шагов", through:"После сильных кризисов — частая ловушка", antidote:"Правило 80/20 — 80% действий в реальном мире, 20% на внутреннюю работу. Не наоборот"},
+  I4: {key:"I4", name:"Растворение в проводнике", logic:"I", phrase:"«Без коуча/гуру/наставника не могу»", desc:"Передал авторство своей жизни внешней фигуре. Спрашиваешь у проводника даже там, где знаешь сам", through:"Этап «учусь у мастеров» — нормально. Застрял там >2 лет — нет", antidote:"Совет мудрецов из 3 проводников вместо одного. Чтобы не было одного «правильного» голоса"},
+  // Стратег — 3 тени
+  S1: {key:"S1", name:"Одиночество", logic:"S", phrase:"«Меня не понимает никто»", desc:"Разрыв масштабов, 8% популяции в твоей логике, не с кем говорить на твоём уровне", through:"Стратеги верхнего эшелона", antidote:"Найти 2-3 партнёров своего уровня. Заплати за это любую цену"},
+  S2: {key:"S2", name:"Кольцо Всевластия", logic:"S", phrase:"Власть, спрятавшаяся за Великой Миссией", desc:"Кажется что ради миссии можно всё. Самый опасный сценарий стратега", through:"Власти, перешедшие в тиранию", antidote:"Практика «Око бури» — точка спокойствия, тест: что я делаю ради миссии VS ради власти"},
+  S3: {key:"S3", name:"Атлант, держащий мир", logic:"S", phrase:"Выгорание не от задач, а от смыслоудержания", desc:"Все смотрят на тебя, ты держишь смысл для команды/семьи/индустрии. Тяжело", through:"Многие лидеры РФ 2022-2024", antidote:"Делегирование смыслов — растить новых носителей. «Фабрика лидерства»"},
+};
+
+const SHADOW_Q = {
+  // 5 вопросов под Достигателя
+  D: [
+    {q:"Когда команда не справляется, ты:", a:[
+      {t:"Делаю сам", s:"D1"},
+      {t:"Заменяю людей", s:"D2"},
+      {t:"Глотаю обиду и работаю дальше", s:"D3"},
+      {t:"Соревнуюсь, кто лучше", s:"D4"},
+      {t:"Считаю — у меня всё равно больше результатов", s:"D5"},
+    ]},
+    {q:"Что радует тебя сейчас?", a:[
+      {t:"Когда всё под контролем", s:"D1"},
+      {t:"Когда команда работает на автопилоте, без меня", s:"D2"},
+      {t:"Когда закрываю старую цель и ставлю новую", s:"D5"},
+      {t:"Когда я в топе рейтинга", s:"D4"},
+      {t:"Уже не радует — отложу на потом", s:"D3"},
+    ]},
+    {q:"Кто ты вне работы?", a:[
+      {t:"Тот же, что и на работе — постоянно думаю о делах", s:"D5"},
+      {t:"Не знаю, давно не было «вне»", s:"D3"},
+      {t:"Боюсь остановиться — пустота", s:"D3"},
+      {t:"Я тот, кто привык быть первым везде — и дома", s:"D4"},
+      {t:"Я главный, в моей семье тоже всё на мне", s:"D1"},
+    ]},
+    {q:"Как ты говоришь о людях, которые уволились?", a:[
+      {t:"Не тянули, заменим", s:"D2"},
+      {t:"Подвели — ушли в трудный момент", s:"D4"},
+      {t:"Не дотерпели до успеха", s:"D5"},
+      {t:"Жаль, надо было самому за них сделать", s:"D1"},
+      {t:"Они выбрали свой путь, я выбрал свой", s:"D3"},
+    ]},
+  ],
+  I: [
+    {q:"Что происходит с тобой в последние полгода?", a:[
+      {t:"Бросаю одно ради другого, ничего не довожу", s:"I1"},
+      {t:"Ищу себя уже годами — страшно остановиться", s:"I2"},
+      {t:"Углубляюсь в медитации, расстановки, ретриты", s:"I3"},
+      {t:"Зависим от коуча/наставника — без него не могу", s:"I4"},
+      {t:"Постоянное состояние «всё не то»", s:"I1"},
+    ]},
+    {q:"Что мешает сделать выбор?", a:[
+      {t:"Через неделю придёт идея получше", s:"I1"},
+      {t:"А вдруг я ошибусь и потеряю годы", s:"I2"},
+      {t:"Нужно ещё одно расстановочное послание", s:"I3"},
+      {t:"Надо сначала с проводником обсудить", s:"I4"},
+      {t:"Уже не выбираю — выбираются за меня", s:"I2"},
+    ]},
+    {q:"Где ты находишь ответы на главные вопросы?", a:[
+      {t:"Каждый раз в новом месте — то книга, то курс", s:"I1"},
+      {t:"Жду что они придут — не тороплюсь", s:"I2"},
+      {t:"В медитациях, телесных практиках, знаках", s:"I3"},
+      {t:"В диалоге с моим терапевтом/коучем", s:"I4"},
+      {t:"Уже не ищу — потерял веру в ответы", s:"I2"},
+    ]},
+    {q:"Какая фраза тебе ближе?", a:[
+      {t:"«Сейчас попробую, потом ещё что-то»", s:"I1"},
+      {t:"«Всё ещё в процессе поиска»", s:"I2"},
+      {t:"«Мне нужно почувствовать, что это моё»", s:"I3"},
+      {t:"«Мой наставник сказал...»", s:"I4"},
+      {t:"«Я уже устал что-то выбирать»", s:"I2"},
+    ]},
+  ],
+  S: [
+    {q:"Что тебя сейчас гнетёт сильнее всего?", a:[
+      {t:"Не с кем поговорить на моём уровне", s:"S1"},
+      {t:"Постоянно проверяю: я для них или для себя?", s:"S2"},
+      {t:"Все смотрят на меня, я держу смысл", s:"S3"},
+      {t:"Хочется уйти, но если уйду — всё рухнет", s:"S3"},
+      {t:"Боюсь, что моя власть превращается в тиранию", s:"S2"},
+    ]},
+    {q:"Какая фраза тебе ближе?", a:[
+      {t:"«Зачем я делаю это всё, если меня никто не понимает»", s:"S1"},
+      {t:"«Я должен держаться, иначе все упадут»", s:"S3"},
+      {t:"«Я знаю как правильно, и я их к этому приведу»", s:"S2"},
+      {t:"«Один в поле»", s:"S1"},
+      {t:"«Кто, если не я»", s:"S3"},
+    ]},
+    {q:"Кто рядом с тобой сейчас?", a:[
+      {t:"Никого моего уровня", s:"S1"},
+      {t:"Команда, которая зависит от меня", s:"S3"},
+      {t:"Те, кому я даю смысл и направление", s:"S2"},
+      {t:"Семья, но они не понимают что я делаю", s:"S1"},
+      {t:"Партнёры моего уровня — но мало", s:"S1"},
+    ]},
+  ],
+};
+
+const MISSION_Q = [
+  "Что тебя бесит в мире? Опиши одной фразой.",
+  "Когда ты последний раз плакал не от боли? Что было причиной?",
+  "Что бы ты делал, если бы платили в 10 раз меньше?",
+  "Кого ты хочешь видеть счастливее через твою работу?",
+  "За что тебя благодарят чаще всего?",
+];
+
+/* ───────────────── HELPERS ───────────────── */
+
+function Btn({onClick, children, primary=true, disabled, style}) {
+  return <button onClick={onClick} disabled={disabled} style={{
+    padding:"12px 26px",border:primary?"none":"1px solid "+T,borderRadius:8,
+    background:primary?T:"transparent",color:primary?"#fff":T,
+    fontSize:14,fontWeight:600,cursor:disabled?"default":"pointer",
+    fontFamily:"inherit",opacity:disabled?0.4:1,transition:"all .2s",
+    ...style
+  }}>{children}</button>;
+}
+
+function StepHeader({n, total, title, sub, onBack, onHome}) {
+  return <div style={{marginBottom:36}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24,fontSize:12,color:MUTED,fontWeight:600,letterSpacing:".06em"}}>
+      <div style={{display:"flex",gap:8}}>
+        {onHome && <button onClick={onHome} style={{background:"transparent",border:"1px solid "+MUTED+"40",borderRadius:6,padding:"5px 12px",fontSize:11,color:MUTED,cursor:"pointer",fontFamily:"inherit"}}>← В начало</button>}
+        {onBack && <button onClick={onBack} style={{background:"transparent",border:"1px solid "+MUTED+"40",borderRadius:6,padding:"5px 12px",fontSize:11,color:MUTED,cursor:"pointer",fontFamily:"inherit"}}>← Назад</button>}
+      </div>
+      <span>Шаг {n} из {total}</span>
+    </div>
+    <div style={{display:"flex",gap:6,marginBottom:20}}>
+      {[...Array(total)].map((_,i)=><div key={i} style={{flex:1,height:4,background:i<n?T:"#ddd",borderRadius:2,transition:"background .3s"}} />)}
+    </div>
+    <p style={{fontSize:11,fontWeight:700,letterSpacing:3,textTransform:"uppercase",color:T,marginBottom:8}}>Шаг {n}</p>
+    <h1 style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:"clamp(28px,4vw,42px)",fontWeight:700,letterSpacing:"-.01em",lineHeight:1.1,marginBottom:10}}>{title}</h1>
+    {sub && <p style={{fontSize:15,color:"#3A332E",lineHeight:1.5,maxWidth:520}}>{sub}</p>}
+  </div>;
+}
+
+function PetelkaBackground() {
+  return <div className="bg-petelka">
+    <svg viewBox="0 0 800 500" fill="none">
+      {/* Восходящая спираль с петлёй через огонь — тот же путь, что в основном Petelka, но крупно как фон */}
+      <path d="M 60 440 C 140 410, 240 360, 340 300 C 400 300, 460 360, 460 410 C 460 440, 410 440, 390 410 C 370 380, 410 330, 460 300 C 540 250, 580 200, 580 150 C 620 110, 700 80, 760 30" stroke={T} strokeWidth="35" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </svg>
+  </div>;
+}
+
+function ResultBadge({label, primary, children, accent=T}) {
+  return <div style={{
+    background:"#fff",
+    border:"1px solid #e5e1d8",
+    borderTop:"4px solid "+accent,
+    borderRadius:"4px 4px 14px 14px",
+    padding:"24px 28px 26px",
+    boxShadow:"0 8px 32px -20px rgba(0,0,0,.15)",
+    animation:"scaleIn .5s ease",
+    position:"relative",
+    overflow:"hidden"
+  }}>
+    <p style={{fontSize:10,fontWeight:700,letterSpacing:2.5,textTransform:"uppercase",color:MUTED,marginBottom:14}}>{label}</p>
+    {children}
+  </div>;
+}
+
+function QuestionBlock({q, options, onPick, selected}) {
+  return <div style={{marginBottom:28,animation:"fadeIn .3s ease"}}>
+    <p style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:18,fontWeight:700,color:INK,marginBottom:14,lineHeight:1.4}}>{q}</p>
+    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+      {options.map((opt,i)=>{
+        const picked = selected === i;
+        return <button key={i} onClick={()=>onPick(i)} style={{
+          textAlign:"left",padding:"14px 18px",
+          background:picked?"rgba(177,74,46,.08)":"#fff",
+          border:"1.5px solid "+(picked?T:"#e5e1d8"),
+          borderRadius:10,cursor:"pointer",fontFamily:"inherit",fontSize:14,
+          color:INK,lineHeight:1.5,transition:"all .15s"
+        }}>{opt.t}</button>;
+      })}
+    </div>
+  </div>;
+}
+
+function SequentialQ({idx, total, q, options, selected, onPick, onPrev, onNext}) {
+  useEffect(()=>{
+    const h = (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+      const n = parseInt(e.key);
+      if (n >= 1 && n <= options.length) { e.preventDefault(); onPick(n-1); }
+      else if (e.key === "ArrowLeft" && onPrev) { e.preventDefault(); onPrev(); }
+      else if (e.key === "ArrowRight" && onNext) { e.preventDefault(); onNext(); }
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [options, onPick, onPrev, onNext]);
+
+  return <div style={{animation:"fadeIn .3s ease"}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,fontSize:12,color:MUTED}}>
+      <span>Вопрос {idx+1} из {total}</span>
+      <div style={{display:"flex",gap:6}}>
+        {onPrev && <button onClick={onPrev} style={{background:"transparent",border:"1px solid "+MUTED+"40",borderRadius:6,padding:"4px 10px",fontSize:11,color:MUTED,cursor:"pointer",fontFamily:"inherit"}}>← Назад</button>}
+        {onNext && <button onClick={onNext} style={{background:"transparent",border:"1px solid "+MUTED+"40",borderRadius:6,padding:"4px 10px",fontSize:11,color:MUTED,cursor:"pointer",fontFamily:"inherit"}}>Вперёд →</button>}
+      </div>
+    </div>
+    <p style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:22,fontWeight:700,color:INK,marginBottom:22,lineHeight:1.35}}>{q}</p>
+    <div style={{display:"flex",flexDirection:"column",gap:10}}>
+      {options.map((opt,i)=>{
+        const picked = selected === i;
+        return <button key={i} onClick={()=>onPick(i)} style={{
+          textAlign:"left",padding:"16px 22px 16px 50px",
+          background:picked?"rgba(177,74,46,.08)":"#fff",
+          border:"1.5px solid "+(picked?T:"#e5e1d8"),
+          borderRadius:12,cursor:"pointer",fontFamily:"inherit",fontSize:15,
+          color:INK,lineHeight:1.55,transition:"all .15s",position:"relative"
+        }}>
+          <span style={{position:"absolute",left:18,top:"50%",transform:"translateY(-50%)",width:22,height:22,borderRadius:6,background:picked?T:"#FBF7F0",color:picked?"#fff":MUTED,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,transition:"all .15s"}}>{i+1}</span>
+          {opt.t}
+        </button>;
+      })}
+    </div>
+    <p className="kb-hint" style={{fontSize:11,color:MUTED,marginTop:14,letterSpacing:".5px"}}>Подсказка: клавиши <b>1–{options.length}</b> · стрелки ← →</p>
+  </div>;
+}
+
+/* ───────────────── APP ───────────────── */
+
+function App() {
+  const [screen, setScreen] = useState("ob");
+  const [step, setStep] = useState(parseInt(localStorage.getItem("sd-step")||"0"));
+  const [name, setName] = useState(localStorage.getItem("sd-name")||"");
+  const [logicAns, setLogicAns] = useState(JSON.parse(localStorage.getItem("sd-logicAns")||"{}"));
+  const [zovAns, setZovAns] = useState(JSON.parse(localStorage.getItem("sd-zovAns-v2")||"{}"));
+  const [shadowAns, setShadowAns] = useState(JSON.parse(localStorage.getItem("sd-shadowAns")||"{}"));
+  const [missionAns, setMissionAns] = useState(JSON.parse(localStorage.getItem("sd-missionAns")||"[]"));
+  const [missionFinal, setMissionFinal] = useState(localStorage.getItem("sd-missionFinal")||"");
+  const [peak, setPeak] = useState(localStorage.getItem("sd-peak")||"");
+  const [crisis, setCrisis] = useState(localStorage.getItem("sd-crisis")||"");
+  const [rebirth, setRebirth] = useState(localStorage.getItem("sd-rebirth")||"");
+  const [goosebumps, setGoosebumps] = useState(localStorage.getItem("sd-goosebumps")==="1");
+  useEffect(()=>{localStorage.setItem("sd-goosebumps",goosebumps?"1":"0")},[goosebumps]);
+  const [s1Idx, setS1Idx] = useState(parseInt(localStorage.getItem("sd-s1Idx")||"0"));
+  const [s2Idx, setS2Idx] = useState(parseInt(localStorage.getItem("sd-s2Idx")||"0"));
+  const [s3Idx, setS3Idx] = useState(parseInt(localStorage.getItem("sd-s3Idx")||"0"));
+  const [s4Idx, setS4Idx] = useState(parseInt(localStorage.getItem("sd-s4Idx")||"0"));
+  const prevPrimary = useRef(localStorage.getItem("sd-primary")||"");
+  useEffect(()=>{localStorage.setItem("sd-s1Idx",s1Idx)},[s1Idx]);
+  useEffect(()=>{localStorage.setItem("sd-s2Idx",s2Idx)},[s2Idx]);
+  useEffect(()=>{localStorage.setItem("sd-s3Idx",s3Idx)},[s3Idx]);
+  useEffect(()=>{localStorage.setItem("sd-s4Idx",s4Idx)},[s4Idx]);
+
+  // persist all
+  useEffect(()=>{localStorage.setItem("sd-screen",screen)},[screen]);
+  useEffect(()=>{localStorage.setItem("sd-step",step)},[step]);
+  useEffect(()=>{localStorage.setItem("sd-name",name)},[name]);
+  useEffect(()=>{localStorage.setItem("sd-logicAns",JSON.stringify(logicAns))},[logicAns]);
+  useEffect(()=>{localStorage.setItem("sd-zovAns-v2",JSON.stringify(zovAns))},[zovAns]);
+  useEffect(()=>{localStorage.setItem("sd-shadowAns",JSON.stringify(shadowAns))},[shadowAns]);
+  useEffect(()=>{localStorage.setItem("sd-missionAns",JSON.stringify(missionAns))},[missionAns]);
+  useEffect(()=>{localStorage.setItem("sd-missionFinal",missionFinal)},[missionFinal]);
+  useEffect(()=>{localStorage.setItem("sd-peak",peak)},[peak]);
+  useEffect(()=>{localStorage.setItem("sd-crisis",crisis)},[crisis]);
+  useEffect(()=>{localStorage.setItem("sd-rebirth",rebirth)},[rebirth]);
+
+  // Computed: logic percentages with weighted scoring (диагностичные вопросы = больше веса)
+  const LOGIC_WEIGHTS = [2, 1.5, 1.5, 2, 1, 1.5]; // вопросы 1,4 — самые диагностичные
+  const computeLogic = () => {
+    const c = {D:0,I:0,S:0};
+    Object.entries(logicAns).forEach(([k,v])=>{
+      const idx = parseInt(k);
+      const opt = LOGIC_Q[idx].a[v];
+      const w = LOGIC_WEIGHTS[idx] || 1;
+      c[opt.v] += w;
+    });
+    const total = c.D+c.I+c.S;
+    if (total === 0) return {D:33,I:33,S:34,primary:"D",secondary:null};
+    const D = Math.round(c.D/total*100);
+    const I = Math.round(c.I/total*100);
+    const S = 100-D-I;
+    // Primary by max raw score
+    const sorted = [["D",c.D],["I",c.I],["S",c.S]].sort((a,b)=>b[1]-a[1]);
+    const primary = sorted[0][0];
+    // Secondary if within 12% — смешанная логика
+    const secondary = (sorted[1][1] > 0 && (sorted[0][1] - sorted[1][1]) / total * 100 < 12) ? sorted[1][0] : null;
+    return {D,I,S,primary,secondary};
+  };
+  const logicResult = computeLogic();
+  const zovLevel = Object.keys(zovAns).length === ZOV_Q.length
+    ? Math.round(Object.values(zovAns).reduce((a,b)=>a+b,0) / ZOV_Q.length)
+    : null;
+  const logicReady = Object.keys(logicAns).length === LOGIC_Q.length && Object.keys(zovAns).length === ZOV_Q.length;
+
+  // Сброс зависимых ответов при смене primary логики (после объявления logicReady и logicResult)
+  useEffect(()=>{
+    if (logicReady && logicResult.primary !== prevPrimary.current && prevPrimary.current !== "") {
+      if (Object.keys(shadowAns).length > 0) {
+        if (confirm("Преобладающая логика изменилась с " + LOGICS[prevPrimary.current].name + " на " + LOGICS[logicResult.primary].name + ". Сбросить ответы шага «Тень»?")) {
+          setShadowAns({}); setS2Idx(0);
+        }
+      }
+    }
+    if (logicReady) {
+      prevPrimary.current = logicResult.primary;
+      localStorage.setItem("sd-primary", logicResult.primary);
+    }
+  }, [logicResult.primary, logicReady]);
+
+  // Computed: shadow
+  const computeShadow = () => {
+    if (!logicReady) return null;
+    const sq = SHADOW_Q[logicResult.primary] || [];
+    const cnt = {};
+    Object.entries(shadowAns).forEach(([k,v])=>{
+      const ans = sq[parseInt(k)]?.a[v];
+      if (ans) cnt[ans.s] = (cnt[ans.s]||0) + 1;
+    });
+    let max=0, key=null;
+    Object.entries(cnt).forEach(([k,v])=>{if(v>max){max=v;key=k;}});
+    return key ? SHADOWS[key] : null;
+  };
+  const shadowResult = computeShadow();
+  const shadowQ = SHADOW_Q[logicResult.primary] || [];
+  const shadowReady = shadowQ.length>0 && Object.keys(shadowAns).length === shadowQ.length;
+
+  // Mission — готова, если есть формулировка >2 символов И либо длина >5, либо мурашки подтверждены
+  const missionReady = missionFinal.trim().length > 2 && (missionFinal.trim().length > 5 || goosebumps);
+
+  // Petelka
+  const petelkaReady = peak && crisis && rebirth;
+
+  const allReady = logicReady && shadowReady && missionReady && petelkaReady;
+  const completedSteps = [logicReady, shadowReady, missionReady, petelkaReady].filter(Boolean).length;
+
+  // Resume to active step on map screen
+  const resumeStep = () => {
+    if (!logicReady) return "step1";
+    if (!shadowReady) return "step2";
+    if (!missionReady) return "step3";
+    if (!petelkaReady) return "step4";
+    return "result";
+  };
+
+  const reset = () => {
+    if (!confirm("Сбросить все ответы и начать заново?")) return;
+    ["sd-screen","sd-step","sd-name","sd-logicAns","sd-zovAns","sd-zovAns-v2","sd-shadowAns","sd-missionAns","sd-missionFinal","sd-peak","sd-crisis","sd-rebirth","sd-s1Idx","sd-s2Idx","sd-s3Idx","sd-s4Idx","sd-primary","sd-goosebumps"].forEach(k=>localStorage.removeItem(k));
+    location.reload();
+  };
+
+  /* ──────── ONBOARDING ──────── */
+  if (screen === "ob") return <div style={{minHeight:"100vh",background:BG,position:"relative",overflow:"hidden",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"40px 24px"}}>
+    <PetelkaBackground />
+    <div className="content" style={{maxWidth:440,width:"100%",animation:"fadeInSlow .6s ease",textAlign:"center"}}>
+      <p style={{fontSize:11,fontWeight:600,letterSpacing:"2.5px",textTransform:"uppercase",color:T,marginBottom:20,opacity:.75}}>Личный канвас лидера</p>
+
+      <h1 style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:"clamp(40px,6vw,64px)",fontWeight:700,color:T,letterSpacing:"-.02em",lineHeight:1.02,marginBottom:18}}>Твоя траектория<br/>развития</h1>
+
+      <div style={{width:42,height:2,background:T,borderRadius:2,margin:"0 auto 22px"}} />
+
+      <p style={{fontFamily:"'PT Serif',Georgia,serif",fontWeight:400,fontStyle:"italic",fontSize:19,color:"#3A332E",marginBottom:22,lineHeight:1.4,letterSpacing:".005em"}}>Узнай, где ты на своём пути</p>
+
+      <p style={{fontSize:14.5,color:MUTED,lineHeight:1.65,marginBottom:36,maxWidth:360,margin:"0 auto 36px"}}>10 минут · 4 шага. По методологии Филиппа Гузенюка из книги «От достигателя к стратегу».</p>
+
+      <div style={{marginBottom:18}}>
+        <input type="text" placeholder="Как вас зовут?" value={name} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==="Enter"&&name.trim()&&setScreen("map")} autoFocus style={{width:"100%",padding:"16px 20px",border:"1.5px solid "+(name?T:"#d4cec3"),borderRadius:12,fontSize:17,fontFamily:"inherit",outline:"none",textAlign:"center",background:"#fff",color:INK,transition:"all .2s",fontWeight:name?600:400,boxShadow:"0 2px 12px -6px rgba(0,0,0,.08)"}} />
+      </div>
+
+      <button onClick={()=>name.trim()&&setScreen("map")} style={{
+        width:"100%",
+        padding:"15px 28px",
+        border:"none",
+        borderRadius:12,
+        background: name.trim() ? T : "#d4cec3",
+        color:"#fff",
+        fontSize:15,
+        fontWeight:600,
+        cursor: name.trim() ? "pointer" : "not-allowed",
+        fontFamily:"inherit",
+        transition:"all .2s",
+        boxShadow: name.trim() ? "0 8px 24px -10px rgba(177,74,46,.5)" : "none"
+      }}>{name.trim()? (completedSteps>0?"Продолжить →":"Начать →") :"Введите имя"}</button>
+
+      {completedSteps>0 && <div style={{marginTop:24,padding:"12px 18px",background:"rgba(177,74,46,.06)",borderRadius:10,fontSize:13,color:"#3A332E"}}>Вы уже прошли <b>{completedSteps} из 4</b> · <a onClick={reset} style={{color:T,cursor:"pointer",textDecoration:"underline"}}>сбросить и начать заново</a></div>}
+
+      <p style={{fontSize:10,color:MUTED,marginTop:40,letterSpacing:"1.5px"}}>ОТВЕТЫ СОХРАНЯЮТСЯ АВТОМАТИЧЕСКИ</p>
+    </div>
+  </div>;
+
+  /* ──────── MAP (overview of 4 steps) ──────── */
+  if (screen === "map") {
+    const cards = [
+      {n:1, key:"logic", title:"Где ты сейчас", sub:"Три логики и уровень зова", done:logicReady, preview: logicReady ? `${logicResult.D}/${logicResult.I}/${logicResult.S}` : null, screen:"step1"},
+      {n:2, key:"shadow", title:"Что во тьме", sub:"Твоя текущая тень", done:shadowReady, preview: shadowResult?.name, screen:"step2", blocked:!logicReady, blockedMsg:"Сначала шаг 1"},
+      {n:3, key:"mission", title:"Куда идёшь", sub:"Миссия с мурашками", done:missionReady, preview: missionFinal ? "✓ записана" : null, screen:"step3"},
+      {n:4, key:"petelka", title:"Откуда пришёл", sub:"Твоя петелька жизни", done:petelkaReady, preview: petelkaReady ? "✓ нарисована" : null, screen:"step4"},
+    ];
+    const pct = Math.round(100*completedSteps/4);
+    return <div style={{minHeight:"100vh",background:BG,padding:"40px 24px 60px",position:"relative",overflow:"hidden"}}>
+      <PetelkaBackground />
+      <div className="content" style={{maxWidth:680,margin:"0 auto"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:40}}>
+          <div>
+            <button onClick={()=>setScreen("ob")} style={{background:"transparent",border:"none",padding:0,cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
+              <p style={{fontSize:11,fontWeight:700,letterSpacing:3,textTransform:"uppercase",color:T,opacity:.7,transition:"opacity .15s"}}>← Петелька · на главный</p>
+            </button>
+            <h1 style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:42,fontWeight:700,lineHeight:1.1,letterSpacing:"-.01em",marginTop:14,marginBottom:8}}>{name},<br/>твоя карта</h1>
+            <p style={{fontSize:15,color:"#3A332E",lineHeight:1.55,maxWidth:440,marginTop:14}}>Иди по порядку или в любом — в конце получишь свой стратегический портрет.</p>
+          </div>
+          <div style={{textAlign:"right",flexShrink:0,marginLeft:24}}>
+            <div style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:44,fontWeight:700,color:T,lineHeight:1}}>{pct}<span style={{fontSize:20,opacity:.6}}>%</span></div>
+            <div style={{fontSize:10,color:MUTED,letterSpacing:".15em",marginTop:6,textTransform:"uppercase"}}>{completedSteps} из 4</div>
+            <div style={{width:100,height:4,background:"#ddd",borderRadius:2,overflow:"hidden",marginTop:8}}>
+              <div style={{height:"100%",width:pct+"%",background:T,transition:"width .5s ease"}} />
+            </div>
+          </div>
+        </div>
+
+        <div style={{display:"flex",flexDirection:"column",gap:12}}>
+          {cards.map((c,i)=><div key={c.key} onClick={()=>!c.blocked&&setScreen(c.screen)} style={{
+            background: c.done ? "linear-gradient(135deg, rgba(177,74,46,.08), rgba(177,74,46,.03))" : "#fff",
+            border:"1.5px solid "+(c.done?T:c.blocked?"#e5e1d8":"#e5e1d8"),
+            borderRadius:14,padding:"20px 24px",cursor:c.blocked?"not-allowed":"pointer",
+            display:"flex",alignItems:"center",gap:20,
+            opacity:c.blocked?0.45:1,
+            transition:"all .2s ease",
+            position:"relative",
+            overflow:"hidden"
+          }} onMouseEnter={e=>{if(!c.blocked){e.currentTarget.style.transform="translateX(4px)";e.currentTarget.style.borderColor=T;}}} onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.borderColor=c.done?T:"#e5e1d8";}}>
+            <div style={{width:54,height:54,borderRadius:14,background:c.done?T:"#fff",color:c.done?"#fff":T,border:c.done?"none":"1.5px solid "+T+"40",display:"flex",alignItems:"center",justifyContent:"center",fontSize:c.done?18:24,fontFamily:"'PT Serif',Georgia,serif",fontWeight:700,flexShrink:0,transition:"all .2s"}}>{c.done?"✓":c.n}</div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{display:"flex",alignItems:"baseline",gap:10,marginBottom:4}}>
+                <span style={{fontSize:11,fontWeight:700,letterSpacing:2,color:T,opacity:.6,textTransform:"uppercase"}}>Шаг {c.n}</span>
+                {c.preview && <span style={{fontSize:11,padding:"2px 8px",background:"rgba(177,74,46,.1)",color:T,borderRadius:4,fontWeight:600}}>{c.preview}</span>}
+              </div>
+              <p style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:22,fontWeight:700,color:INK,marginBottom:2,lineHeight:1.2}}>{c.title}</p>
+              <p style={{fontSize:13,color:MUTED}}>{c.blocked?c.blockedMsg:c.sub}</p>
+            </div>
+            {!c.blocked && <span style={{color:T,fontSize:22,opacity:.5,flexShrink:0}}>→</span>}
+          </div>)}
+        </div>
+
+        {!allReady && completedSteps>0 && <div style={{marginTop:32,padding:"22px 26px",background:"#fff",border:"1px solid "+T+"30",borderRadius:14,textAlign:"center"}}>
+          <p style={{fontSize:13,color:"#3A332E",lineHeight:1.55,marginBottom:14}}>Продолжишь с того места, где остановился</p>
+          <Btn onClick={()=>setScreen(resumeStep())}>Продолжить →</Btn>
+        </div>}
+
+        {allReady && <div style={{marginTop:40,padding:"28px 32px",background:T,color:"#fff",borderRadius:16,textAlign:"center",boxShadow:"0 16px 40px -16px rgba(177,74,46,.5)",animation:"scaleIn .4s ease"}}>
+          <p style={{fontSize:11,fontWeight:700,letterSpacing:3,textTransform:"uppercase",opacity:.8,marginBottom:10}}>Готово</p>
+          <p style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:24,fontWeight:700,marginBottom:18}}>Твой стратегический портрет собран</p>
+          <button onClick={()=>setScreen("result")} style={{padding:"12px 30px",background:"#fff",color:T,border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>Посмотреть карточку →</button>
+        </div>}
+        <div style={{marginTop:36,textAlign:"center"}}><a onClick={reset} style={{fontSize:12,color:MUTED,cursor:"pointer",textDecoration:"underline"}}>Начать заново</a></div>
+      </div>
+    </div>;
+  }
+
+  /* ──────── STEP 1: ГДЕ ТЫ ──────── */
+  if (screen === "step1") {
+    const total = LOGIC_Q.length + ZOV_Q.length;
+    const idx = Math.min(s1Idx, total-1);
+    const isZov = idx >= LOGIC_Q.length;
+    const zovIdx = idx - LOGIC_Q.length;
+    const curQ = isZov ? ZOV_Q[zovIdx] : LOGIC_Q[idx];
+    const curSel = isZov
+      ? (zovAns[zovIdx]!==undefined ? ZOV_Q[zovIdx].a.findIndex(a=>a.v===zovAns[zovIdx]) : null)
+      : (logicAns[idx]??null);
+    const allAnswered = Object.keys(logicAns).length === LOGIC_Q.length && Object.keys(zovAns).length === ZOV_Q.length;
+
+    return <div style={{minHeight:"100vh",background:BG,padding:"40px 24px 60px"}}>
+      <div style={{maxWidth:560,margin:"0 auto"}}>
+        <StepHeader n={1} total={4} title="Где ты сейчас" sub={`${total} вопросов · отвечай как есть, без правильных ответов.`} onHome={()=>setScreen("map")} />
+        {!allAnswered && <SequentialQ
+          idx={idx}
+          total={total}
+          q={curQ.q}
+          options={curQ.a}
+          selected={curSel}
+          onPick={v=>{
+            if (isZov) setZovAns({...zovAns,[zovIdx]:ZOV_Q[zovIdx].a[v].v});
+            else setLogicAns({...logicAns,[idx]:v});
+            if (idx < total-1) setTimeout(()=>setS1Idx(idx+1), 220);
+          }}
+          onPrev={idx>0?()=>setS1Idx(idx-1):null}
+          onNext={curSel!==null && idx<total-1?()=>setS1Idx(idx+1):null}
+        />}
+
+        {allAnswered && logicReady && <ResultBadge label="Твоя логика сейчас" accent={LOGICS[logicResult.primary].color}>
+          <div style={{display:"flex",alignItems:"baseline",gap:12,flexWrap:"wrap",marginBottom:6}}>
+            <p style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:30,fontWeight:700,color:INK,lineHeight:1,letterSpacing:"-.015em"}}>{LOGICS[logicResult.primary].name}</p>
+            <span style={{fontSize:11,padding:"3px 10px",borderRadius:20,background:LOGICS[logicResult.primary].color+"15",color:LOGICS[logicResult.primary].color,fontWeight:700,letterSpacing:".5px"}}>{Math.max(logicResult.D,logicResult.I,logicResult.S)}%</span>
+          </div>
+          <p style={{fontSize:14,color:MUTED,marginBottom:18}}>«{LOGICS[logicResult.primary].mantra}»</p>
+          <div style={{display:"flex",height:40,borderRadius:8,overflow:"hidden",marginBottom:14,fontSize:13,fontWeight:700,color:"#fff",boxShadow:"0 2px 8px -4px rgba(0,0,0,.15)"}}>
+            {logicResult.D>5&&<div style={{flex:logicResult.D,background:LOGICS.D.color,display:"flex",alignItems:"center",justifyContent:"center"}}>{logicResult.D}%</div>}
+            {logicResult.I>5&&<div style={{flex:logicResult.I,background:LOGICS.I.color,display:"flex",alignItems:"center",justifyContent:"center"}}>{logicResult.I}%</div>}
+            {logicResult.S>5&&<div style={{flex:logicResult.S,background:LOGICS.S.color,display:"flex",alignItems:"center",justifyContent:"center"}}>{logicResult.S}%</div>}
+          </div>
+          {logicResult.secondary && <div style={{padding:"10px 14px",background:"rgba(177,74,46,.04)",borderRadius:8,marginBottom:12,fontSize:12,color:MUTED,lineHeight:1.5}}>Смешанная логика — вторая близка: <b style={{color:LOGICS[logicResult.secondary].color}}>{LOGICS[logicResult.secondary].name}</b></div>}
+          <div style={{padding:"12px 14px",background:BG,borderRadius:8,marginBottom:18}}>
+            <p style={{fontSize:11,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",color:MUTED,marginBottom:4}}>Уровень зова</p>
+            <p style={{fontSize:14,fontWeight:600,color:INK}}>{zovLevel} · {ZOV_LABELS[zovLevel]}</p>
+          </div>
+          <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+            <Btn onClick={()=>{setS2Idx(0);setScreen("step2");}}>Дальше: твоя тень →</Btn>
+            <Btn primary={false} onClick={()=>setScreen("map")}>К карте</Btn>
+            <a onClick={()=>{setLogicAns({});setZovAns({});setS1Idx(0);}} style={{marginLeft:"auto",fontSize:13,color:MUTED,cursor:"pointer",textDecoration:"underline",textDecorationColor:MUTED+"60"}}>перепройти</a>
+          </div>
+        </ResultBadge>}
+      </div>
+    </div>;
+  }
+
+  /* ──────── STEP 2: ВО ТЬМЕ ──────── */
+  if (screen === "step2") {
+    if (!logicReady) {
+      return <div style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center",padding:24,textAlign:"center"}}>
+        <div>
+          <p style={{fontSize:16,marginBottom:20}}>Сначала пройдите шаг 1 — без него нельзя определить вашу тень.</p>
+          <Btn onClick={()=>setScreen("step1")}>К шагу 1</Btn>
+        </div>
+      </div>;
+    }
+    const total = shadowQ.length;
+    const idx = Math.min(s2Idx, total-1);
+    const curQ = shadowQ[idx];
+    const curSel = shadowAns[idx]??null;
+    const allAnswered = Object.keys(shadowAns).length === total;
+
+    return <div style={{minHeight:"100vh",background:BG,padding:"40px 24px 60px"}}>
+      <div style={{maxWidth:560,margin:"0 auto"}}>
+        <StepHeader n={2} total={4} title="Что во тьме" sub={`У ${LOGICS[logicResult.primary].name.toLowerCase()}а — свой набор теней. Несколько вопросов помогут понять, какая активна.`} onHome={()=>setScreen("map")} onBack={()=>setScreen("step1")} />
+        {!allAnswered && <SequentialQ
+          idx={idx}
+          total={total}
+          q={curQ.q}
+          options={curQ.a}
+          selected={curSel}
+          onPick={v=>{
+            setShadowAns({...shadowAns,[idx]:v});
+            if (idx < total-1) setTimeout(()=>setS2Idx(idx+1), 220);
+          }}
+          onPrev={idx>0?()=>setS2Idx(idx-1):null}
+          onNext={curSel!==null && idx<total-1?()=>setS2Idx(idx+1):null}
+        />}
+
+        {allAnswered && shadowResult && <ResultBadge label="Твоя тень сейчас">
+          <p style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:30,fontWeight:700,color:INK,marginBottom:8,lineHeight:1.1,letterSpacing:"-.015em"}}>{shadowResult.name}</p>
+          <p style={{fontSize:14,color:MUTED,marginBottom:20,lineHeight:1.5}}>{shadowResult.phrase}</p>
+          <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:18}}>
+            <div style={{padding:"12px 14px",background:BG,borderRadius:8}}>
+              <p style={{fontSize:11,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",color:MUTED,marginBottom:4}}>Симптом</p>
+              <p style={{fontSize:14,color:"#3A332E",lineHeight:1.5}}>{shadowResult.desc}</p>
+            </div>
+            <div style={{padding:"12px 14px",background:BG,borderRadius:8}}>
+              <p style={{fontSize:11,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",color:MUTED,marginBottom:4}}>Через это прошли</p>
+              <p style={{fontSize:14,color:"#3A332E",lineHeight:1.5}}>{shadowResult.through}</p>
+            </div>
+            <div style={{padding:"14px 16px",background:"rgba(177,74,46,.06)",borderRadius:8,borderLeft:"3px solid "+T}}>
+              <p style={{fontSize:11,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",color:T,marginBottom:4}}>⚡ Антидот</p>
+              <p style={{fontSize:14,color:"#3A332E",lineHeight:1.5}}>{shadowResult.antidote}</p>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+            <Btn onClick={()=>{setS3Idx(0);setScreen("step3");}}>Дальше: миссия →</Btn>
+            <Btn primary={false} onClick={()=>setScreen("map")}>К карте</Btn>
+            <a onClick={()=>{setShadowAns({});setS2Idx(0);}} style={{marginLeft:"auto",fontSize:13,color:MUTED,cursor:"pointer",textDecoration:"underline",textDecorationColor:MUTED+"60"}}>перепройти</a>
+          </div>
+        </ResultBadge>}
+      </div>
+    </div>;
+  }
+
+  /* ──────── STEP 3: КУДА ──────── */
+  if (screen === "step3") {
+    const buildVariants = () => {
+      const a = missionAns;
+      const beef = (a[0]||"").toLowerCase().replace(/[.!?]+$/,"").trim();
+      const cry = (a[1]||"").toLowerCase().replace(/[.!?]+$/,"").trim();
+      const free = (a[2]||"").toLowerCase().replace(/[.!?]+$/,"").trim();
+      const audience = (a[3]||"").toLowerCase().replace(/[.!?]+$/,"").trim();
+      const thanks = (a[4]||"").toLowerCase().replace(/[.!?]+$/,"").trim();
+      const variants = [];
+      if (audience && beef) variants.push({type:"Действие", text:`Помогать тем, кто ${audience}, перестать сталкиваться с тем, что ${beef}`});
+      if (audience && free) variants.push({type:"Дар", text:`Делать для ${audience} то, что я делал бы даже бесплатно: ${free}`});
+      if (beef && thanks) variants.push({type:"Сила", text:`Через ${thanks} устранять в мире то, что ${beef}`});
+      if (cry && audience) variants.push({type:"Сердце", text:`Возвращать ${audience} то, что когда-то заставило меня плакать: ${cry}`});
+      return variants.slice(0,3);
+    };
+    const variants = buildVariants();
+    const total = MISSION_Q.length;
+    const idx = Math.min(s3Idx, total);
+    const isLast = idx >= total;
+
+    return <div style={{minHeight:"100vh",background:BG,padding:"40px 24px 60px"}}>
+      <div style={{maxWidth:560,margin:"0 auto"}}>
+        <StepHeader n={3} total={4} title="Куда идёшь" sub="Формула: МИССИЯ = СМЫСЛ + МУРАШКИ. 5 вопросов → черновик → переписываешь пока не зайдёт от мурашек." onHome={()=>setScreen("map")} onBack={()=>setScreen("step2")} />
+
+        {!isLast && <div style={{animation:"fadeIn .3s ease"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,fontSize:12,color:MUTED}}>
+            <span>Вопрос {idx+1} из {total}</span>
+            <div style={{display:"flex",gap:6}}>
+              {idx>0 && <button onClick={()=>setS3Idx(idx-1)} style={{background:"transparent",border:"1px solid "+MUTED+"40",borderRadius:6,padding:"4px 10px",fontSize:11,color:MUTED,cursor:"pointer",fontFamily:"inherit"}}>← Назад</button>}
+            </div>
+          </div>
+          <p style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:22,fontWeight:700,marginBottom:22,lineHeight:1.35}}>{MISSION_Q[idx]}</p>
+          <textarea autoFocus value={missionAns[idx]||""} onChange={e=>{const a=[...missionAns];a[idx]=e.target.value;setMissionAns(a);}} onKeyDown={e=>{if((e.metaKey||e.ctrlKey)&&e.key==="Enter"&&missionAns[idx]&&missionAns[idx].trim().length>2){e.preventDefault();setS3Idx(idx+1);}}} placeholder="Одно-два предложения..." style={{width:"100%",minHeight:100,padding:"14px 16px",border:"1.5px solid "+(missionAns[idx]?T:"#ddd"),borderRadius:12,fontFamily:"inherit",fontSize:15,lineHeight:1.55,resize:"vertical",outline:"none",background:"#fff"}} />
+          <p style={{fontSize:11,color:MUTED,marginTop:6}}>⌘+Enter — дальше</p>
+          <div style={{marginTop:20,display:"flex",gap:10}}>
+            <Btn onClick={()=>setS3Idx(idx+1)} disabled={!(missionAns[idx]&&missionAns[idx].trim().length>2)}>{idx===total-1?"К черновику →":"Дальше →"}</Btn>
+            {idx<total-1 && <Btn primary={false} onClick={()=>setS3Idx(idx+1)}>Пропустить</Btn>}
+          </div>
+        </div>}
+
+        {isLast && <ResultBadge label="3 черновика твоей миссии">
+          {variants.length === 0 && <p style={{fontSize:14,color:MUTED,fontStyle:"italic",marginBottom:16}}>Заполни хотя бы вопросы 1 и 4 — соберу варианты.</p>}
+          {variants.length > 0 && <>
+            <p style={{fontSize:13,color:"#3A332E",marginBottom:14,lineHeight:1.55}}>Кликни тот, от которого мурашки — он станет твоим, можно потом переписать.</p>
+            <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:18}}>
+              {variants.map((v,i)=><button key={i} onClick={()=>setMissionFinal(v.text)} style={{
+                textAlign:"left",padding:"16px 18px",
+                background: missionFinal===v.text?"rgba(177,74,46,.1)":"#fff",
+                border:"1.5px solid "+(missionFinal===v.text?T:"#e5e1d8"),
+                borderRadius:10,cursor:"pointer",fontFamily:"inherit",
+                transition:"all .15s"
+              }}>
+                <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",color:T,marginBottom:6}}>{v.type}</div>
+                <div style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:15,fontStyle:"italic",lineHeight:1.5,color:INK}}>«{v.text}»</div>
+              </button>)}
+            </div>
+          </>}
+          <p style={{fontSize:11,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",color:MUTED,marginBottom:8}}>Своя формулировка</p>
+          <textarea value={missionFinal} onChange={e=>{setMissionFinal(e.target.value);setGoosebumps(false);}} placeholder="Перепиши или напиши свою..." style={{width:"100%",minHeight:80,padding:"14px 16px",border:"1.5px solid "+(missionFinal?T:"#ddd"),borderRadius:10,fontFamily:"inherit",fontSize:15,lineHeight:1.5,resize:"vertical",outline:"none",background:"#fff",fontStyle:"italic"}} />
+
+          {missionFinal && <div style={{marginTop:14,padding:"14px 16px",background:goosebumps?"rgba(45,125,70,.08)":"rgba(192,139,14,.08)",borderRadius:10,borderLeft:"3px solid "+(goosebumps?"#2D7D46":"#C08B0E"),transition:"all .3s"}}>
+            <p style={{fontSize:12,color:"#3A332E",lineHeight:1.55,marginBottom:10}}>⚡ <b>Ритуал мурашек.</b> Прочти миссию вслух. Закрой глаза. Помолчи 3 секунды. Слушай тело.</p>
+            {!goosebumps && <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              <button onClick={()=>{setGoosebumps(true);setTimeout(()=>{setS4Idx(0);setScreen("step4");},900);}} style={{padding:"8px 14px",borderRadius:6,fontSize:13,fontWeight:600,background:"#fff",color:"#2D7D46",border:"1.5px solid #2D7D46",cursor:"pointer",fontFamily:"inherit"}}>Да, мурашки идут ⚡</button>
+              <button onClick={()=>{setGoosebumps(false);setMissionFinal("");}} style={{padding:"8px 14px",borderRadius:6,fontSize:13,fontWeight:500,background:"transparent",color:MUTED,border:"1px solid "+MUTED+"40",cursor:"pointer",fontFamily:"inherit"}}>Нет — переписать</button>
+            </div>}
+            {goosebumps && <div style={{display:"flex",alignItems:"center",gap:10,animation:"fadeIn .3s ease"}}>
+              <span style={{width:28,height:28,borderRadius:"50%",background:"#2D7D46",color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:700}}>✓</span>
+              <span style={{fontSize:14,color:"#2D7D46",fontWeight:600}}>Мурашки идут — переходим к петельке…</span>
+            </div>}
+          </div>}
+
+          <div style={{marginTop:18,display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+            <Btn onClick={()=>{setS4Idx(0);setScreen("step4");}} disabled={!missionReady}>Дальше: петелька →</Btn>
+            <Btn primary={false} onClick={()=>setScreen("map")}>К карте</Btn>
+            <a onClick={()=>{setMissionAns([]);setMissionFinal("");setGoosebumps(false);setS3Idx(0);}} style={{marginLeft:"auto",fontSize:13,color:MUTED,cursor:"pointer",textDecoration:"underline",textDecorationColor:MUTED+"60"}}>перепройти</a>
+          </div>
+          {!missionReady && missionFinal.trim().length>0 && missionFinal.trim().length<=5 && <p style={{fontSize:12,color:MUTED,marginTop:10,lineHeight:1.5}}>Допиши формулировку хотя бы на 6 символов — или нажми «Мурашки есть», если уверен.</p>}
+          {!missionReady && missionFinal.trim().length===0 && <p style={{fontSize:12,color:MUTED,marginTop:10,lineHeight:1.5}}>Выбери один из черновиков выше или напиши свою формулировку.</p>}
+        </ResultBadge>}
+      </div>
+    </div>;
+  }
+
+  /* ──────── STEP 4: ОТКУДА ──────── */
+  if (screen === "step4") {
+    const points = [
+      {key:"peak", label:"Пик", arrow:"↗", color:T, q:"Когда ты был на вершине — что это было?", placeholder:"Например: продал компанию в 2021", val:peak, set:setPeak},
+      {key:"crisis", label:"Кризис", arrow:"↘", color:"#C08B0E", q:"Когда всё рухнуло или зашло в тупик — что это было?", placeholder:"Например: выгорел в 2022, ушёл от партнёров", val:crisis, set:setCrisis},
+      {key:"rebirth", label:"Возрождение", arrow:"↗", color:"#2B5E8C", q:"Где ты сейчас — на новом уровне?", placeholder:"Например: строю системный бизнес, без надрыва", val:rebirth, set:setRebirth},
+    ];
+    const total = points.length;
+    const idx = Math.min(s4Idx, total);
+    const isLast = idx >= total;
+
+    return <div style={{minHeight:"100vh",background:BG,padding:"40px 24px 60px"}}>
+      <div style={{maxWidth:560,margin:"0 auto"}}>
+        <StepHeader n={4} total={4} title="Откуда пришёл" sub="Петелька — главный символ книги. Три точки твоего пути." onHome={()=>setScreen("map")} onBack={()=>setScreen("step3")} />
+
+        {!isLast && (() => {
+          const p = points[idx];
+          return <div style={{animation:"fadeIn .3s ease"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,fontSize:12,color:MUTED}}>
+              <span>Шаг {idx+1} из {total}</span>
+              {idx>0 && <button onClick={()=>setS4Idx(idx-1)} style={{background:"transparent",border:"1px solid "+MUTED+"40",borderRadius:6,padding:"4px 10px",fontSize:11,color:MUTED,cursor:"pointer",fontFamily:"inherit"}}>← Назад</button>}
+            </div>
+            <p style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:32,fontWeight:700,color:p.color,marginBottom:8,lineHeight:1}}>{p.arrow} {p.label}</p>
+            <p style={{fontSize:15,color:"#3A332E",marginBottom:18,lineHeight:1.5}}>{p.q}</p>
+            <input autoFocus value={p.val} onChange={e=>p.set(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&p.val.trim()){e.preventDefault();setS4Idx(idx+1);}}} placeholder={p.placeholder} style={{width:"100%",padding:"14px 16px",border:"1.5px solid "+(p.val?p.color:"#ddd"),borderRadius:12,fontFamily:"inherit",fontSize:15,outline:"none",background:"#fff"}} />
+            <div style={{marginTop:20,display:"flex",gap:10}}>
+              <Btn onClick={()=>setS4Idx(idx+1)} disabled={!p.val.trim()}>{idx===total-1?"Готово →":"Дальше →"}</Btn>
+            </div>
+          </div>;
+        })()}
+
+        {isLast && petelkaReady && <div style={{padding:"24px",background:"#fff",border:"1px solid "+T+"40",borderRadius:14,animation:"fadeIn .3s ease"}}>
+          <p style={{fontSize:11,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:T,marginBottom:18}}>Твоя петелька</p>
+          <Petelka peak={peak} crisis={crisis} rebirth={rebirth} />
+          <div style={{marginTop:24,display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+            <Btn onClick={()=>setScreen("result")}>Сводная карточка →</Btn>
+            <Btn primary={false} onClick={()=>setScreen("map")}>К карте</Btn>
+            <a onClick={()=>setS4Idx(0)} style={{marginLeft:"auto",fontSize:13,color:MUTED,cursor:"pointer",textDecoration:"underline",textDecorationColor:MUTED+"60"}}>← переписать</a>
+          </div>
+        </div>}
+      </div>
+    </div>;
+  }
+
+  /* ──────── RESULT ──────── */
+  if (screen === "result") {
+    return <Result {...{name,logicResult,zovLevel,shadowResult,missionFinal,peak,crisis,rebirth,onBack:()=>setScreen("map"),onReset:reset}} />;
+  }
+
+  return null;
+}
+
+/* ───────────────── PETELKA SVG ───────────────── */
+
+function Petelka({peak, crisis, rebirth}) {
+  // Восходящая спираль с петлёй через огонь.
+  // Начало внизу слева на УРОВНЕ 1 → подъём (Достигатель) → петля вниз через огонь (Индивидуалист, кризис) → выход выше → продолжение к Стратегу на УРОВНЕ 3
+  return <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+    <svg viewBox="0 0 700 400" style={{width:"100%",maxWidth:620,height:"auto",overflow:"visible"}}>
+      {/* Уровни — тонкие пунктирные направляющие */}
+      <line x1="40" y1="330" x2="660" y2="330" stroke="#d4cec3" strokeWidth="1" strokeDasharray="3 4" />
+      <line x1="40" y1="200" x2="660" y2="200" stroke="#d4cec3" strokeWidth="1" strokeDasharray="3 4" />
+      <line x1="40" y1="80" x2="660" y2="80" stroke="#d4cec3" strokeWidth="1" strokeDasharray="3 4" />
+      <text x="40" y="325" fill="#a8a098" fontFamily="Inter,sans-serif" fontSize="9" letterSpacing="1.5">УРОВЕНЬ 1</text>
+      <text x="40" y="195" fill="#a8a098" fontFamily="Inter,sans-serif" fontSize="9" letterSpacing="1.5">УРОВЕНЬ 2</text>
+      <text x="40" y="75" fill="#a8a098" fontFamily="Inter,sans-serif" fontSize="9" letterSpacing="1.5">УРОВЕНЬ 3</text>
+
+      {/* 1. Достигатель: восхождение от низа слева к пику */}
+      <path d="M 80 320 C 140 295, 200 260, 260 220" fill="none" stroke={T} strokeWidth="3.5" strokeLinecap="round" />
+
+      {/* 2. Петля через огонь: вниз к огню, вокруг и вверх на новый уровень */}
+      <path d="M 260 220 C 305 220, 335 250, 335 290 C 335 320, 305 330, 290 312 C 275 295, 305 270, 335 250 C 370 230, 390 195, 385 155" fill="none" stroke="#C08B0E" strokeWidth="3.5" strokeLinecap="round" />
+
+      {/* 3. Индивидуалист → Стратег: подъём к финальной точке на УРОВНЕ 3 */}
+      <path d="M 385 155 C 440 125, 510 100, 620 80" fill="none" stroke="#2B5E8C" strokeWidth="3.5" strokeLinecap="round" />
+
+      {/* Огонь в центре петли */}
+      <g transform="translate(310, 308)">
+        <ellipse cx="0" cy="0" rx="22" ry="14" fill="#C08B0E" opacity="0.15" />
+        <path d="M -5 4 Q -10 -2 -6 -8 Q -4 -4 -2 -6 Q 0 -12 4 -10 Q 8 -6 6 0 Q 10 -2 8 4 Q 4 8 -5 4 Z" fill="#C08B0E" />
+      </g>
+      <text x="310" y="350" textAnchor="middle" fill="#C08B0E" fontFamily="Inter,sans-serif" fontSize="10" fontWeight="800" letterSpacing="1.5">ОГОНЬ</text>
+
+      {/* Точки стадий */}
+      <circle cx="260" cy="220" r="9" fill="#fff" stroke={T} strokeWidth="3" />
+      <circle cx="385" cy="155" r="9" fill="#fff" stroke="#C08B0E" strokeWidth="3" />
+      <circle cx="620" cy="80" r="9" fill="#fff" stroke="#2B5E8C" strokeWidth="3" />
+
+      <text x="260" y="200" textAnchor="middle" fill={T} fontFamily="Inter,sans-serif" fontSize="11" fontWeight="800" letterSpacing="1.2">ПИК</text>
+      <text x="385" y="138" textAnchor="middle" fill="#C08B0E" fontFamily="Inter,sans-serif" fontSize="11" fontWeight="800" letterSpacing="1.2">КРИЗИС</text>
+      <text x="600" y="62" textAnchor="end" fill="#2B5E8C" fontFamily="Inter,sans-serif" fontSize="11" fontWeight="800" letterSpacing="1.2">ВОЗРОЖДЕНИЕ</text>
+
+      {/* Подписи логик вдоль траектории — отнесены от пути, чтобы не пересекаться */}
+      <text x="135" y="320" fill={T} fontFamily="Inter,sans-serif" fontSize="9.5" fontWeight="700" opacity="0.7" letterSpacing="1.5" textTransform="uppercase">ДОСТИГАТЕЛЬ</text>
+      <text x="425" y="222" fill="#C08B0E" fontFamily="Inter,sans-serif" fontSize="9.5" fontWeight="700" opacity="0.7" letterSpacing="1.5" textTransform="uppercase">ИНДИВИДУАЛИСТ</text>
+      <text x="490" y="125" fill="#2B5E8C" fontFamily="Inter,sans-serif" fontSize="9.5" fontWeight="700" opacity="0.7" letterSpacing="1.5" textTransform="uppercase">СТРАТЕГ</text>
+    </svg>
+
+    <div style={{width:"100%",marginTop:18,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:14,fontSize:13,lineHeight:1.5}}>
+      <div style={{padding:"12px 14px",background:"rgba(177,74,46,.06)",borderRadius:8,borderTop:"3px solid "+T}}>
+        <b style={{color:T,fontSize:10,letterSpacing:1.5,textTransform:"uppercase"}}>↗ Пик · Достигатель</b>
+        <p style={{marginTop:6,color:"#3A332E",wordBreak:"break-word"}}>{peak}</p>
+      </div>
+      <div style={{padding:"12px 14px",background:"rgba(192,139,14,.08)",borderRadius:8,borderTop:"3px solid #C08B0E"}}>
+        <b style={{color:"#C08B0E",fontSize:10,letterSpacing:1.5,textTransform:"uppercase"}}>↻ Кризис · Огонь</b>
+        <p style={{marginTop:6,color:"#3A332E",wordBreak:"break-word"}}>{crisis}</p>
+      </div>
+      <div style={{padding:"12px 14px",background:"rgba(43,94,140,.06)",borderRadius:8,borderTop:"3px solid #2B5E8C"}}>
+        <b style={{color:"#2B5E8C",fontSize:10,letterSpacing:1.5,textTransform:"uppercase"}}>↗ Возрождение · Новый уровень</b>
+        <p style={{marginTop:6,color:"#3A332E",wordBreak:"break-word"}}>{rebirth}</p>
+      </div>
+    </div>
+  </div>;
+}
+
+/* ───────────────── RESULT CARD ───────────────── */
+
+function Result({name,logicResult,zovLevel,shadowResult,missionFinal,peak,crisis,rebirth,onBack,onReset}) {
+  const zovLabel = ZOV_LABELS[zovLevel];
+  const yearsTrad = logicResult.primary==="S" ? 0 : logicResult.primary==="I" ? 4 : 14;
+  const yearsSpec = logicResult.primary==="S" ? 0 : logicResult.primary==="I" ? 2 : 4;
+  const primaryColor = LOGICS[logicResult.primary].color;
+  const cardRef = useRef(null);
+  const [exporting, setExporting] = useState(false);
+
+  const exportPNG = async () => {
+    if (!cardRef.current || !window.htmlToImage) { alert("Загрузка библиотеки экспорта. Подождите секунду."); return; }
+    setExporting(true);
+    try {
+      const dataUrl = await window.htmlToImage.toPng(cardRef.current, {pixelRatio:2,backgroundColor:"#FBF7F0"});
+      const link = document.createElement("a");
+      link.download = `petelka-${name||"portret"}-${new Date().toISOString().slice(0,10)}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch(e) { alert("Не удалось экспортировать: "+e.message); }
+    setExporting(false);
+  };
+
+  return <div style={{minHeight:"100vh",background:BG,padding:"40px 24px 80px",position:"relative",overflow:"hidden"}}>
+    <PetelkaBackground />
+    <div className="content" style={{maxWidth:680,margin:"0 auto"}}>
+
+      <div style={{display:"flex",gap:10,marginBottom:28,fontSize:12}}>
+        <button onClick={onBack} style={{background:"transparent",border:"1px solid "+MUTED+"40",borderRadius:6,padding:"6px 14px",color:MUTED,cursor:"pointer",fontFamily:"inherit"}}>← К карте</button>
+        <button onClick={onReset} style={{background:"transparent",border:"1px solid "+MUTED+"40",borderRadius:6,padding:"6px 14px",color:MUTED,cursor:"pointer",fontFamily:"inherit",marginLeft:"auto"}}>Сбросить</button>
+      </div>
+
+      {/* HERO of the card */}
+      <div ref={cardRef} style={{background:"#fff",borderRadius:24,overflow:"hidden",border:"1.5px solid "+T+"30",boxShadow:"0 40px 80px -40px rgba(0,0,0,.35)",animation:"fadeIn .6s ease"}}>
+
+        {/* Top banner */}
+        <div style={{background:"linear-gradient(135deg, "+primaryColor+" 0%, "+T2+" 100%)",color:"#fff",padding:"40px 40px 36px",position:"relative",overflow:"hidden"}}>
+          <div style={{position:"absolute",top:-60,right:-60,width:240,height:240,borderRadius:"50%",background:"rgba(255,255,255,.08)"}} />
+          <div style={{position:"absolute",bottom:-40,left:-40,width:160,height:160,borderRadius:"50%",background:"rgba(255,255,255,.05)"}} />
+          <p style={{fontSize:11,fontWeight:700,letterSpacing:3,textTransform:"uppercase",opacity:.85,marginBottom:14,position:"relative",zIndex:1}}>Стратегический портрет</p>
+          <h1 style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:"clamp(34px,5vw,52px)",fontWeight:700,lineHeight:1,letterSpacing:"-.02em",marginBottom:14,position:"relative",zIndex:1}}>{name}</h1>
+          <p style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:22,fontStyle:"italic",opacity:.95,position:"relative",zIndex:1}}>«{LOGICS[logicResult.primary].mantra}»</p>
+        </div>
+
+        {/* Logic chart */}
+        <div style={{padding:"36px 40px 28px"}}>
+          <p style={{fontSize:11,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:MUTED,marginBottom:14}}>Логика</p>
+          <div style={{display:"flex",height:56,borderRadius:12,overflow:"hidden",marginBottom:18,fontSize:14,fontWeight:700,color:"#fff",boxShadow:"0 4px 16px -8px rgba(0,0,0,.15)"}}>
+            {logicResult.D>5&&<div style={{flex:logicResult.D,background:LOGICS.D.color,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",fontFamily:"'PT Serif',Georgia,serif"}}><div style={{fontSize:18}}>{logicResult.D}%</div><div style={{fontSize:9,opacity:.85,letterSpacing:1,textTransform:"uppercase",fontFamily:"Inter,sans-serif",marginTop:2}}>Достигатель</div></div>}
+            {logicResult.I>5&&<div style={{flex:logicResult.I,background:LOGICS.I.color,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",fontFamily:"'PT Serif',Georgia,serif"}}><div style={{fontSize:18}}>{logicResult.I}%</div><div style={{fontSize:9,opacity:.85,letterSpacing:1,textTransform:"uppercase",fontFamily:"Inter,sans-serif",marginTop:2}}>Индивидуалист</div></div>}
+            {logicResult.S>5&&<div style={{flex:logicResult.S,background:LOGICS.S.color,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",fontFamily:"'PT Serif',Georgia,serif"}}><div style={{fontSize:18}}>{logicResult.S}%</div><div style={{fontSize:9,opacity:.85,letterSpacing:1,textTransform:"uppercase",fontFamily:"Inter,sans-serif",marginTop:2}}>Стратег</div></div>}
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+            <div style={{padding:"14px 16px",background:BG,borderRadius:10}}>
+              <p style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",color:MUTED,marginBottom:4}}>Уровень зова</p>
+              <p style={{fontSize:14,fontWeight:600,color:INK}}>{zovLevel} · {zovLabel}</p>
+            </div>
+            {yearsTrad>0 && <div style={{padding:"14px 16px",background:BG,borderRadius:10}}>
+              <p style={{fontSize:10,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",color:MUTED,marginBottom:4}}>До Стратега</p>
+              <p style={{fontSize:14,fontWeight:600,color:INK}}>{yearsTrad} лет самой / {yearsSpec} со спецом</p>
+            </div>}
+          </div>
+        </div>
+
+        {/* Shadow */}
+        {shadowResult && <div style={{padding:"28px 40px",borderTop:"1px solid #f0ece4"}}>
+          <p style={{fontSize:11,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:MUTED,marginBottom:12}}>Текущая тень</p>
+          <p style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:28,fontWeight:700,marginBottom:8,color:T,lineHeight:1.1,letterSpacing:"-.01em"}}>{shadowResult.name}</p>
+          <p style={{fontSize:15,fontStyle:"italic",color:"#3A332E",marginBottom:14,lineHeight:1.4}}>{shadowResult.phrase}</p>
+          <div style={{padding:"14px 18px",background:"rgba(177,74,46,.05)",borderRadius:10,borderLeft:"3px solid "+T}}>
+            <p style={{fontSize:11,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",color:T,marginBottom:6}}>Антидот</p>
+            <p style={{fontSize:14,color:"#3A332E",lineHeight:1.55}}>{shadowResult.antidote}</p>
+          </div>
+        </div>}
+
+        {/* Mission */}
+        {missionFinal && <div style={{padding:"32px 40px",borderTop:"1px solid #f0ece4",background:"linear-gradient(135deg, #FBF7F0 0%, #fff 100%)",textAlign:"center"}}>
+          <p style={{fontSize:11,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:MUTED,marginBottom:14}}>Моя миссия</p>
+          <p style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:24,fontWeight:700,lineHeight:1.4,color:INK,fontStyle:"italic",letterSpacing:"-.01em",maxWidth:520,margin:"0 auto"}}>«{missionFinal}»</p>
+          <p style={{fontSize:11,color:MUTED,marginTop:14,letterSpacing:".1em"}}>⚡ СМЫСЛ + МУРАШКИ</p>
+        </div>}
+
+        {/* Petelka */}
+        {peak && crisis && rebirth && <div style={{padding:"32px 40px",borderTop:"1px solid #f0ece4"}}>
+          <p style={{fontSize:11,fontWeight:700,letterSpacing:2,textTransform:"uppercase",color:MUTED,marginBottom:16}}>Моя петелька</p>
+          <Petelka peak={peak} crisis={crisis} rebirth={rebirth} />
+        </div>}
+
+        {/* Footer */}
+        <div style={{padding:"22px 40px",borderTop:"1px solid #f0ece4",textAlign:"center",background:"#FBF7F0"}}>
+          <p style={{fontSize:10,color:MUTED,letterSpacing:".15em",textTransform:"uppercase"}}>ПО МЕТОДОЛОГИИ ФИЛИППА ГУЗЕНЮКА</p>
+          <p style={{fontSize:11,color:MUTED,marginTop:4,fontStyle:"italic"}}>«От достигателя к стратегу»</p>
+        </div>
+      </div>
+
+      <div style={{display:"flex",gap:10,marginTop:20,flexWrap:"wrap",justifyContent:"center"}}>
+        <Btn onClick={exportPNG} disabled={exporting}>{exporting?"Создаём картинку…":"Скачать PNG для сторис"}</Btn>
+        <Btn onClick={()=>window.print()} primary={false}>Печать / PDF</Btn>
+        <Btn onClick={()=>{navigator.clipboard?.writeText(window.location.href);alert("Ссылка скопирована");}} primary={false}>Скопировать ссылку</Btn>
+      </div>
+
+      <div style={{marginTop:36,padding:"32px",background:"#fff",border:"2px solid "+T+"30",borderRadius:18,textAlign:"center",position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",top:-40,right:-40,width:160,height:160,borderRadius:"50%",background:"rgba(177,74,46,.04)"}} />
+        <p style={{fontSize:11,fontWeight:700,letterSpacing:3,textTransform:"uppercase",color:T,marginBottom:12,position:"relative"}}>Следующий шаг</p>
+        <p style={{fontFamily:"'PT Serif',Georgia,serif",fontSize:24,fontWeight:700,marginBottom:10,lineHeight:1.2,position:"relative"}}>Хочешь идти дальше?</p>
+        <p style={{fontSize:14,color:"#3A332E",lineHeight:1.6,marginBottom:22,maxWidth:440,margin:"0 auto 22px",position:"relative"}}>Расширенный отчёт + личная встреча со специалистом из команды «Счастье в деятельности».<br/>14 → 4 года. Это первый шаг.</p>
+        <Btn onClick={()=>alert("Здесь будет форма захвата контакта")} style={{padding:"14px 32px",fontSize:15}}>Записаться на диагностику →</Btn>
+      </div>
+    </div>
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

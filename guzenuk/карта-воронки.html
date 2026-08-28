@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Карта воронки · Филипп</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%BA%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF; --ink:#17161A; --ink2:#4A4D52; --muted:#8C8677;
+    --accent:#F2B600; --accent-ink:#8A5A12; --green:#2F5A2A; --rule:#EAE6DC; --surface:#FBFAF7;
+    --blue:#2b6fb3; --purple:#7a4ea8; --red:#b3392b; --dash:#c9c3b4;
+    --sans:'Golos Text',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --disp:'Oswald',var(--sans);
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;padding:34px 30px 90px}
+  h1{font-family:var(--disp);font-weight:500;font-size:1.9rem;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:.86rem;margin-bottom:8px}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.72rem;color:var(--ink2);margin:12px 0 26px;padding:10px 14px;background:var(--surface);border:1px solid var(--rule);border-radius:3px}
+  .legend b{font-family:var(--mono);font-weight:500}
+  .dotc{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:middle}
+  .layertitle{font-family:var(--disp);font-weight:500;font-size:.92rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);margin:0 0 8px}
+
+  .board{overflow-x:auto;padding-bottom:10px}
+  .grid{display:grid;grid-template-columns:repeat(8,minmax(150px,1fr));gap:8px;min-width:1240px}
+
+  /* journey */
+  .jr{background:var(--ink);color:#fff;border-radius:3px;padding:10px 10px;text-align:center;position:relative}
+  .jr .n{font-family:var(--mono);font-size:.6rem;color:var(--accent);display:block;margin-bottom:3px}
+  .jr .t{font-family:var(--disp);font-weight:500;font-size:.82rem;letter-spacing:.02em;line-height:1.2}
+  .jr::after{content:'→';position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.9rem;z-index:2}
+  .jr:last-child::after{content:''}
+
+  .cell{background:var(--surface);border:1px solid var(--rule);border-radius:3px;padding:8px 9px;font-size:.78rem;color:var(--ink2)}
+  .cell.empty{background:transparent;border:1px dashed var(--dash)}
+  .step{margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+  .step:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+  .step .sid{font-family:var(--mono);font-size:.64rem;color:var(--ink);font-weight:500}
+  .step .sx{display:block;color:var(--ink2);font-size:.75rem;line-height:1.3;margin-top:1px}
+  .flag{display:inline-block;font-family:var(--mono);font-size:.58rem;padding:1px 5px;border-radius:2px;margin-top:3px}
+  .f-move{background:#FBE6C9;color:#8a4a12}
+  .f-gap{background:#F6DADA;color:#9a2b2b}
+
+  .src{font-family:var(--mono);font-size:.62rem;line-height:1.6;color:var(--muted)}
+  .spill{display:inline-block;padding:0 4px;border-radius:2px;margin:1px 2px 1px 0}
+  .s-i{background:#F0EEE8;color:var(--ink2)}   /* источник Филиппа */
+  .s-v{background:#E4EDF5;color:var(--blue)}   /* вывод */
+  .s-p{background:#EFE4F2;color:var(--purple)} /* редакторская гипотеза */
+
+  /* trajectories */
+  .lanes{margin-top:34px}
+  .lane{display:grid;grid-template-columns:170px 1fr;gap:0;border:1px solid var(--rule);border-radius:3px;margin-bottom:10px;overflow:hidden}
+  .lane .lh{background:var(--ink);color:#fff;padding:12px 14px;font-family:var(--disp);font-weight:500;font-size:.9rem;display:flex;align-items:center}
+  .lane.read .lh{background:var(--green)}
+  .lane .lb{padding:11px 14px;font-size:.8rem;color:var(--ink2)}
+  .lane .lb b{color:var(--ink)}
+  .conv{margin-top:6px;font-size:.78rem;color:var(--accent-ink)}
+
+  .note{margin-top:30px;background:#FBF3D6;border:1px solid #E6D28A;border-radius:3px;padding:12px 16px;font-size:.82rem;color:var(--ink);max-width:100ch}
+  .note b{color:var(--accent-ink)}
+  .secgap{height:26px}
+</style>
+</head>
+<body>
+  <h1>Карта воронки — текущая версия (GPT-5)</h1>
+  <div class="sub">Рабочая карта, не декоратив. Показана версия GPT-5 как есть; мои замечания вынесены флажками, не вшиты в саму карту.</div>
+  <div class="legend">
+    <span>Источник смысла:</span>
+    <span><span class="dotc" style="background:#c7c2b6"></span><b class="s-i" style="padding:0 4px">И</b> Филипп/книга</span>
+    <span><span class="dotc" style="background:#8fb3d6"></span><b class="s-v" style="padding:0 4px">В</b> вывод</span>
+    <span><span class="dotc" style="background:#c19ad0"></span><b class="s-p" style="padding:0 4px">П</b> редакторская гипотеза</span>
+    <span style="margin-left:14px"><span class="flag f-move">переставить</span> моё предложение сдвига</span>
+    <span><span class="flag f-gap">пробел</span> дыра/тонкое место</span>
+  </div>
+
+  <div class="board">
+    <div class="layertitle">Верхний слой · Customer Journey</div>
+    <div class="grid" style="margin-bottom:16px">
+      <div class="jr"><span class="n">01</span><span class="t">Вкладыш</span></div>
+      <div class="jr"><span class="n">02</span><span class="t">QR</span></div>
+      <div class="jr"><span class="n">03</span><span class="t">Digital Entry</span></div>
+      <div class="jr"><span class="n">04</span><span class="t">Контакт</span></div>
+      <div class="jr"><span class="n">05</span><span class="t">Смысловой маршрут</span></div>
+      <div class="jr"><span class="n">06</span><span class="t">Персонализация</span></div>
+      <div class="jr"><span class="n">07</span><span class="t">Диагностика</span></div>
+      <div class="jr"><span class="n">08</span><span class="t">Sales</span></div>
+    </div>
+
+    <div class="layertitle">Средний слой · Master Narrative (20 шагов) под участками</div>
+    <div class="grid" style="margin-bottom:16px">
+      <!-- Вкладыш -->
+      <div class="cell">
+        <div class="step"><span class="sid">вход</span><span class="sx">Физический крючок из книги: «Задачи текущего уровня решаются только с переходом на следующий» (стр. 275)</span></div>
+      </div>
+      <!-- QR -->
+      <div class="cell empty" style="text-align:center;color:var(--muted);font-size:.72rem">переход в digital</div>
+      <!-- Digital Entry -->
+      <div class="cell">
+        <div class="step"><span class="sid">Ш1</span><span class="sx">Есть другой тип развития (гориз/верт)</span></div>
+        <div class="step"><span class="sid">Ш2</span><span class="sx">Это не типология</span></div>
+        <span class="flag f-gap">пробел</span> <span class="flag f-move">сюда → зов (S47–S50) как узнавание</span>
+      </div>
+      <!-- Контакт -->
+      <div class="cell">
+        <div class="step"><span class="sid">—</span><span class="sx">Получение контакта. В версии GPT-5 момент захвата явно не привязан к смыслу.</span></div>
+        <span class="flag f-gap">пробел: чем «оплачивается» контакт?</span>
+      </div>
+      <!-- Смысловой маршрут -->
+      <div class="cell">
+        <div class="step"><span class="sid">Ш3</span><span class="sx">Разная логика — разная доступная реальность</span></div>
+        <div class="step"><span class="sid">Ш4</span><span class="sx">Не только про задачи (корректив)</span></div>
+        <div class="step"><span class="sid">Ш5</span><span class="sx">Фокус Д→И→С</span></div>
+        <div class="step"><span class="sid">Ш6</span><span class="sx">Достигатель — сила, не диагноз</span></div>
+        <div class="step"><span class="sid">Ш7</span><span class="sx">Формула может перестать быть достаточной</span></div>
+        <div class="step"><span class="sid">Ш8</span><span class="sx">Необязательно сначала стать сверхуспешным</span></div>
+        <div class="step"><span class="sid">Ш9</span><span class="sx">Внешняя победа = внутреннее фиаско</span></div>
+        <div class="step"><span class="sid">Ш10</span><span class="sx">Не каждый кризис — переход</span></div>
+        <div class="step"><span class="sid">Ш11</span><span class="sx">У перехода есть драматургия (петелька)</span></div>
+        <div class="step"><span class="sid">Ш12</span><span class="sx">«Достичь успеха» → «найти себя»</span></div>
+        <div class="step"><span class="sid">Ш13</span><span class="sx">Не уничтожить достигателя</span></div>
+        <div class="step"><span class="sid">Ш14</span><span class="sx">Вместить противоречия</span></div>
+        <div class="step"><span class="sid">Ш15</span><span class="sx">Обещание: масштаб из целостности</span></div>
+        <div class="step"><span class="sid">Ш16</span><span class="sx">Знать карту ≠ жить из неё</span></div>
+        <span class="flag f-gap">пробел: 14 шагов теории до персонализации</span>
+      </div>
+      <!-- Персонализация -->
+      <div class="cell">
+        <div class="step"><span class="sid">Ш17</span><span class="sx">Одна задача — разные рычаги</span></div>
+        <div class="step"><span class="sid">Ш18</span><span class="sx">Нужна не «уровень», а моя точка А</span></div>
+        <div class="step"><span class="sid">Ш19</span><span class="sx">Из общей карты траекторию не вывести</span></div>
+      </div>
+      <!-- Диагностика -->
+      <div class="cell">
+        <div class="step"><span class="sid">Ш20</span><span class="sx">Диагностика как естественный следующий шаг</span></div>
+        <span class="flag f-move">сюда → срочность (S51–S54) + образ будущего (S43/S66/S67)</span>
+      </div>
+      <!-- Sales -->
+      <div class="cell">
+        <div class="step"><span class="sid">после</span><span class="sx">3–5 осей → встреча → Harthill/LDF → партнёрство (S59–S62, S60)</span></div>
+      </div>
+    </div>
+
+    <div class="layertitle">Нижний слой · Source Control (какие S за блоком и чей источник)</div>
+    <div class="grid">
+      <div class="cell src"><span class="spill s-i">S02</span><span class="spill s-i">S26</span> книга: петелька, «линия судьбы»</div>
+      <div class="cell src" style="color:var(--muted)">—</div>
+      <div class="cell src"><span class="spill s-i">S01</span><span class="spill s-i">S03</span><span class="spill s-i">S04</span><span class="spill s-v">S05</span> · зов <span class="spill s-i">S47</span><span class="spill s-i">S48</span><span class="spill s-i">S49</span><span class="spill s-i">S50</span></div>
+      <div class="cell src" style="color:var(--muted)">механика захвата — гипотеза <span class="spill s-p">S63</span></div>
+      <div class="cell src"><span class="spill s-i">S08</span><span class="spill s-v">S09</span><span class="spill s-v">S13</span><span class="spill s-v">S14</span><span class="spill s-i">S18</span><span class="spill s-i">S20</span><span class="spill s-i">S21</span><span class="spill s-i">S22</span><span class="spill s-i">S25</span><span class="spill s-i">S28</span><span class="spill s-i">S29</span><span class="spill s-i">S31</span><span class="spill s-i">S37</span><span class="spill s-i">S41</span><span class="spill s-p">S69</span><span class="spill s-i">S45</span></div>
+      <div class="cell src"><span class="spill s-i">S56</span><span class="spill s-i">S57</span><span class="spill s-v">S58</span> · метод <span class="spill s-i">S55</span></div>
+      <div class="cell src"><span class="spill s-v">S58</span><span class="spill s-i">S59</span> · срочность <span class="spill s-i">S51</span><span class="spill s-i">S54</span> · будущее <span class="spill s-i">S66</span><span class="spill s-i">S67</span></div>
+      <div class="cell src"><span class="spill s-i">S60</span><span class="spill s-i">S62</span><span class="spill s-p">S63</span><span class="spill s-p">S74</span></div>
+    </div>
+  </div>
+
+  <div class="lanes">
+    <div class="layertitle">Две пользовательские траектории — где нужна разная глубина</div>
+    <div class="lane">
+      <div class="lh">Не читал / читал частично</div>
+      <div class="lb">Нужна вся смысловая база. Вход через <b>узнавание</b> (зов + «внешняя победа/внутреннее фиаско» + «ты не сломался»), затем минимально достаточная рамка (Ш1–Ш4, Ш6–Ш16), потом персонализация. <b>Риск текущей версии:</b> 14 шагов рамки до первого «это я» — холодный отвалится.
+        <div class="conv">Сходится с прочитавшим на: Ш17 (одна задача — разные рычаги) → точка А → диагностика.</div>
+      </div>
+    </div>
+    <div class="lane read">
+      <div class="lh">Прочитал книгу полностью</div>
+      <div class="lb">Ш1–Ш16 он уже знает из книги. Пересказ = раздражение и отвал (твой критерий №9). Ему нужен <b>быстрый вход сразу в персонализацию</b>: «узнай не теорию, а СВОЮ точку А». Возможен разворот «ты дочитал книгу → вот твой личный следующий шаг».
+        <div class="conv">Сходится с непрочитавшим на: Ш17 → точка А → диагностика (общий узел развилки).</div>
+      </div>
+    </div>
+    <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Точка схождения обеих траекторий = <b>Ш17 «одна задача — разные рычаги»</b>. До неё — разная глубина; от неё — одна дорога в диагностику. Механику развилки пока не проектируем, только фиксируем узел.</div>
+  </div>
+
+  <div class="grid" style="grid-template-columns:1fr;min-width:0;margin-top:22px">
+    <div class="cell" style="border-style:dashed;background:transparent;max-width:520px">
+      <div style="font-family:var(--disp);font-size:.85rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Второй вход (пунктир, пока не проектируем)</div>
+      <div style="font-size:.8rem;color:var(--ink2)">ПРЕДЗАКАЗ ⟶ Digital Core (тот же участок 03+). Отдельную воронку не строим, адаптируем как второй вход в то же ядро.</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Как читать карту.</b> Средний слой показывает версию GPT-5 без правок. Флажки «переставить» — мои предложения (часть III), они НЕ вшиты в карту. Главные видимые дыры: (1) 14 шагов теории между входом и персонализацией; (2) зов лежит вне входа, хотя это лучший механизм узнавания; (3) момент захвата контакта не привязан к смыслу-обмену; (4) срочность и образ будущего выпали и не стоят у диагностики. Точка, где две траектории обязаны сойтись — Ш17.
+  </div>
+</body>
+</html>

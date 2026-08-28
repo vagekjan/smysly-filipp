@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Цепочка тезисов · От достигателя к стратегу</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%97%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF; --ink:#17161A; --ink2:#4A4D52; --muted:#8C8677;
+    --accent:#F2B600; --accent-ink:#8A5A12; --rule:#E7E3D8; --surface:#FBFAF7;
+    --sans:'Golos Text',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --disp:'Oswald',var(--sans); --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--surface);color:var(--ink);font-family:var(--sans);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+  .top{flex:none;display:flex;align-items:center;gap:14px;padding:10px 24px;background:#fff;border-bottom:1px solid var(--rule)}
+  .brand{font-family:var(--disp);font-weight:500;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+  .stagewrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:16px}
+  .stage{width:min(100%, calc((100vh - 120px) * 1.777));aspect-ratio:16/9;max-height:100%;background:var(--bg);border:1px solid var(--rule);border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.10);position:relative;overflow:hidden}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;align-items:center;padding:3vh 3vw}
+  .slide.active{display:flex;animation:fade .18s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .loc{position:absolute;top:2.6vh;left:3vw;font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+  .loc b{color:var(--accent-ink);font-weight:500}
+
+  .thesis{font-family:var(--sans);font-weight:400;color:var(--ink2);font-size:clamp(1.3rem,2.9vw,2.5rem);line-height:1.25;text-align:center;max-width:26ch;margin:0 auto;text-wrap:balance}
+  .thesis b{font-weight:700;color:var(--ink)}
+
+  .bridge{position:absolute;left:0;right:0;bottom:3vh;display:flex;justify-content:center}
+  .bridge .in{max-width:52ch;text-align:center;font-size:clamp(.85rem,1.2vw,1.08rem);color:var(--accent-ink);line-height:1.35}
+  .bridge .in .mk{font-family:var(--mono);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px}
+
+  .title-slide .tt{font-family:var(--disp);font-weight:500;font-size:clamp(2rem,5vw,4.2rem);text-align:center;letter-spacing:-.01em;max-width:18ch}
+  .title-slide .sub{font-family:var(--disp);font-weight:400;font-size:clamp(1rem,1.6vw,1.35rem);color:var(--ink2);margin-top:1.4vh;text-align:center}
+  .title-slide .hint{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:3vh}
+  .final .tt{font-family:var(--disp);font-weight:500;font-size:clamp(1.6rem,3.6vw,3rem);text-align:center;max-width:20ch}
+  .final .sub{font-size:clamp(.95rem,1.4vw,1.2rem);color:var(--ink2);text-align:center;max-width:46ch;margin-top:1.6vh;line-height:1.4}
+
+  .nav{flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 24px;background:#fff;border-top:1px solid var(--rule)}
+  .nav button{font-family:var(--disp);font-weight:500;font-size:.84rem;padding:8px 17px;border:1px solid var(--ink);border-radius:7px;background:#fff;color:var(--ink);cursor:pointer}
+  .nav button.primary{background:var(--ink);color:#fff}
+  .nav button:disabled{opacity:.28;cursor:default}
+  .prog{flex:1;margin:0 18px;height:4px;background:var(--rule);border-radius:2px;overflow:hidden}
+  .prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+  .mid{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="top"><span class="brand">Цепочка тезисов · От достигателя к стратегу</span></div>
+
+<div class="stagewrap"><div class="stage" id="stage"></div></div>
+
+<div class="nav">
+  <button id="prev">← Назад</button>
+  <div class="prog"><i id="progbar"></i></div>
+  <div class="mid" id="mid"></div>
+  <button id="next" class="primary">Далее →</button>
+</div>
+
+<script>
+const T=[
+ {loc:'Т1',h:'Развитие взрослого человека бывает не только <b>горизонтальным</b> (новые знания и навыки), но и <b>вертикальным</b> — может меняться <b>сама внутренняя система</b>, которой он воспринимает реальность, создаёт смысл и действует.',
+  out:'Если оптика может меняться — это кто-то изучал системно, или это просто метафора коуча?'},
+ {loc:'Т2',h:'Вертикальное развитие <b>значительно менее известно в бизнес-среде</b>, хотя качественное взрослое развитие <b>десятилетиями исследуют</b> разные исследовательские традиции.',
+  out:'Хорошо, исследовательская история есть. А в каком практически применимом виде это описано?'},
+ {loc:'Т3',h:'Одна из таких операционализаций <b>(Билл Торберт)</b> описывает вертикальное развитие как <b>последовательность качественно разных логик действия</b>.',
+  out:'Что практически меняется между логиками — и почему это важно именно лидеру?'},
+ {loc:'Т4а',h:'Некоторые задачи <b>могут требовать другой логики действия</b>: то, каким способом человек <b>видит проблему</b>, определяет <b>доступные ему способы её решать</b>.',
+  out:'Но здесь легко соскользнуть: это не значит «развитие = задачи покрупнее».'},
+ {loc:'Т4б',h:'Вертикальное развитие <b>нельзя свести к способности решать задачи всё большего класса</b>: при переходе могут меняться <b>мотивация, смыслообразование, отношения, идентичность, отношение к успеху и качество жизни</b>.',
+  out:'Раз меняется многое — где на этой карте стоит наша аудитория?'},
+ {loc:'Т5',h:'Дальше фокусируемся на переходе <b>Достигатель → Индивидуалист → Стратег</b> — как на <b>наиболее релевантном для аудитории</b> участке.',
+  out:'А честный разговор про Достигателя начинается не с критики, а с его силы.'},
+ {loc:'Т6',h:'Логика Достигателя — <b>не проблема</b>: часто именно она и <b>создала сегодняшний успех</b> человека.',
+  out:'Но у этой сильной формулы есть условия, где её перестаёт хватать.'},
+ {loc:'Т7',h:'Два разных процесса — <b>усложнение внешней среды</b> и <b>исчерпание внутренней мотивации</b> — могут совпасть, и тогда достигательская логика <b>перестаёт «нести»</b>.',
+  out:'Тут возникает возражение: «но мне ещё рано, я недостаточно достиг».'},
+ {loc:'Т8',h:'Исчерпание логики <b>не измеряется величиной успеха</b> — переход возможен <b>и без миллиардного бизнеса</b>.',
+  out:'Если дело не в размере успеха — что тогда на кону?'},
+ {loc:'Т9',h:'<b>Внешняя победа</b> может сопровождаться <b>внутренним фиаско</b>: уровень жизни растёт, а <b>качество жизни падает</b>.',
+  out:'Это не обязательно переход. Но у перехода бывает узнаваемая форма — покажем её.'},
+ {loc:'Т10',h:'Вертикальный переход может иметь <b>узнаваемую драматургию</b> (это <b>предлагаемая рамка</b>, а не диагноз любого кризиса).',
+  out:'Если у формы есть начало — можно ли поймать его раньше, до самого дна?'},
+ {loc:'Т11',h:'<b>Зов</b> может быть <b>ранним сигналом</b>, что прежний способ жить и действовать <b>требует внимания</b> и, возможно, начинается переход.',
+  out:'А раз сигнал приходит рано — момент ответа влияет на цену перехода.'},
+ {loc:'Т12',h:'<b>Чем раньше</b> человек отвечает на сигнал, <b>тем меньше цена перехода</b> — его можно пройти <b>экологичнее</b>.',
+  out:'Что же это за первый переход, с которого всё начинается?'},
+ {loc:'Т13',h:'Переход Достигатель → Индивидуалист — это разворот <b>«достичь успеха» → «найти себя»</b>: старая мотивационная система ослабевает, новая ещё не собрана, <b>возникает маета</b>.',
+  out:'В этой пересборке есть развилка, на которой ломается многое.'},
+ {loc:'Т14',h:'Главный риск перехода — не интегрировать Достигателя, <b>а уничтожить его</b>; здоровое развитие <b>включает предыдущую логику</b>, а не обнуляет.',
+  out:'Если Достигателя надо вобрать — как складывается следующая целостность?'},
+ {loc:'Т15',h:'Движение Индивидуалист → Стратег — это <b>исследование граней → интеграция → способность удерживать противоречия</b> и создавать между ними <b>синергию</b>.',
+  out:'Если противоположности усиливают друг друга — какой образ это задаёт?'},
+ {loc:'Т16',h:'Предыдущая цепочка создаёт основание для образа: <b>не выбор между масштабом и собой</b>, а <b>больший внешний масштаб из большей внутренней целостности</b>.',
+  out:'Меняется ли при этом то, кем человек себя ощущает и ради чего действует?'},
+ {loc:'Т17',h:'<b>Расширяется идентичность</b> (от отдельного «я» к включённости в более крупные системы) и меняется способ организации целей — <b>от «добиться» к «создать/оставить»</b>.',
+  out:'Звучит достижимо: «я понял — значит, я почти там». Но понять ≠ жить.'},
+ {loc:'Т18',h:'<b>Понять описание уровня — не значит жить из него</b>: развитие идёт по нескольким линиям (эмоциональной, межличностной, смыслообразующей), а <b>интеллектуальное понимание ≠ способность</b>.',
+  out:'А рядом стоит ещё более сильный довод, чем «понять мало».'},
+ {loc:'Т19',h:'<b>Одна и та же внешняя задача</b> у разных людей проходит через разные точки → даёт <b>разные доступные рычаги</b> → ведёт по <b>разным траекториям</b>; поэтому универсального маршрута недостаточно.',
+  out:'Раз маршрут не универсален — человеку нужен способ определить свой.'},
+ {loc:'Т20',h:'Индивидуальная траектория — это <b>не «узнай уровень / стань Стратегом»</b>, а: <b>где я → в чём моя сила → что стало ограничением → что сохранить → что развить → какие рычаги → как пройти с меньшей ценой</b>.',
+  out:'Человек сам пришёл к необходимости своей траектории — дальше вопрос: как её получить.'},
+];
+
+const S=[{kind:'title'}, ...T.map(t=>({kind:'thesis',...t})), {kind:'final'}];
+const stage=document.getElementById('stage');
+function slideHTML(s,i){
+  if(s.kind==='title') return `<div class="slide title-slide"><div class="tt">От достигателя<br>к стратегу</div><div class="sub">цепочка из 21 тезиса — как одна мысль тянет следующую</div><div class="hint">→ Далее · ← Назад</div></div>`;
+  if(s.kind==='final') return `<div class="slide final"><div class="tt">К персональной траектории</div><div class="sub">Общая карта объяснила, что происходит. Дальше — уже не «что бывает с людьми», а «где именно я и какой маршрут мой».</div></div>`;
+  return `<div class="slide"><div class="loc"><b>${s.loc}</b></div><div class="thesis">${s.h}</div><div class="bridge"><div class="in"><span class="mk">и тогда возникает</span>${s.out}</div></div></div>`;
+}
+stage.innerHTML=S.map(slideHTML).join('');
+const slides=[...stage.querySelectorAll('.slide')];
+let pos=0;
+function render(){
+  slides.forEach((el,i)=>el.classList.toggle('active',i===pos));
+  document.getElementById('prev').disabled=pos===0;
+  document.getElementById('next').disabled=pos===S.length-1;
+  document.getElementById('progbar').style.width=(pos/(S.length-1)*100)+'%';
+  const s=S[pos];
+  document.getElementById('mid').textContent=(s.kind==='title'?'Начало':s.kind==='final'?'Итог':s.loc)+'   ·   '+(pos+1)+'/'+S.length;
+}
+function go(i){pos=Math.max(0,Math.min(S.length-1,i));render();}
+document.getElementById('next').onclick=()=>go(pos+1);
+document.getElementById('prev').onclick=()=>go(pos-1);
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();go(pos+1);}if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(pos-1);}});
+render();
+</script>
+</body>
+</html>

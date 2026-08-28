@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Собрать свою Петельку</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23F2EEE6'/><path d='M22 76 C22 40 48 22 58 44 C65 58 43 64 43 46 C43 30 68 28 82 20' fill='none' stroke='%23C08424' stroke-width='7' stroke-linecap='round'/></svg>">
+<style>
+  :root{--paper:#F2EEE6;--card:#FBF8F1;--ink:#17161A;--ink2:#5D5A52;--accent:#C08424;--accent-ink:#8A5A12;--accent-lit:#D6A24A;
+    --green:#4C6141;--green-ink:#2F5A2A;--wash:#E6DFCF;--sel:#F5EFE0;--rule:rgba(23,22,26,.1);--rule2:rgba(23,22,26,.14)}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:'Golos Text',sans-serif;line-height:1.55;overflow-x:hidden;display:flex;flex-direction:column;min-height:100vh}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(24px,4vw,48px);width:100%}
+
+  .top{position:sticky;top:0;z-index:10;background:var(--paper);border-bottom:1px solid var(--rule2);padding:15px 0}
+  .top .wrap{display:flex;align-items:center;justify-content:center;gap:16px}
+  .steps{display:flex;gap:6px}
+  .stp{width:24px;height:3px;background:var(--rule2)}
+  .stp.on{background:var(--accent)}.stp.done{background:var(--ink)}
+
+  main{flex:1;display:flex;align-items:center;padding:34px 0}
+  .screen{display:none;width:100%}
+  .screen.on{display:block}
+
+  .kick{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:16px}
+  h1{font-family:'Playfair Display',serif;font-weight:500;font-size:clamp(34px,5vw,60px);line-height:1.04;letter-spacing:-.02em;margin:0}
+  h2{font-family:'Playfair Display',serif;font-weight:500;font-size:clamp(28px,3.6vw,46px);line-height:1.05;letter-spacing:-.02em;margin:0 0 4px}
+  .acc{font-style:italic;color:var(--accent-ink)}
+  p.lead{font-size:clamp(15px,1.6vw,18px);color:var(--ink2);max-width:62ch;margin:16px 0 0}
+  p.q{font-size:15px;color:var(--ink2);margin:8px 0 24px;max-width:64ch}
+  .sub{font-family:'Playfair Display',serif;font-size:clamp(17px,2vw,22px);color:var(--ink2);max-width:34ch;line-height:1.35;margin:20px 0 0}
+
+  .btn{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:var(--card);border:0;
+    font-family:'JetBrains Mono',monospace;font-weight:500;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;padding:15px 26px;cursor:pointer;transition:background .18s}
+  .btn:hover{background:var(--ink)}
+  .btn.ghost{background:transparent;color:var(--ink2);border:1px solid rgba(23,22,26,.25)}
+  .btn.ghost:hover{background:transparent;border-color:var(--ink);color:var(--ink)}
+  .btn svg{width:15px;height:15px}
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:14px}
+  .nav .hint{font-size:13px;color:var(--ink2)}
+
+  /* герой */
+  .hero{width:100vw;margin-left:calc(50% - 50vw);box-sizing:border-box;padding:0 clamp(28px,6vw,96px);
+        display:grid;grid-template-columns:1fr 1.04fr;align-items:center;gap:clamp(32px,6vw,80px);overflow:hidden}
+  @media(max-width:760px){.hero{grid-template-columns:1fr;text-align:center;justify-items:center;padding:0 24px}.hero img{max-width:76%}}
+  .hero img{width:100%;max-height:80vh;object-fit:contain;display:block;margin:0 auto}
+
+  /* --- интерактив петля (по референсу) --- */
+  .ihdr{display:flex;align-items:center;gap:20px;padding-bottom:16px;border-bottom:1px solid var(--rule2)}
+  .ihdr .lab{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);display:flex;align-items:center;gap:10px}
+  .ihdr .bars{flex:1;display:flex;gap:5px}
+  .ihdr .bars span{flex:1;height:3px;background:var(--rule2)}
+  .ihdr .bars span.f{background:var(--accent)}
+  .ihdr .pct{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--ink2)}
+  .ihero{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(20px,4vw,48px);align-items:end;margin-top:24px}
+  @media(max-width:820px){.ihero{grid-template-columns:1fr;gap:16px}}
+  .instr{display:flex;gap:14px;align-items:flex-start;padding-bottom:4px}
+  .instr .t{font-size:15px;line-height:1.5;color:var(--ink2)}
+  .ibody{display:grid;grid-template-columns:1fr 336px;gap:22px;margin-top:22px;align-items:start}
+  @media(max-width:900px){.ibody{grid-template-columns:1fr}}
+
+  .gcard{background:var(--card);border:1px solid var(--rule)}
+  .glegend{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;border-bottom:1px solid var(--rule);flex-wrap:wrap;gap:10px}
+  .glegend .gt{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2)}
+  .glegend .lg{display:flex;align-items:center;gap:16px}
+  .glegend .lg span{display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+  .glegend .lg i{width:9px;height:9px;border-radius:50%}
+  .canvas{width:100%;cursor:grab;touch-action:none;display:block}
+  .canvas.drag{cursor:grabbing}
+  .canvas svg{width:100%;aspect-ratio:1000/400;height:auto;display:block}
+  .rail{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--rule)}
+  .rcell{cursor:pointer;padding:14px 10px;text-align:center;border-right:1px solid var(--rule);transition:background .18s}
+  .rcell:last-child{border-right:0}
+  .rcell:hover{background:var(--sel)}
+  .rcell.on{background:var(--sel)}
+  .rcell svg{width:34px;height:34px}
+  .rcell .rn{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:var(--accent-ink);margin-top:8px}
+  .rcell .rnm{font-family:'Playfair Display',serif;font-size:16px;line-height:1.14;margin-top:3px}
+
+  .side{display:grid;gap:14px}
+  .darkcard{background:var(--ink);color:#FBF8F1;padding:22px 24px}
+  .darkcard .m{display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-lit)}
+  .darkcard .h{font-family:'Playfair Display',serif;font-size:28px;line-height:1.1;margin-top:12px}
+  .darkcard .x{font-size:15px;line-height:1.55;color:#CFC9BB;margin-top:12px}
+  .feel{background:var(--card);border:1px solid var(--rule);padding:20px 22px}
+  .feel .ft{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);padding-bottom:12px;border-bottom:1px solid var(--rule2)}
+  .feelrow{display:flex;gap:12px;align-items:flex-start;margin-top:14px}
+  .feelrow svg{flex:none;width:26px;height:26px}
+  .feelrow .r{font-size:14px;line-height:1.45;color:var(--ink2)}
+  .feelrow.move .r{color:var(--green-ink)}
+  .mark{background:var(--card);border:1px solid var(--rule);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .mark .ml{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2)}
+  .mark .mv{font-family:'Playfair Display',serif;font-size:21px;margin-top:4px}
+  .mark .rst{cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);border:1px solid rgba(23,22,26,.22);padding:9px 13px}
+  .mark .rst:hover{border-color:var(--ink);color:var(--ink)}
+
+  /* карточка-листалка зов */
+  .cardwrap{display:flex;align-items:center;gap:16px;margin-top:8px}
+  .arrow{flex:none;width:44px;height:44px;border:1px solid var(--rule2);background:transparent;color:var(--ink);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .18s}
+  .arrow:hover{border-color:var(--accent)}
+  .card{flex:1;background:var(--card);border:1px solid var(--rule);padding:34px 36px;min-height:236px;display:flex;flex-direction:column;justify-content:center;position:relative}
+  .card .num{position:absolute;top:18px;right:22px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);letter-spacing:.14em}
+  .zicon{width:60px;height:60px;margin-bottom:16px}
+  .zicon svg{width:100%;height:100%;display:block}
+  .card .name{font-family:'Playfair Display',serif;font-weight:500;font-size:clamp(28px,3.6vw,40px);letter-spacing:-.01em;margin:0 0 12px}
+  .card .line{font-size:clamp(16px,2vw,20px);color:var(--accent-ink)}
+  .dots{display:flex;gap:7px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .dot{width:8px;height:8px;background:var(--rule2);cursor:pointer}
+  .dot.on{background:var(--accent)}
+  .check{display:inline-flex;align-items:center;gap:12px;margin-top:26px;cursor:pointer;user-select:none}
+  .check .box{width:26px;height:26px;border:1.5px solid var(--ink);flex:none;position:relative}
+  .check.on .box{background:var(--accent);border-color:var(--accent)}
+  .check.on .box::after{content:"";position:absolute;left:8px;top:3px;width:7px;height:13px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg)}
+  .check .lab{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:500}
+  .check.on .lab{color:var(--accent-ink)}
+
+  /* уровень — эскалация формы */
+  .lrow{display:flex;gap:10px;margin-top:14px}
+  .lcell{flex:1;display:flex;flex-direction:column;align-items:center;background:var(--card);border:1px solid var(--rule);padding:16px 8px 14px;cursor:pointer;transition:border-color .18s,background .18s;min-width:0}
+  .lcell:hover{border-color:var(--accent)}
+  .lcell.sel{border-color:var(--accent);background:var(--sel)}
+  .lnum{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink2);margin-bottom:10px}
+  .lcell.sel .lnum{color:var(--accent-ink)}
+  .lbox{width:clamp(44px,5.5vw,58px);height:clamp(44px,5.5vw,58px);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+  .lbox svg{width:100%;height:100%;display:block}
+  .lname{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:4px;text-align:center;line-height:1.08}
+  .ldesc{font-size:11px;color:var(--ink2);text-align:center;line-height:1.3}
+  .lends{display:flex;justify-content:space-between;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+  .lends .l{color:var(--ink2)}.lends .r{color:var(--ink)}
+  @media(max-width:560px){.ldesc{display:none}}
+
+  /* логика */
+  .qblock{margin:0 0 20px}
+  .qblock .qh{font-family:'Playfair Display',serif;font-size:19px;margin-bottom:10px}
+  .opts{display:grid;gap:9px}
+  .opt{text-align:left;background:var(--card);border:1px solid var(--rule);padding:14px 18px;cursor:pointer;font:inherit;font-size:15px;color:var(--ink);transition:border-color .18s,background .18s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.sel{background:var(--sel);border-color:var(--accent)}
+
+  /* инсайт / карта */
+  .coords{display:flex;flex-wrap:wrap;border:1px solid var(--rule);background:var(--card);margin-top:16px}
+  .coord{flex:1;min-width:130px;padding:16px 18px;border-right:1px solid var(--rule)}
+  .coord:last-child{border-right:0}
+  .coord .cl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
+  .coord .cv{font-family:'Playfair Display',serif;font-size:20px;line-height:1.1}
+  .coord .cv small{font-family:'Golos Text';font-size:12px;color:var(--ink2);display:block;margin-top:2px}
+  .hyp{margin-top:16px;background:var(--ink);color:#FBF8F1;padding:24px 26px}
+  .hyp .t{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-lit);margin-bottom:12px}
+  .hyp .x{font-family:'Playfair Display',serif;font-size:clamp(18px,2.2vw,24px);line-height:1.35}
+  .maprow{display:flex;gap:16px;padding:14px 0;border-top:1px solid var(--rule2)}
+  .maprow .mk{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);flex:none;width:170px}
+  .maprow .mv{font-size:15px;color:var(--ink2)}
+  .share{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);background:transparent;color:var(--ink);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:11px 18px;cursor:pointer}
+  .share:hover{background:var(--sel)}
+
+  /* форма / досье */
+  .field{margin:0 0 16px}
+  .field label{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;background:var(--card);border:1px solid var(--rule);padding:13px 15px;font:inherit;font-size:15px;color:var(--ink);border-radius:0}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
+  .field textarea{resize:vertical;min-height:64px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+  .dossier{border:1px solid var(--ink);background:var(--card);padding:24px 26px}
+  .dossier h4{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);margin:0 0 14px}
+  .dline{display:flex;gap:14px;padding:9px 0;border-top:1px solid var(--rule2);font-size:14px}
+  .dline .dk{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2);flex:none;width:120px;letter-spacing:.04em}
+  .dline .dv{color:var(--ink2)}
+  .pnote{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2);margin-top:16px;letter-spacing:.04em}
+</style>
+
+<div class="top"><div class="wrap">
+  <div class="steps" id="steps"></div>
+</div></div>
+
+<main><div class="wrap">
+
+  <!-- 0 герой -->
+  <section class="screen on" id="s0"><div class="hero">
+    <div>
+      <div class="kick">Идея книги</div>
+      <h1>Кризис это вход,<br><span class="acc">а не обрыв</span></h1>
+      <div class="sub">Развитие лидера идёт не прямой, а Петелькой.</div>
+      <div style="margin-top:32px"><button class="btn" onclick="go(1)">Пройти по траектории <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M10 24 H36"/><path d="M29 17 L36 24 L29 31"/></svg></button></div>
+    </div>
+    <img src="петелька.png?v=6" alt="Петелька">
+  </div></section>
+
+  <!-- 1 интерактив петля -->
+  <section class="screen" id="s1">
+    <div class="ihdr">
+      <div class="lab" id="railSign"></div>
+      <div class="bars" id="pbars"></div>
+      <div class="pct" id="pctL">0% пути</div>
+    </div>
+    <div class="ihero">
+      <h2>Ведите точку по траектории <span class="acc">и увидите, где вы сейчас</span></h2>
+      <div class="instr">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#5D5A52" stroke-width="1.8" stroke-linecap="round" style="flex:none;width:30px;height:30px;margin-top:2px"><path d="M10 24 H34"/><path d="M27 17 L34 24 L27 31"/><path d="M10 14 V34"/></svg>
+        <div class="t">Тяните точку слева направо или кликните по фазе внизу. Пять состояний перехода, остановитесь там, где узнаёте себя.</div>
+      </div>
+    </div>
+    <div class="ibody">
+      <div class="gcard">
+        <div class="glegend">
+          <div class="gt">траектория перехода</div>
+          <div class="lg">
+            <span><i style="border:2px solid #17161A"></i>вершина</span>
+            <span><i style="background:#17161A"></i>низ</span>
+            <span><i style="background:#4C6141"></i>новый уровень</span>
+          </div>
+        </div>
+        <div class="canvas" id="canvas">
+          <svg id="svg" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet">
+            <line x1="52" y1="352" x2="948" y2="352" stroke="rgba(23,22,26,0.18)" stroke-width="1"></line>
+            <text x="52" y="374" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;fill:#5D5A52">ВРЕМЯ</text>
+            <path id="path" d="M60 338 C 180 338, 250 92, 356 72 C 442 56, 466 168, 372 198 C 300 220, 268 140, 372 112 C 512 74, 592 296, 720 278 C 856 258, 900 116, 944 58" fill="none" stroke="#E6DFCF" stroke-width="20" stroke-linecap="round"></path>
+            <path id="prog" d="M60 338 C 180 338, 250 92, 356 72 C 442 56, 466 168, 372 198 C 300 220, 268 140, 372 112 C 512 74, 592 296, 720 278 C 856 258, 900 116, 944 58" fill="none" stroke="#C08424" stroke-width="3" stroke-linecap="round" stroke-dasharray="0 9999"></path>
+            <circle cx="60" cy="338" r="6.5" fill="#FBF8F1" stroke="#17161A" stroke-width="2.4"></circle>
+            <circle cx="356" cy="72" r="6.5" fill="#FBF8F1" stroke="#17161A" stroke-width="2.4"></circle>
+            <circle cx="372" cy="198" r="6.5" fill="#17161A"></circle>
+            <circle cx="720" cy="278" r="6.5" fill="#17161A"></circle>
+            <circle cx="944" cy="58" r="8" fill="#4C6141"></circle>
+            <text x="60" y="318" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;fill:#5D5A52">01 ПОДЪЁМ</text>
+            <text x="356" y="52" text-anchor="middle" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;fill:#5D5A52">02 НАДЛОМ</text>
+            <text x="372" y="222" text-anchor="middle" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;fill:#5D5A52">03 РАСПАД</text>
+            <text x="720" y="302" text-anchor="middle" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;fill:#5D5A52">04 КОРИДОР</text>
+            <text x="944" y="38" text-anchor="end" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;fill:#4C6141">05 НОВАЯ ЛОГИКА</text>
+            <circle id="mDot" cx="60" cy="338" r="12" fill="#C08424" stroke="#FBF8F1" stroke-width="3"></circle>
+          </svg>
+        </div>
+        <div class="rail" id="rail"></div>
+      </div>
+      <div class="side">
+        <div class="darkcard">
+          <div class="m"><svg viewBox="0 0 48 48" fill="none" stroke="#D6A24A" stroke-width="2" stroke-linecap="round" style="width:22px;height:22px"><circle cx="24" cy="24" r="13"/><path d="M24 15 V24 L32 28"/></svg><span id="phMeta"></span></div>
+          <div class="h" id="phTitle"></div>
+          <div class="x" id="phText"></div>
+        </div>
+        <div class="feel">
+          <div class="ft">как это ощущается</div>
+          <div class="feelrow"><svg viewBox="0 0 48 48" fill="none" stroke="#17161A" stroke-width="1.8" stroke-linecap="round"><path d="M12 36 V22 M24 36 V14 M36 36 V26"/><path d="M8 40 H40"/></svg><div class="r" id="phSign"></div></div>
+          <div class="feelrow"><svg viewBox="0 0 48 48" fill="none" stroke="#17161A" stroke-width="1.8" stroke-linecap="round"><circle cx="24" cy="24" r="13"/><path d="M24 17 V25"/><circle cx="24" cy="31" r="1.6" fill="#17161A"/></svg><div class="r" id="phRisk"></div></div>
+          <div class="feelrow move"><svg viewBox="0 0 48 48" fill="none" stroke="#2F5A2A" stroke-width="1.8" stroke-linecap="round"><path d="M24 10 V38"/><path d="M14 20 L24 10 L34 20"/></svg><div class="r" id="phMove"></div></div>
+        </div>
+        <div class="mark">
+          <div><div class="ml">ваша отметка</div><div class="mv" id="markL"></div></div>
+          <div class="rst" onclick="setT(PH[0].t)">сброс</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="btn ghost" onclick="go(0)"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M38 24 H12"/><path d="M19 17 L12 24 L19 31"/></svg>Назад</button>
+      <span class="hint">Отметка сохраняется, можно вернуться и уточнить</span>
+      <button class="btn" onclick="go(2)">Дальше: диагностика <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M10 24 H36"/><path d="M29 17 L36 24 L29 31"/></svg></button>
+    </div>
+  </section>
+
+  <!-- 2 зов -->
+  <section class="screen" id="s2">
+    <div class="kick">Шаг 1 · Зов</div>
+    <h2>Какой зов сейчас ваш?</h2>
+    <p class="q">Не спешите. Пролистайте и вчувствуйтесь в каждый.</p>
+    <div class="cardwrap"><button class="arrow" id="zprev">‹</button><div class="card" id="zcard"></div><button class="arrow" id="znext">›</button></div>
+    <div class="dots" id="zdots"></div>
+    <div class="nav"><button class="btn ghost" onclick="go(1)">Назад</button><button class="btn" id="zgo" style="display:none" onclick="go(3)">Далее →</button></div>
+  </section>
+
+  <!-- 3 уровень -->
+  <section class="screen" id="s3">
+    <div class="kick">Шаг 2 · Громкость</div>
+    <h2>Насколько громко он звучит?</h2>
+    <p class="q">Лучше следовать за белым кроликом, чем ждать пушистого песца.</p>
+    <div class="lrow" id="lrow"></div>
+    <div class="lends"><span class="l">тихо · легко не заметить</span><span class="r">громко · игнорировать нельзя</span></div>
+    <div class="nav"><button class="btn ghost" onclick="go(2)">Назад</button><button class="btn" id="lgo" style="display:none" onclick="go(4)">Далее →</button></div>
+  </section>
+
+  <!-- 4 логика -->
+  <section class="screen" id="s4">
+    <div class="kick">Шаг 3 · Логика</div>
+    <h2>Как вы проходите этот переход?</h2>
+    <p class="q">Три коротких вопроса.</p>
+    <div id="logicQs"></div>
+    <div class="nav"><button class="btn ghost" onclick="go(3)">Назад</button><button class="btn" id="qgo" disabled onclick="calcInsight()">Показать инсайт →</button></div>
+  </section>
+
+  <!-- 5 инсайт -->
+  <section class="screen" id="s5">
+    <div class="kick">Инсайт</div>
+    <h2>Вот что складывается</h2>
+    <div class="coords" id="coords"></div>
+    <div class="hyp"><div class="t">Гипотеза</div><div class="x" id="hyp"></div></div>
+    <div class="nav"><button class="share" onclick="alert('Ссылка на вашу Петельку скопирована (прототип)')">↗ Поделиться</button><button class="btn" onclick="buildMap();go(6)">Собрать карту перехода →</button></div>
+  </section>
+
+  <!-- 6 карта -->
+  <section class="screen" id="s6">
+    <div class="kick">Карта перехода</div>
+    <h2>Карта вашего перехода</h2>
+    <div id="mapRows" style="margin-top:14px"></div>
+    <p class="lead">Это гипотеза. Следующий шаг: проверить её на вашей ситуации вместе с экспертом команды Филиппа.</p>
+    <div class="nav"><button class="share" onclick="alert('Ссылка на вашу Петельку скопирована (прототип)')">↗ Поделиться</button><button class="btn" onclick="go(7)">Верифицировать мою стратегию →</button></div>
+  </section>
+
+  <!-- 7 верификация -->
+  <section class="screen" id="s7">
+    <div class="kick">Верификация</div>
+    <h2>Разобрать вашу Петельку</h2>
+    <p class="q">Эксперт подготовится по вашей карте заранее. Оставьте контекст.</p>
+    <div class="grid2">
+      <div class="field"><label>Имя</label><input id="f_name" placeholder="Как к вам обращаться"></div>
+      <div class="field"><label>Роль</label><input id="f_role" placeholder="Собственник / CEO / ..."></div>
+      <div class="field"><label>Компания</label><input id="f_comp" placeholder="Название"></div>
+      <div class="field"><label>Масштаб / оборот</label><input id="f_scale" placeholder="Напр. 500 млн ₽/год"></div>
+    </div>
+    <div class="field"><label>Ваш ключевой стратегический вопрос</label><textarea id="f_q" placeholder="Что для вас важнее всего решить"></textarea></div>
+    <div class="grid2">
+      <div class="field"><label>Горизонт решения</label><select id="f_hor"><option value="">выберите</option><option>сейчас</option><option>1–3 месяца</option><option>полгода+</option></select></div>
+      <div class="field"><label>Контакт</label><input id="f_contact" placeholder="Телефон / телеграм / почта"></div>
+    </div>
+    <div class="nav"><button class="btn ghost" onclick="go(6)">Назад</button><button class="btn" onclick="finish()">Отправить эксперту →</button></div>
+  </section>
+
+  <!-- 8 досье -->
+  <section class="screen" id="s8">
+    <div class="kick">Готово</div>
+    <h2>Ваша Петелька передана эксперту</h2>
+    <p class="lead" style="margin-bottom:22px">Эксперт придёт в разговор уже с вашей картой перехода. Ниже то, что он видит.</p>
+    <div class="dossier"><h4>Досье для эксперта</h4><div id="dossierBody"></div><div class="pnote">Прототип · данные сохранены локально, backend не подключён.</div></div>
+    <div class="nav"><span></span><button class="btn ghost" onclick="location.reload()">Пройти заново</button></div>
+  </section>
+
+</div></main>
+
+<script>
+  var ST=JSON.parse(localStorage.getItem('petelka_warm')||'{}');
+  function save(){ localStorage.setItem('petelka_warm', JSON.stringify(ST)); }
+  var K="#17161A", A="#C08424";
+
+  /* ---------- знаковый слой (официальные пиктограммы) ---------- */
+  function sg(inner,stroke,w){ return '<svg viewBox="0 0 48 48" fill="none" stroke="'+(stroke||K)+'" stroke-width="'+(w||1.8)+'" stroke-linecap="round" stroke-linejoin="round">'+inner+'</svg>'; }
+  var PHSIGN=[
+    '<path d="M8 38 C 16 38, 22 14, 40 10"/><circle cx="40" cy="10" r="2.8"/>',
+    '<path d="M8 36 C 16 36, 20 14, 27 13"/><path d="M33 13 C 40 14, 42 24, 42 30"/><path d="M27 8 L27 19 M33 8 L33 19"/>',
+    '<circle cx="24" cy="24" r="13" stroke-dasharray="4 5"/><path d="M18 30 L30 18"/>',
+    '<path d="M10 12 V36"/><path d="M38 12 V36"/><path d="M16 24 H32"/><path d="M28 20 L32 24 L28 28"/>',
+    '<circle cx="24" cy="24" r="8"/><path d="M24 4 V10 M24 38 V44 M4 24 H10 M38 24 H44 M10 10 L14 14 M34 34 L38 38 M38 10 L34 14 M14 34 L10 38"/>'];
+  var ZSIGN=[
+    '<circle cx="24" cy="24" r="12"/><circle cx="24" cy="24" r="4"/>',
+    '<rect x="12" y="14" width="24" height="20"/><path d="M12 20 H4 M36 28 H44 M20 14 V6 M28 34 V42"/>',
+    '<path d="M10 38 L20 20 L26 28 L32 12 L40 30"/><path d="M6 42 H42"/>',
+    '<path d="M12 10 V38 M20 10 V38 M28 10 V38 M36 10 V38"/><path d="M8 10 H40 M8 38 H40"/>',
+    '<path d="M24 40 V24"/><path d="M24 24 L10 8 M24 24 L38 8"/><circle cx="24" cy="24" r="2.4"/>',
+    '<circle cx="24" cy="24" r="14"/><path d="M24 14 V24 L32 29"/><path d="M24 24 L18 32"/>',
+    '<path d="M6 34 C 14 34, 16 18, 24 18 C 32 18, 34 34, 42 34"/><path d="M24 18 V6"/>',
+    '<path d="M24 8 V40"/><path d="M24 16 C 16 16, 12 22, 12 28 C 20 28, 24 22, 24 16"/><path d="M24 20 C 32 20, 36 26, 36 32 C 28 32, 24 26, 24 20"/>',
+    '<path d="M8 34 L28 24"/><path d="M22 21 L28 24 L25 30"/><circle cx="38" cy="19" r="4"/>',
+    '<circle cx="24" cy="24" r="13"/><circle cx="27" cy="20" r="2.6"/>'];
+
+  /* ---------- данные ---------- */
+  var ZOVY=[["Большая игра","Масштаб не тот, играю не с теми."],["В меня не помещается","Мне всё надо, но я не вывожу."],
+    ["Кризис","Всё горит, а я анекдоты рассказываю."],["Золотая клетка","Как будто варёную тряпку жую."],
+    ["Витязь на распутье","Куда ни пойдёшь, по голове."],["Трудоголизм","За успех плачу собой и близкими."],
+    ["Новая эпоха","Порох в пороховницах ещё есть."],["Творческий импульс","Я беременный своим талантом."],
+    ["Что-то упускаю","Готов к рывку, но не за что ухватиться."],["Поиск себя","Свою ли жизнь я живу?"]];
+  var LEVELS=[["Флирт","Едва заметный интерес, «вот бы мне»."],["Эмоции","Апатия, скука, вина без причины."],
+    ["Неуспехи","Осечки на ровном месте."],["Отношения","Начинает сыпаться близкое."],["Тело","Соматика, организм выключает."]];
+  var LVLI=[
+   '<svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="2.4" fill="'+K+'"/></svg>',
+   '<svg viewBox="0 0 30 30"><rect x="10" y="10" width="10" height="10" fill="'+K+'"/></svg>',
+   '<svg viewBox="0 0 30 30"><rect x="7" y="7" width="16" height="16" fill="'+K+'"/><path d="M15 3 L18 14 L12 14 L16 27" fill="none" stroke="'+A+'" stroke-width="2.6"/></svg>',
+   '<svg viewBox="0 0 30 30"><rect x="4" y="5" width="18" height="20" fill="'+K+'"/><polygon points="18,4 28,4 28,26" fill="'+A+'"/></svg>',
+   '<svg viewBox="0 0 30 30"><rect x="2" y="2" width="26" height="26" fill="'+K+'"/></svg>'];
+  var LOGICQ=[["Когда что-то идёт не так, я…",[["беру на себя и дожимаю результатом","D"],["сижу с этим, иду в себя / к коучу","I"],["спрашиваю: о чём этот сигнал системы","S"]]],
+    ["Что для меня сейчас важнее?",[["цели, скорость, эффективность","D"],["смысл, отношения, быть собой","I"],["система, наследие, развитие целого","S"]]],
+    ["Неопределённость для меня…",[["враг, стараюсь её убрать","D"],["пространство поиска себя","I"],["топливо и материал для игры","S"]]]];
+  var LOGIC={D:"Достигатель",I:"Индивидуалист",S:"Стратег"};
+  var HYP={D:"Похоже, вы пытаетесь войти в следующую игру, становясь ещё эффективнее в предыдущей. Возможно, дело не в том, чтобы делать больше, а в том, чтобы сменить саму логику.",
+    I:"Вы уже вышли из прежней логики, но новая опора ещё не собралась. Задача перехода: выдержать неопределённость и собрать себя заново.",
+    S:"Вы видите систему, но что-то в текущей конструкции ещё держит вас в прежнем масштабе. Задача: найти, что именно пора отпустить."};
+
+  /* ---------- зов ---------- */
+  var zi=0, zcard=document.getElementById('zcard'), zdots=document.getElementById('zdots');
+  ZOVY.forEach(function(z,i){ var d=document.createElement('div'); d.className='dot'; d.onclick=function(){zi=i;renderZ()}; zdots.appendChild(d); });
+  function renderZ(){
+    var ic=ZSIGN[zi]?'<div class="zicon">'+sg(ZSIGN[zi])+'</div>':'';
+    zcard.innerHTML='<div class="num">'+(zi+1)+' / 10</div>'+ic+
+      '<div class="name">'+ZOVY[zi][0]+'</div><div class="line">«'+ZOVY[zi][1]+'»</div>'+
+      '<div class="check'+(ST.zovIdx===zi?' on':'')+'" onclick="selZ()"><span class="box"></span><span class="lab">'+(ST.zovIdx===zi?'Это мой зов':'Отметить: мой зов')+'</span></div>';
+    [].forEach.call(zdots.children,function(d,i){ d.className='dot'+(i===zi?' on':''); });
+    document.getElementById('zgo').style.display=(ST.zovIdx!=null?'inline-flex':'none');
+  }
+  document.getElementById('zprev').onclick=function(){ zi=(zi+9)%10; renderZ(); };
+  document.getElementById('znext').onclick=function(){ zi=(zi+1)%10; renderZ(); };
+  function selZ(){ ST.zovIdx=zi; ST.zov=ZOVY[zi][0]; ST.zovLine=ZOVY[zi][1]; save(); renderZ(); }
+  renderZ();
+
+  /* ---------- уровень ---------- */
+  var lrow=document.getElementById('lrow');
+  LEVELS.forEach(function(l,i){ var b=document.createElement('div'); b.className='lcell';
+    b.innerHTML='<div class="lnum">'+(i+1)+'</div><div class="lbox">'+LVLI[i]+'</div><div class="lname">'+l[0]+'</div><div class="ldesc">'+l[1]+'</div>';
+    b.onclick=function(){ [].forEach.call(lrow.children,function(x){x.classList.remove('sel')}); b.classList.add('sel'); ST.level=i+1; ST.levelName=l[0]; save(); document.getElementById('lgo').style.display='inline-flex'; };
+    lrow.appendChild(b); });
+
+  /* ---------- логика ---------- */
+  var lq=document.getElementById('logicQs'); ST.logicAns=ST.logicAns||{};
+  LOGICQ.forEach(function(q,qi){ var d=document.createElement('div'); d.className='qblock';
+    d.innerHTML='<div class="qh">'+q[0]+'</div>'; var box=document.createElement('div'); box.className='opts';
+    q[1].forEach(function(o){ var b=document.createElement('button'); b.className='opt'; b.textContent=o[0];
+      b.onclick=function(){ [].forEach.call(box.children,function(x){x.classList.remove('sel')}); b.classList.add('sel'); ST.logicAns[qi]=o[1]; save(); if(Object.keys(ST.logicAns).length===3) document.getElementById('qgo').disabled=false; };
+      box.appendChild(b); });
+    d.appendChild(box); lq.appendChild(d); });
+
+  function calcInsight(){
+    var t={D:0,I:0,S:0}; Object.keys(ST.logicAns).forEach(function(k){t[ST.logicAns[k]]++});
+    var win=Object.keys(t).sort(function(a,b){return t[b]-t[a]})[0]; ST.logic=win; ST.logicName=LOGIC[win]; ST.hyp=HYP[win]; save();
+    document.getElementById('coords').innerHTML=
+      '<div class="coord"><div class="cl">Зов</div><div class="cv">'+ST.zov+'</div></div>'+
+      '<div class="coord"><div class="cl">Громкость</div><div class="cv">'+ST.level+' / 5 <small>'+ST.levelName+'</small></div></div>'+
+      '<div class="coord"><div class="cl">Логика</div><div class="cv">'+ST.logicName+'</div></div>';
+    document.getElementById('hyp').textContent=ST.hyp;
+    go(5);
+  }
+  function buildMap(){
+    document.getElementById('mapRows').innerHTML=
+      row('Какой зов звучит',ST.zov+' · «'+ST.zovLine+'»')+row('На каком уровне',ST.level+' / 5 · '+ST.levelName)+
+      row('Из какой логики',ST.logicName)+row('Гипотеза перехода',ST.hyp)+
+      row('Вопрос к себе','Что в вашей текущей конструкции уже не соответствует следующему масштабу?');
+  }
+  function row(k,v){ return '<div class="maprow"><div class="mk">'+k+'</div><div class="mv">'+v+'</div></div>'; }
+  function finish(){
+    ST.name=v('f_name');ST.role=v('f_role');ST.comp=v('f_comp');ST.scale=v('f_scale');ST.question=v('f_q');ST.horizon=v('f_hor');ST.contact=v('f_contact');save();
+    document.getElementById('dossierBody').innerHTML=
+      dl('Зов',ST.zov)+dl('Уровень',ST.level+' / 5 · '+ST.levelName)+dl('Логика',ST.logicName)+dl('Гипотеза',ST.hyp)+
+      dl('Имя',ST.name||'—')+dl('Роль',ST.role||'—')+dl('Компания',ST.comp||'—')+dl('Масштаб',ST.scale||'—')+dl('Вопрос',ST.question||'—')+dl('Горизонт',ST.horizon||'—')+dl('Контакт',ST.contact||'—');
+    go(8);
+  }
+  function v(id){ return (document.getElementById(id).value||'').trim(); }
+  function dl(k,val){ return '<div class="dline"><div class="dk">'+k+'</div><div class="dv">'+val+'</div></div>'; }
+
+  /* ---------- интерактив петля (по референсу) ---------- */
+  var PH=[
+    {meta:'Фаза 01 · подъём',title:'Достигатель бежит вверх',text:'Берёт высоту за высотой. Прежние инструменты работают.',sign:'Рост есть, вопросов к себе нет.',risk:'Риск: не заметить, что потолок уже близко.',move:'Ход: искать задачу на размер больше.',t:0.10},
+    {meta:'Фаза 02 · надлом',title:'Вершина перестаёт держать',text:'Результат есть, а опоры под ним больше нет.',sign:'Успех не приносит того, что обещал.',risk:'Риск: удвоить усилие вместо смены способа.',move:'Ход: назвать, что именно перестало работать.',t:0.30},
+    {meta:'Фаза 03 · распад',title:'Ночь души',text:'Прежняя конструкция разбирается, новой ещё нет.',sign:'Апатия, потеря смысла, осечки на ровном.',risk:'Риск: принять пустоту за поломку себя.',move:'Ход: снизить обороты и выдержать паузу.',t:0.45},
+    {meta:'Фаза 04 · коридор',title:'Идёшь без карты',text:'Пробуешь новое, но старым способом мерить уже нельзя.',sign:'Решения даются медленно и на ощупь.',risk:'Риск: вернуться в прежнюю роль от усталости.',move:'Ход: маленькие ставки вместо одного прыжка.',t:0.72},
+    {meta:'Фаза 05 · новая логика',title:'Другой уровень сложности',text:'Появляется способ видеть, которого раньше не было.',sign:'Масштаб вырос, суеты стало меньше.',risk:'Риск: закрепиться и снова уснуть на вершине.',move:'Ход: закрепить новую опору в системе решений.',t:0.97}];
+  var NODES=[[60,338],[356,72],[372,198],[720,278],[944,58]];
+  var RNAMES=['Подъём','Надлом','Распад','Коридор','Новая логика'];
+  var svg=document.getElementById('svg'), path=document.getElementById('path'), prog=document.getElementById('prog'),
+      canvas=document.getElementById('canvas'), mDot=document.getElementById('mDot');
+  var LEN=0, SAMP=[], curT=(function(){var v=parseFloat(ST.t); return isNaN(v)?PH[0].t:v;})(), drag=false;
+
+  // рельса
+  var rail=document.getElementById('rail');
+  PH.forEach(function(p,i){ var c=document.createElement('div'); c.className='rcell'; c.dataset.i=i;
+    c.innerHTML='<div id="rp'+i+'">'+sg(PHSIGN[i],K,1.8)+'</div><div class="rn">0'+(i+1)+'</div><div class="rnm">'+RNAMES[i]+'</div>';
+    c.onclick=function(){ setT(PH[i].t); }; rail.appendChild(c); });
+  // прогресс-полоски и знак в шапке
+  var pbars=document.getElementById('pbars');
+  for(var b=0;b<5;b++){ var s=document.createElement('span'); pbars.appendChild(s); }
+  document.getElementById('railSign').innerHTML=sg(PHSIGN[0],'#8A5A12',2.2).replace('width="48"','')+'<span>карта перехода</span>';
+  document.getElementById('railSign').querySelector('svg').setAttribute('style','width:22px;height:22px');
+
+  function buildSamples(){ LEN=path.getTotalLength(); if(!LEN)return; SAMP=[];
+    for(var k=0;k<=1000;k++){ var p=path.getPointAtLength(LEN*k/1000); SAMP.push([p.x,p.y]); }
+    NODES.forEach(function(n,i){ var best=0,bd=Infinity; for(var k=0;k<SAMP.length;k++){ var dd=(SAMP[k][0]-n[0])*(SAMP[k][0]-n[0])+(SAMP[k][1]-n[1])*(SAMP[k][1]-n[1]); if(dd<bd){bd=dd;best=k;} } PH[i].t=best/1000; });
+  }
+  function tAtXY(x,y){ if(!SAMP.length)return curT; var best=0,bd=Infinity;
+    for(var k=0;k<SAMP.length;k++){ var dd=(SAMP[k][0]-x)*(SAMP[k][0]-x)+(SAMP[k][1]-y)*(SAMP[k][1]-y); if(dd<bd){bd=dd;best=k;} } return best/1000; }
+  function nearestI(){ var i=0,d=Infinity; PH.forEach(function(p,k){ var dd=Math.abs(p.t-curT); if(dd<d){d=dd;i=k;} }); return i; }
+  function setT(t){ curT=Math.max(0,Math.min(1,t)); ST.t=curT; save(); renderP(); }
+  function renderP(){
+    if(!LEN)return; var q=path.getPointAtLength(LEN*curT);
+    mDot.setAttribute('cx',q.x); mDot.setAttribute('cy',q.y);
+    prog.setAttribute('stroke-dasharray',(LEN*curT)+' '+LEN);
+    var i=nearestI(), ph=PH[i];
+    document.getElementById('phMeta').textContent=ph.meta; document.getElementById('phTitle').textContent=ph.title;
+    document.getElementById('phText').textContent=ph.text; document.getElementById('phSign').textContent=ph.sign;
+    document.getElementById('phRisk').textContent=ph.risk; document.getElementById('phMove').textContent=ph.move;
+    document.getElementById('markL').textContent=ph.title;
+    document.getElementById('pctL').textContent=Math.round(curT*100)+'% пути';
+    for(var b=0;b<5;b++){ pbars.children[b].className=(b<=i?'f':''); }
+    [].forEach.call(rail.children,function(c,k){ c.className='rcell'+(k===i?' on':'');
+      var stroke=(k===i)?(k===4?'#2F5A2A':'#8A5A12'):K; document.getElementById('rp'+k).innerHTML=sg(PHSIGN[k],stroke,1.8); });
+  }
+  function evtXY(e){ var r=canvas.getBoundingClientRect(); var sc=Math.min(r.width/1000,r.height/400);
+    var ox=(r.width-1000*sc)/2, oy=(r.height-400*sc)/2; return [(e.clientX-r.left-ox)/sc,(e.clientY-r.top-oy)/sc]; }
+  canvas.addEventListener('pointerdown',function(e){ canvas.classList.add('drag'); try{e.target.setPointerCapture&&e.target.setPointerCapture(e.pointerId);}catch(x){} var xy=evtXY(e); setT(tAtXY(xy[0],xy[1])); drag=true; });
+  canvas.addEventListener('pointermove',function(e){ if(!drag)return; var xy=evtXY(e); setT(tAtXY(xy[0],xy[1])); });
+  function endDrag(){ drag=false; canvas.classList.remove('drag'); }
+  canvas.addEventListener('pointerup',endDrag); canvas.addEventListener('pointerleave',endDrag);
+  document.addEventListener('keydown',function(e){ if(!document.getElementById('s1').classList.contains('on'))return;
+    if(e.key==='ArrowRight')setT(curT+0.02); if(e.key==='ArrowLeft')setT(curT-0.02); });
+
+  /* ---------- навигация ---------- */
+  var TOT=8, stepsEl=document.getElementById('steps');
+  for(var i=1;i<=TOT;i++){ var s=document.createElement('div'); s.className='stp'; stepsEl.appendChild(s); }
+  function go(n){
+    document.querySelector('.screen.on').classList.remove('on');
+    document.getElementById('s'+n).classList.add('on'); window.scrollTo(0,0);
+    var sn=parseInt(n,10)||0;
+    [].forEach.call(stepsEl.children,function(s,i){ s.className='stp'; if(i<sn-1)s.classList.add('done'); else if(i===sn-1)s.classList.add('on'); });
+    if(n===1){ requestAnimationFrame(function(){ if(!LEN)buildSamples(); renderP(); }); }
+  }
+</script>

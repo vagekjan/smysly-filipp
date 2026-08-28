@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Матрица зовов × уровни · слайд</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23fff'/><rect x='20' y='20' width='60' height='60' fill='none' stroke='%23F2B600' stroke-width='8'/><path d='M20 47 H80 M50 20 V80' stroke='%2317161A' stroke-width='6'/></svg>">
+<style>
+  :root{--ink:#17161A;--ink2:#4A4D52;--muted:#8C8677;--accent:#F2B600;--accent-ink:#8A5A12;--green:#2F5A2A;--rule:rgba(23,22,26,.12);--rule2:rgba(23,22,26,.2)}
+  *{box-sizing:border-box;margin:0}
+  body{background:#fff;color:var(--ink);font-family:'Golos Text',sans-serif;padding:26px clamp(16px,2.5vw,40px) 30px}
+  .slide{max-width:1680px;margin:0 auto}
+  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:18px}
+  h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(26px,3.4vw,44px);text-transform:uppercase;line-height:1;letter-spacing:0}
+  h1 .x{color:var(--accent)}
+  .sub{font-size:15px;color:var(--ink2);margin-top:6px}
+  .sub b{border-bottom:3px solid var(--accent);padding-bottom:1px}
+  .rabbit{font-family:'Golos Text';font-size:13px;line-height:1.4;color:var(--ink);border:1px solid var(--rule2);padding:11px 16px;max-width:280px}
+  .rabbit b{color:var(--accent-ink)}
+
+  .grid{display:grid;grid-template-columns:150px repeat(10,1fr);border:1px solid var(--rule2);border-right:0;border-bottom:0}
+  .c{border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:8px 9px;min-width:0}
+  /* угловая ячейка */
+  .corner{border-right:1px solid var(--rule2);border-bottom:1px solid var(--rule2);display:flex;align-items:flex-end;padding:10px}
+  .corner span{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  /* заголовки зовов */
+  .zh{border-bottom:1px solid var(--rule2);text-align:left}
+  .zh .n{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent-ink);letter-spacing:.1em}
+  .zh .nm{font-family:'Oswald',sans-serif;font-weight:600;font-size:12.5px;text-transform:uppercase;line-height:1.05;margin:3px 0 4px}
+  .zh .q{font-size:10.5px;line-height:1.3;color:var(--muted)}
+  /* заголовки уровней (первая колонка) */
+  .lh{border-right:1px solid var(--rule2)}
+  .lh .ln{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-family:'Oswald',sans-serif;font-weight:700;font-size:12px;color:#fff}
+  .lh .lnm{font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;text-transform:uppercase;line-height:1.08;margin:6px 0 3px}
+  .lh .ld{font-size:10px;color:var(--muted);line-height:1.3}
+  /* ячейки-состояния */
+  .cell{font-size:11px;line-height:1.32;color:var(--ink)}
+  .r1{background:rgba(242,182,0,.05)}.r2{background:rgba(242,182,0,.09)}.r3{background:rgba(232,64,31,.05)}.r4{background:rgba(232,64,31,.08)}.r5{background:rgba(232,64,31,.12)}
+
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-top:18px}
+  .note{display:flex;align-items:flex-start;gap:12px;border:1px dashed var(--rule2);padding:12px 16px;max-width:520px}
+  .note .t{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);margin-bottom:4px}
+  .note .d{font-size:12.5px;color:var(--ink2);line-height:1.4}
+  .next{font-size:13px;color:var(--ink2);text-align:right}
+  .next b{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:3px}
+  @media(max-width:1100px){body{overflow-x:auto}.slide{min-width:1100px}}
+</style>
+
+<div class="slide">
+  <div class="head">
+    <div>
+      <h1>Бизнесовые зовы <span class="x">×</span> уровни зова</h1>
+      <div class="sub"><b>50 портретов состояний вашего бизнеса</b></div>
+    </div>
+    <div class="rabbit">Лучше следовать за <b>белым кроликом</b>, чем ждать пушистого песца.</div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="foot">
+    <div class="note">
+      <div>
+        <div class="t">Это не диагноз. Это сигнал.</div>
+        <div class="d">Ваш бизнес зовёт вас к изменениям. Главное — услышать, на каком уровне этот зов звучит сейчас.</div>
+      </div>
+    </div>
+    <div class="next"><b>Дальше — определим</b>где требуются изменения: во мне, в бизнесе или и там, и там →</div>
+  </div>
+</div>
+
+<script>
+var ZOV=[
+ ["Большая игра","Масштаб не тот, играем не с теми"],
+ ["В меня не помещается","Всё хочу, но бизнес не тянет"],
+ ["Кризис","Пожары каждый день"],
+ ["Золотая клетка (Маета)","Деньги есть, но удовольствия нет"],
+ ["Витязь на распутье","Налево — вправо — прямо здесь"],
+ ["Трудоголизм","Работа всё сожрала"],
+ ["Новая эпоха","Порох в пороховницах ещё есть"],
+ ["Творческий импульс","Беременный своим талантом"],
+ ["Что-то упускаю","Чувствую силу, но не вижу рычаг роста"],
+ ["Поиск себя","Не знаю, зачем я это делаю"]];
+var LVL=[
+ ["Вдохновение и интерес","Тянет к новому, хочется отдыха и вдохновения","#E7B22C"],
+ ["Негативные эмоции","Апатия, скука, агрессия, вина","#D9A23A"],
+ ["Неуспехи на ровном месте","Всё идёт не так, как раньше","#C08424"],
+ ["Разрушение отношений","Трещит в семье и в бизнесе","#B3261E"],
+ ["Соматика, болезни","Тело говорит: «СТОП»","#7A1B14"]];
+var CELL=[
+ ["Мечтаю о другой лиге","Хочу всё и сразу","Ещё держится, но искра тусклая","Вроде всё есть, а жить не вкусно","Интересно, куда меня выведет поворот?","Работаю с огнём (пока нравится)","Чувствую ветер перемен","Идеи прут!","Чую потенциал, но где кнопка «ПУСК»?","Ищу себя, но пока любопытно"],
+ ["Уже не восторгает","Хочу всего, но не успеваю","Раздражает каждый день","Скучно до зевоты","Любой путь бесит понемногу","Усталость — мой второй директор","Старое бесит, новое не ясно","Много идей, мало сил","Чувствую, что упускаю возможность","Кто я? Вопрос начинает напрягать"],
+ ["Почему я стараюсь, а не расту?","Хватаю за всё, а результата ноль","Пожары не гаснут, они размножаются","Деньги есть, но счастья почему-то нет","Ошибаюсь на каждом повороте","Делаю больше, получаю меньше","Пытаюсь меняться, но буксую","Талант есть, а выстрела нет","Вижу цель, но постоянно мимо","Не понимаю, туда ли вообще иду"],
+ ["Партнёры на другой волне","Команда выдыхается рядом со мной","Ссоры, крики, недовольные лица","Близкие меня не узнают","Выбираю путь — теряю людей","Работаю, а дома меня нет","Друзья, семья не понимают моих идей","Моё творчество никому не нужно?","Никто не верит в мою цель","Чувствую себя чужим для себя"],
+ ["Организм говорит: «ХВАТИТ!»","Выжимаю себя досуха","Скорая — мой частый гость","Тело не даёт дальше","Решение за меня принимает больница","Хроническая усталость — мой стиль жизни","Нервы — как струна на грани","Творю через боль и апатию","Потерял вкус, сон и энергию","Не знаю, проснулся ли я вообще живым"]];
+
+var g=document.getElementById('grid'), h='';
+h+='<div class="corner"><span>Уровень \\ Зов</span></div>';
+ZOV.forEach(function(z,i){ h+='<div class="c zh"><div class="n">'+(i+1)+'</div><div class="nm">'+z[0]+'</div><div class="q">«'+z[1]+'»</div></div>'; });
+LVL.forEach(function(l,r){
+  h+='<div class="c lh"><span class="ln" style="background:'+l[2]+'">'+(r+1)+'</span><div class="lnm">'+l[0]+'</div><div class="ld">'+l[1]+'</div></div>';
+  for(var c=0;c<10;c++){ h+='<div class="c cell r'+(r+1)+'">'+CELL[r][c]+'</div>'; }
+});
+g.innerHTML=h;
+</script>

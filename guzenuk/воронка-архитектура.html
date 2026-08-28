@@ -1,0 +1,248 @@
+<meta charset="utf-8">
+<title>Архитектура воронки · Гузенюк</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23EFE7D6'/><path d='M20 76 C20 40 46 22 57 44 C64 58 42 64 42 46 C42 30 68 28 82 20' fill='none' stroke='%23CE3A20' stroke-width='6' stroke-linecap='round'/></svg>">
+<style>
+  :root{
+    --paper:#EFE7D6; --paper2:#E7DEC9; --card:#FBF7EF; --ink:#141210; --ink2:#3b3529;
+    --red:#CE3A20; --redt:#F4E7E1; --yellow:#E7B22C; --mut:#6f6656; --mut2:#9a917f;
+    --line:rgba(20,18,16,.16); --edge:#141210; --branchA:#141210; --branchB:#CE3A20;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:'Helvetica Neue',Arial,system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  header{padding:40px 0 8px;position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--paper) 70%,rgba(239,231,214,.85));border-bottom:1px solid var(--line)}
+  .htop{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+  .htop .ttl{font-weight:800;font-size:clamp(21px,2.7vw,32px);color:var(--ink);letter-spacing:-.02em}
+  .htop .ttl b{color:var(--red);font-weight:800}
+  .htop .sub{font-size:12.5px;color:var(--mut);margin-top:5px}
+  .modes{display:flex;gap:3px;border:2px solid var(--ink);padding:3px}
+  .modes button{border:0;background:transparent;color:var(--ink);font:inherit;font-size:12.5px;font-weight:700;padding:8px 16px;cursor:pointer;transition:all .2s;white-space:nowrap}
+  .modes button.on{background:var(--ink);color:var(--paper)}
+  .modehint{font-size:12.5px;color:var(--mut);margin:14px 0 0;min-height:18px;font-weight:600}
+  main{padding:22px 0 40px}
+  .flow{display:flex;flex-direction:column;align-items:center;gap:0}
+  .conn{width:2px;height:30px;background:var(--ink);position:relative;flex:none}
+  .conn::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);border-left:5px solid transparent;border-right:5px solid transparent;border-top:8px solid var(--red)}
+  .node{width:min(640px,92vw);background:var(--card);border:1.5px solid var(--ink);padding:20px 24px;cursor:pointer;position:relative;transition:transform .2s cubic-bezier(.2,.8,.25,1),box-shadow .2s}
+  .node:hover{transform:translateY(-2px);box-shadow:8px 8px 0 rgba(20,18,16,.9)}
+  .node .num{font-family:ui-monospace,monospace;font-size:12px;color:var(--red);letter-spacing:.08em;font-weight:700}
+  .node .nt{font-weight:800;font-size:clamp(18px,2.1vw,25px);color:var(--ink);margin:5px 0;letter-spacing:-.02em}
+  .node .ns{font-size:13.5px;color:var(--ink2);max-width:56ch;font-weight:500}
+  .node .badge{position:absolute;top:-11px;right:16px;font-family:ui-monospace,monospace;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;background:var(--red);color:var(--paper);display:none}
+  .node .op{margin-top:11px;font-size:12px;color:var(--red);font-weight:700;display:none;align-items:center;gap:8px}
+  .node .op::before{content:"→ ОП:";font-family:ui-monospace,monospace;color:var(--mut2);font-weight:400}
+  .booknode{display:flex;gap:24px;align-items:center}
+  .booknode .txt{flex:1}
+  .booknode .cover{width:clamp(96px,12vw,132px);flex:none;border:1.5px solid var(--ink);box-shadow:5px 5px 0 rgba(20,18,16,.85);display:block}
+  @media(max-width:520px){.booknode{flex-direction:column;align-items:flex-start}}
+  .insertnode .preview{width:100%;margin-top:14px;border:1.5px solid var(--ink);box-shadow:5px 5px 0 rgba(20,18,16,.85);display:block}
+  .openlink{display:block;position:relative;margin-top:14px;text-decoration:none;cursor:pointer}
+  .openlink .preview{margin-top:0}
+  .openbadge{position:absolute;left:12px;bottom:12px;background:var(--ink);color:var(--paper);font-family:ui-monospace,monospace;font-size:12px;font-weight:700;padding:8px 14px;letter-spacing:.02em;display:flex;align-items:center;gap:6px}
+  .openlink:hover .openbadge{background:var(--red)}
+  .embedwrap{margin-top:14px;border:1.5px solid var(--ink);box-shadow:5px 5px 0 rgba(20,18,16,.85);position:relative;overflow:hidden}
+  .embedbar{display:flex;justify-content:space-between;align-items:center;background:var(--ink);padding:7px 12px}
+  .embedbar .lbl{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut2)}
+  .embedopen{font-family:ui-monospace,monospace;font-size:12px;font-weight:700;color:var(--paper);text-decoration:none;padding:4px 10px;border:1px solid rgba(255,255,255,.25)}
+  .embedopen:hover{background:var(--red);border-color:var(--red)}
+  .embed{width:100%;height:clamp(380px,54vh,560px);border:0;display:block;background:#1c1a17}
+  .node.insight,.node.final{background:var(--redt);border-color:var(--red);border-width:2px}
+  .node.handoff{border-width:2.5px}
+  .node.fork{border-style:dashed}
+  .core-wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:0;padding:28px 0 10px;margin:6px 0}
+  .core-label{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--mut);margin-bottom:8px;font-weight:700}
+  .core-wrap::before{content:"";position:absolute;inset:0;border:1.5px dashed rgba(20,18,16,.28);pointer-events:none}
+  .branches{display:grid;grid-template-columns:1fr 1fr;gap:20px;width:min(720px,94vw);margin-top:4px}
+  @media(max-width:680px){.branches{grid-template-columns:1fr}}
+  .branch-head{grid-column:1/-1;text-align:center;font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);margin-bottom:2px;font-weight:700}
+  .btag{display:inline-block;font-family:ui-monospace,monospace;font-size:11px;font-weight:700;padding:3px 9px;margin-bottom:8px;color:var(--paper)}
+  .bA .btag{background:var(--ink)}
+  .bB .btag{background:var(--red)}
+  body.mode-method .node:not([data-method]){opacity:.3}
+  body.mode-method .node[data-method] .badge{display:inline-block}
+  body.mode-data .node[data-op] .op{display:flex}
+  body.mode-data .dossier{display:block}
+  .dossier{display:none;position:fixed;right:20px;top:118px;width:250px;z-index:25;background:var(--card);border:2px solid var(--ink);padding:18px 18px 14px}
+  @media(max-width:1180px){.dossier{position:static;width:min(640px,92vw);margin:20px auto 0}}
+  .dossier h4{margin:0 0 4px;font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--red);font-weight:700}
+  .dossier .dh{font-size:11.5px;color:var(--mut);margin-bottom:12px}
+  .dossier ul{margin:0;padding:0;list-style:none}
+  .dossier li{font-size:12.5px;color:var(--ink2);padding:6px 0;border-top:1px solid var(--line);display:flex;gap:8px;font-weight:500}
+  .dossier li .k{color:var(--red);font-family:ui-monospace,monospace;font-size:11px;flex:none;width:74px;font-weight:700}
+  .logic{margin:70px 0 30px;border-top:2px solid var(--ink);padding-top:44px}
+  .logic h3{font-weight:800;font-size:clamp(20px,2.4vw,28px);color:var(--ink);margin:0 0 4px;text-align:center;letter-spacing:-.02em}
+  .logic .ls{text-align:center;font-size:13px;color:var(--mut);margin:0 0 30px;font-weight:600}
+  .chain{display:flex;flex-direction:column;align-items:center;gap:0}
+  .ch{width:min(560px,92vw);display:flex;gap:16px;align-items:baseline;padding:13px 20px;background:var(--card);border:1.5px solid var(--ink)}
+  .ch .cn{font-weight:800;font-size:15px;color:var(--red);flex:none;width:160px;letter-spacing:-.01em}
+  .ch .cq{font-size:13.5px;color:var(--ink2);font-weight:500}
+  .ch.split{background:transparent;border:0;justify-content:center;gap:40px;padding:8px 0}
+  .ch.split span{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+  .ch.split .a{color:var(--ink)}.ch.split .b{color:var(--red)}
+  .cconn{width:2px;height:14px;background:var(--ink)}
+  .scrim{position:fixed;inset:0;background:rgba(20,18,16,.45);opacity:0;pointer-events:none;transition:opacity .3s;z-index:40}
+  .scrim.on{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(460px,94vw);z-index:50;background:var(--paper);border-left:3px solid var(--ink);transform:translateX(100%);transition:transform .4s cubic-bezier(.2,.8,.25,1);overflow-y:auto;box-shadow:-20px 0 60px -30px rgba(0,0,0,.5)}
+  .drawer.on{transform:none}
+  .dr-in{padding:34px 32px 60px}
+  .dr-close{position:absolute;top:20px;right:22px;width:34px;height:34px;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;font-size:15px;font-weight:700}
+  .dr-num{font-family:ui-monospace,monospace;font-size:12px;color:var(--red);letter-spacing:.1em;font-weight:700}
+  .dr-t{font-weight:800;font-size:25px;color:var(--ink);margin:8px 0 20px;letter-spacing:-.02em;line-height:1.08}
+  .dr-sec{margin:0 0 18px}
+  .dr-sec .lab{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:5px;font-weight:700}
+  .dr-sec p{margin:0;font-size:14px;line-height:1.6;color:var(--ink2);font-weight:500}
+  .dr-cta{display:inline-block;font-family:ui-monospace,monospace;font-size:12px;color:var(--paper);background:var(--red);padding:6px 12px;font-weight:700}
+  .dr-share{display:inline-block;font-size:12px;color:var(--red);border:1.5px solid var(--ink);padding:5px 12px;margin-top:4px;font-weight:700}
+  .foot{text-align:center;padding:20px 0 70px;font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.14em;color:var(--mut2)}
+</style>
+
+<header>
+  <div class="wrap">
+    <div class="htop">
+      <div>
+        <div class="ttl">Архитектура воронки · <b>Филипп Гузенюк</b></div>
+        <div class="sub">Книга → вкладыш → диагностика → квалифицированный лид → отдел продаж · кликните блок для деталей</div>
+      </div>
+      <div class="modes" id="modes">
+        <button data-mode="client" class="on">Путь клиента</button>
+        <button data-mode="method">Методология</button>
+        <button data-mode="data">Данные для ОП</button>
+      </div>
+    </div>
+    <div class="modehint" id="modehint">Так систему видит клиент: от книги до разговора с экспертом.</div>
+  </div>
+</header>
+
+<main><div class="wrap"><div class="flow" id="flow">
+
+  <div class="node booknode" data-id="b0"><div class="txt"><div class="num">00</div><div class="nt">Книга</div><div class="ns">Человек получает книгу «От достигателя к стратегу».</div></div><img class="cover" src="обложка-книги.png" alt="Обложка книги"></div>
+  <div class="conn"></div>
+  <div class="node insertnode" data-id="b1"><div class="num">01</div><div class="nt">Вкладыш</div><div class="ns">Не продать продукт, а вызвать желание зайти в digital-механику. CTA: «Собрать свою Петельку».</div><div class="embedwrap" onclick="event.stopPropagation()"><div class="embedbar"><span class="lbl">Листаемый вкладыш · стрелки внизу</span><a class="embedopen" href="вкладыш-макет.html" target="_blank" rel="noopener">На весь экран ↗</a></div><iframe class="embed" src="вкладыш-макет.html" title="Вкладыш" loading="lazy"></iframe></div></div>
+  <div class="conn"></div>
+  <div class="node core" data-id="b2" data-method><div class="badge">Петелька</div><div class="num">02</div><div class="nt">Вход в digital-механику</div><div class="ns">Короткое объяснение Петельки и главный вопрос о текущем переходе.</div><div class="embedwrap" onclick="event.stopPropagation()"><div class="embedbar"><span class="lbl">Кризис это вход, а не обрыв · вход в механику</span><a class="embedopen" href="петелька-интерактив.html" target="_blank" rel="noopener">Открыть механику ↗</a></div><img class="embed" src="petelka-hero.png" alt="Кризис это вход, а не обрыв" style="height:auto;object-fit:contain;background:#F2EEE6"></div></div>
+
+  <div class="conn"></div>
+  <div class="core-wrap">
+    <div class="core-label">Общее ядро · до развилки</div>
+    <div class="node core" data-id="b3" data-method data-op="Ведущий Зов"><div class="badge">10 зовов</div><div class="num">03</div><div class="nt">Шаг 1 · Диагностика Зова</div><div class="ns">ЧТО сигнализирует о переходе. Результат: «Ваш ведущий Зов — ___» и короткая интерпретация. Без теории.</div><div class="op">ведущий Зов</div></div>
+    <div class="conn"></div>
+    <div class="node core" data-id="b4" data-method data-op="Уровень зова"><div class="badge">5 уровней</div><div class="num">04</div><div class="nt">Шаг 2 · Уровень Зова</div><div class="ns">НАСКОЛЬКО силён сигнал. Слабый: «не обязательно ждать, когда изменения станут вынужденными». Сильный: «пора переходить от наблюдения к стратегическому решению».</div><div class="op">уровень зова</div></div>
+  </div>
+
+  <div class="conn"></div>
+  <div class="node fork" data-id="b5" data-op="Фокус: во мне / бизнес / оба"><div class="num">05</div><div class="nt">Шаг 3 · Главный поворот</div><div class="ns">«Где главное ограничение следующего перехода?» — ВО МНЕ · В БИЗНЕСЕ · И ТАМ, И ТАМ. Переход лидера и бизнеса связаны; начинаем с системы, где напряжение сильнее. Если «оба» — выбрать, с чего начать.</div><div class="op">во мне / бизнес / оба</div></div>
+  <div class="conn"></div>
+
+  <div class="branches">
+    <div class="branch-head">Ветка А &nbsp;·&nbsp; или &nbsp;·&nbsp; Ветка Б · одна глубокая диагностика</div>
+    <div class="node bA" data-id="b6a" data-method data-op="Карта личной стратегии"><span class="btag">Ветка А · Личное</span><div class="num">06А</div><div class="nt">Аудит личной стратегии</div><div class="ns">7 элементов: Миссия · Ценности · Видение · ТОЖ · НОЖ · Сдвиг · Стратегирование. По каждому две оценки 1–10: важность и проработка. Карта + 1–2 глубоких вопроса по максимальному разрыву.</div><div class="op">карта личной стратегии</div><div class="embedwrap" onclick="event.stopPropagation()"><div class="embedbar"><span class="lbl">Аудит личной стратегии · пошагово</span><a class="embedopen" href="самоаудит-методология.html" target="_blank" rel="noopener">Открыть аудит ↗</a></div><img class="embed" src="samoaudit-poster.png" alt="Аудит личной стратегии" style="height:auto;object-fit:contain;background:#fff"></div></div>
+    <div class="node bB" data-id="b6b" data-method data-op="Карта бизнес-стратегии"><span class="btag">Ветка Б · Бизнес</span><div class="num">06Б</div><div class="nt">Аудит бизнес-стратегии · Дисплей стратега</div><div class="ns">16 факторов в 4 зонах: 01 ДНК (кто мы) · 02 Внешняя среда и рынок (что вокруг) · 03 Внутренняя среда (из чего мы сделаны) · 04 Стратегия (куда идём). По каждому фактору коуч с вопросами и оценка.</div><div class="op">карта бизнес-стратегии</div><div class="embedwrap" onclick="event.stopPropagation()"><div class="embedbar"><span class="lbl">Дисплей стратега · 16 факторов</span><a class="embedopen" href="дисплей-стратега.html" target="_blank" rel="noopener">Открыть разбор ↗</a></div><img class="embed" src="strateg-poster.png" alt="Дисплей стратега" style="height:auto;object-fit:contain;background:#fff"></div></div>
+  </div>
+
+  <div class="conn"></div>
+  <div class="node core" data-id="b7" data-op="Первая карта перехода"><div class="num">07</div><div class="nt">Первая карта перехода</div><div class="ns">Возврат в общую воронку: «вы увидели не только что изменения нужны, но и где сейчас стратегическое напряжение».</div><div class="op">карта напряжения</div></div>
+  <div class="conn"></div>
+  <div class="node core" data-id="b8" data-method><div class="badge">Приложение / ОС</div><div class="num">08</div><div class="nt">Вертикальное развитие</div><div class="ns">Не каждый разрыв закрывается новым планом или навыком. Новое приложение = навык / инструмент. Новая операционная система = смена самой логики взаимодействия с миром.</div></div>
+  <div class="conn"></div>
+  <div class="node core" data-id="b9" data-method><div class="badge">7 логик</div><div class="num">09</div><div class="nt">Логики действия</div><div class="ns">Оппортунист · Дипломат · Эксперт · Достигатель · Индивидуалист · Стратег · Алхимик. Фокус: Достигатель → Индивидуалист → Стратег. Не диагноз «вы Достигатель», а объяснение природы вертикального перехода.</div></div>
+  <div class="conn"></div>
+  <div class="node final" data-id="b10" data-op="Верификация"><div class="badge">CTA</div><div class="num">10</div><div class="nt">Верифицировать свою стратегию</div><div class="ns">Не «оставьте заявку». «Самодиагностика показала карту. Следующий шаг — проверить главный разрыв и переход за ним с командой Филиппа». CTA: «Разобрать карту перехода».</div><div class="op">верификация</div></div>
+  <div class="conn"></div>
+  <div class="node" data-id="b11" data-op="leadProfile → CRM"><div class="num">11</div><div class="nt">Стратегический профиль лида</div><div class="ns">leadProfile: тип зова, уровень, во мне/бизнес/оба, выбранная ветка, результаты аудита и разрывы, ответы на глубокие вопросы, завершённость, контакт.</div><div class="op">leadProfile</div></div>
+  <div class="conn"></div>
+  <div class="node handoff" data-id="b12"><div class="num">12</div><div class="nt">Отдел продаж</div><div class="ns">Менеджер видит не лид, а стратегический профиль: какой зов → насколько силён → где человек сам видит проблему → что показал аудит → где основной разрыв.</div></div>
+
+</div></div></main>
+
+<!-- досье -->
+<aside class="dossier">
+  <h4>Досье лида</h4>
+  <div class="dh">Накапливается по мере прохождения</div>
+  <ul>
+    <li><span class="k">Зов</span> ведущий сценарий</li>
+    <li><span class="k">Уровень</span> сила сигнала X / 5</li>
+    <li><span class="k">Фокус</span> во мне / бизнес / оба</li>
+    <li><span class="k">Ветка</span> личная / бизнес</li>
+    <li><span class="k">Аудит</span> оценки по элементам</li>
+    <li><span class="k">Разрыв</span> максимальный GAP</li>
+    <li><span class="k">Глубина</span> ответы на глубокие вопросы</li>
+    <li><span class="k">Профиль</span> роль · компания · оборот</li>
+    <li><span class="k">Решение</span> горизонт · контакт</li>
+  </ul>
+</aside>
+
+<!-- логика системы -->
+<div class="wrap"><section class="logic">
+  <h3>Ключевая логика системы</h3>
+  <p class="ls">Каждый шаг отвечает на один точный вопрос</p>
+  <div class="chain">
+    <div class="ch"><span class="cn">Петелька</span><span class="cq">Какой переход происходит?</span></div><div class="cconn"></div>
+    <div class="ch"><span class="cn">Зов</span><span class="cq">Что зовёт к изменению?</span></div><div class="cconn"></div>
+    <div class="ch"><span class="cn">Уровень зова</span><span class="cq">Насколько сигнал уже силён?</span></div><div class="cconn"></div>
+    <div class="ch"><span class="cn">Главный поворот</span><span class="cq">Где главное ограничение: во мне, в бизнесе или в обоих?</span></div><div class="cconn"></div>
+    <div class="ch split"><span class="a">↙ Аудит личной стратегии</span><span class="b">Аудит бизнес-стратегии ↘</span></div><div class="cconn"></div>
+    <div class="ch"><span class="cn">Первая карта</span><span class="cq">Где сейчас стратегическое напряжение?</span></div><div class="cconn"></div>
+    <div class="ch"><span class="cn">Вертикальное развитие</span><span class="cq">Новое приложение или новая ОС?</span></div><div class="cconn"></div>
+    <div class="ch"><span class="cn">Логики действия</span><span class="cq">Природа перехода — без диагноза</span></div><div class="cconn"></div>
+    <div class="ch"><span class="cn">Верификация</span><span class="cq">Разговор с экспертом → отдел продаж</span></div>
+  </div>
+</section></div>
+
+<div class="foot">Продуктовый прототип · работает локально · не финальный дизайн</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer"><button class="dr-close" id="drclose">✕</button><div class="dr-in" id="drin"></div></div>
+
+<script>
+  var DATA = {
+    b0:{n:'00',t:'Книга',task:'Человек получает книгу Филиппа Гузенюка «От достигателя к стратегу».',user:'Первый контакт с идеей вертикального развития и петельки.',next:'Внутри книги — вкладыш.'},
+    b1:{n:'01',t:'Вкладыш',task:'Главная задача — не продать продукт, а вызвать желание зайти в digital-механику.',user:'Знакомится с ключевыми идеями: мир усложняется; недостаточно ставить новые «приложения» (знания и навыки); нужна смена «операционной системы» — самой логики взаимодействия с миром; развитие идёт не только линейно; есть Петелька; есть Зов.',cta:'«Собрать свою Петельку»',next:'Переход в digital-механику по QR или ссылке.'},
+    b2:{n:'02',t:'Вход в digital-механику',task:'Короткое объяснение Петельки перед диагностикой.',method:'Петелька: развитие лидера не линейно. Пик → Зов / начало перехода → Перелом / перестройка → Возрождение → Новый уровень. Лидер проходит переходы в любом случае; методология помогает увидеть раньше, понять характер перехода и пройти осознаннее.',user:'Получает рамку и главный вопрос: «Какой переход вы проходите сейчас — и что в вашей текущей системе уже не соответствует следующему масштабу?»',next:'Общее диагностическое ядро.'},
+    b3:{n:'03',t:'Шаг 1 · Диагностика Зова',task:'Определить, ЧТО именно сигнализирует человеку о необходимости перехода. Не перегружать теорией.',method:'10 Зовов методологии.',user:'«Ваш ведущий Зов — ___» и короткая интерпретация результата.',business:'Тип зова.',next:'Уровень зова.'},
+    b4:{n:'04',t:'Шаг 2 · Уровень Зова',task:'Определить, НАСКОЛЬКО силён сигнал, и дать короткую интерпретацию.',method:'Модель 5 уровней Зова. Формулировки редактируются через config.',user:'Слабый сигнал: «уже появился; не обязательно ждать, когда изменения станут вынужденными». Сильный: «достаточно силён, чтобы переходить от наблюдения к стратегическому решению».',business:'Уровень зова.',next:'Главный поворот.'},
+    b5:{n:'05',t:'Шаг 3 · Главный поворот',task:'Спросить: «Где, как вам кажется, находится главное ограничение вашего следующего перехода?»',method:'ВО МНЕ (моя стратегия / роль / направление) · В БИЗНЕСЕ (стратегия и будущее дела) · И ТАМ, И ТАМ.',user:'«Переход лидера и переход бизнеса связаны. Изменение одного перестраивает другое. Но начать полезнее с той системы, где напряжение сейчас сильнее». Если «оба» — выбрать: с себя или с бизнеса.',business:'Фокус: во мне / бизнес / оба + выбранная ветка.',next:'Одна глубокая диагностика.'},
+    b6a:{n:'06А',t:'Аудит личной стратегии',task:'Пройти 7 элементов личной стратегии. На первом проходе — не глубокое интервью, а по две оценки 1–10.',method:'Существующий файл «Аудит личной стратегии»: Миссия · Ценности · Видение · ТОЖ · НОЖ · Сдвиг · Стратегирование. По каждому: важность и степень проработки.',diagnose:'GAP = важность − проработка (техническая логика визуализации, не отдельная авторская метрика). Выделить 1–2 элемента с максимальным разрывом и задать по ним 1–2 глубоких вопроса ИЗ методологии аудита.',user:'Карта личной стратегии: важность / проработка / разрыв по каждому элементу. «Самый большой разрыв сейчас здесь: ___».',business:'Результаты 7 элементов, разрывы, ответы на глубокие вопросы.',next:'Первая карта перехода.'},
+    b6b:{n:'06Б',t:'Аудит бизнес-стратегии · Дисплей стратега',task:'Симметрично личной ветке: показать карту факторов, быстрый аудит, собрать результат, показать сильные зоны и разрывы, дать углубиться в 1–2.',method:'Дисплей стратега: 16 факторов в 4 зонах. 01 ДНК (кто мы): Миссия, Видение, Ценности. 02 Внешняя среда и рынок (что вокруг): PESTEL, Стейкхолдеры, Сегменты, Ценность, Клиентский опыт. 03 Внутренняя среда (из чего мы сделаны): Компетенции, Система, Культура, Команда, Лидер. 04 Стратегия (куда идём): Вопросы, Ориентиры, Инициативы.',diagnose:'По каждому фактору — коуч с вопросами и пояснением, статус: не начато / в работе / оценено. Идти по зонам слева направо: сначала кто вы, потом что вокруг, потом чем располагаете, и лишь затем куда идёте.',user:'Карта бизнес-стратегии по факторам методологии, сильные зоны и разрывы.',business:'Результаты 16 факторов и разрывы.',next:'Первая карта перехода.'},
+    b7:{n:'07',t:'Первая карта перехода',task:'После личной ИЛИ бизнес-ветки вернуть человека в общую воронку.',user:'«Теперь у вас есть первая карта перехода. Вы увидели не только что изменения необходимы, но и где именно сегодня находится стратегическое напряжение».',business:'Карта напряжения.',next:'Вертикальное развитие.'},
+    b8:{n:'08',t:'Вертикальное развитие',task:'Ввести идею вертикального развития. Не каждый разрыв закрывается новым планом, инструментом или навыком.',method:'Метафора: НОВОЕ ПРИЛОЖЕНИЕ = новый навык / инструмент. НОВАЯ ОПЕРАЦИОННАЯ СИСТЕМА = изменение самой логики взаимодействия с миром.',user:'«Иногда следующий переход требует изменить сам способ, которым лидер воспринимает ситуацию и принимает решения».',next:'Логики действия.'},
+    b9:{n:'09',t:'Логики действия',task:'Впервые полноценно ввести вертикальное развитие и логики. НЕ ставить диагноз «Вы Достигатель / Стратег».',method:'Оппортунист · Дипломат · Эксперт · Достигатель · Индивидуалист · Стратег · Алхимик. Особый фокус: Достигатель → Индивидуалист → Стратег.',user:'Задача блока — не классифицировать человека, а объяснить природу вертикального перехода. Ключевой инсайт: «Возможно, следующий уровень невозможно построить исключительно инструментами той логики, которая привела вас к текущему результату».',next:'Верификация.'},
+    b10:{n:'10',t:'Верифицировать свою стратегию',task:'Финальный CTA под собственников и CEO. Не «оставьте заявку на консультацию».',user:'«Самодиагностика позволяет увидеть карту. Следующий шаг — проверить, правильно ли определён главный стратегический разрыв и какой переход за ним стоит». CTA: «Верифицировать свою стратегию» / «Разобрать карту перехода с командой».',next:'leadProfile → отдел продаж.'},
+    b11:{n:'11',t:'Стратегический профиль лида (leadProfile)',task:'Собрать объект leadProfile для CRM.',user:'Контактные данные + вся диагностика.',business:'leadProfile: тип зова · уровень зова · во мне / бизнес / оба · выбранная ветка · результаты всех элементов аудита · оценки · выявленные разрывы · ответы на глубокие вопросы · завершённость диагностики · контакт.',next:'Отдел продаж.'},
+    b12:{n:'12',t:'Отдел продаж',task:'Менеджер видит не просто лид, а его стратегический профиль.',user:'До разговора понятно: какой у человека зов → насколько он силён → где человек сам видит проблему → что показал аудит → где основной стратегический разрыв.',business:'Полный leadProfile на входе в разговор.',next:'—'}
+  };
+
+  var drawer=document.getElementById('drawer'), scrim=document.getElementById('scrim'), drin=document.getElementById('drin');
+  function row(lab,val){ return val? '<div class="dr-sec"><div class="lab">'+lab+'</div><p>'+val+'</p></div>':''; }
+  function open(id){
+    var d=DATA[id]; if(!d) return;
+    var h='<div class="dr-num">'+d.n+'</div><div class="dr-t">'+d.t+'</div>';
+    h+=row('Задача',d.task);
+    h+=row('Методология',d.method);
+    h+=row('Что диагностируем',d.diagnose);
+    h+=row('Что получает пользователь',d.user);
+    if(d.cta) h+='<div class="dr-sec"><div class="lab">CTA</div><span class="dr-cta">'+d.cta+'</span></div>';
+    h+=row('Данные для отдела продаж',d.business);
+    if(d.share) h+='<div class="dr-sec"><div class="lab">Share</div><span class="dr-share">'+d.share+'</span></div>';
+    h+=row('Следующий шаг',d.next);
+    drin.innerHTML=h;
+    drawer.classList.add('on'); scrim.classList.add('on');
+  }
+  function close(){ drawer.classList.remove('on'); scrim.classList.remove('on'); }
+  document.querySelectorAll('.node').forEach(function(n){ n.addEventListener('click',function(){ open(n.dataset.id); }); });
+  document.getElementById('drclose').onclick=close; scrim.onclick=close;
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+
+  var hints={client:'Так систему видит клиент: от книги до разговора с экспертом.',
+    method:'Подсвечена методология: Петелька, Зов, 5 уровней, главный поворот, аудиты, вертикальное развитие, 7 логик.',
+    data:'Видно, какие данные о лиде накапливаются к моменту передачи в отдел продаж.'};
+  document.getElementById('modes').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    document.querySelectorAll('#modes button').forEach(function(x){x.classList.remove('on')}); b.classList.add('on');
+    document.body.className='mode-'+b.dataset.mode;
+    document.getElementById('modehint').textContent=hints[b.dataset.mode];
+  });
+  document.body.className='mode-client';
+</script>

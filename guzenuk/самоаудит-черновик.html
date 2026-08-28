@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Аудит личной стратегии · черновик квиза</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2322332B'/%3E%3Cpath d='M20 16h25v8H28v24h-8z' fill='%23C9A15C'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#F5EFE3;--paper:#FFFDF8;--ink:#191611;--deep:#22332B;--deep2:#1B2A23;--gold:#A9772F;--gold2:#C9A15C;--amber:#E8A94A;--navy:#23324F;--mut:#8C8272;--hair:#E6DBC6}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.layout{display:flex;max-width:1160px;margin:0 auto;gap:72px;padding:0 32px}
+.rail{flex:none;width:248px;position:sticky;top:28px;align-self:flex-start;padding:56px 0 24px}
+.railcard{background:linear-gradient(168deg,var(--deep),var(--deep2));border-radius:20px;padding:26px 26px 22px;color:#EAE4D3;display:flex;flex-direction:column;max-height:calc(100vh - 110px);box-shadow:0 18px 44px -18px rgba(27,42,35,.5)}
+.rt{font-family:Georgia,serif;font-size:16px;margin-bottom:22px;color:#F1EBD9}
+.tl{position:relative;overflow:auto;min-height:0}
+.tl::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:1.5px;background:rgba(201,161,92,.28)}
+.tblock{margin-bottom:16px}
+.tnum{font-family:Georgia,serif;font-size:11.5px;color:var(--gold2);letter-spacing:1.8px;margin:0 0 8px 26px}
+.titem{display:flex;align-items:center;gap:12px;padding:5px 0;cursor:pointer;position:relative}
+.tdot{width:15px;height:15px;border-radius:50%;border:1.5px solid rgba(201,161,92,.55);background:var(--deep);flex:none;transition:all .3s;position:relative;z-index:1}
+.titem:hover .tdot{border-color:var(--gold2)}
+.titem.ok .tdot{background:var(--gold2);border-color:var(--gold2);box-shadow:0 0 10px rgba(201,161,92,.5)}
+.titem.act .tdot{border-color:#F1EBD9;border-width:2px}
+.tname{font-size:13px;color:rgba(238,232,216,.92);transition:color .2s}
+.titem:hover .tname{color:#fff}
+.titem.act .tname{color:#F1EBD9;font-weight:600}
+.rbar{height:2px;background:rgba(201,161,92,.18);border-radius:2px;margin-top:18px;overflow:hidden}
+.rfill{height:100%;width:0;background:linear-gradient(90deg,var(--gold2),#E7CD92);transition:width .5s}
+.rcount{font-size:11px;color:rgba(234,228,211,.68);margin-top:9px;letter-spacing:.4px}
+.main{flex:1;min-width:0;padding:56px 0 140px}
+.kicker{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:12px}
+h1{font-family:Georgia,serif;font-weight:500;font-size:clamp(32px,3.6vw,42px);line-height:1.12;margin-bottom:14px;letter-spacing:-.4px;text-wrap:balance}
+.sub{color:#524c40;font-size:15px;max-width:58ch;margin-bottom:44px}
+.sub b{color:var(--ink)}
+.card{background:var(--paper);border:1px solid var(--hair);border-radius:20px;padding:32px 36px 24px;margin-bottom:26px;position:relative;overflow:hidden;transition:box-shadow .4s}
+.card.filled{box-shadow:0 14px 34px -20px rgba(34,51,43,.3)}
+.ghost{position:absolute;top:4px;right:24px;font-family:Georgia,serif;font-size:92px;color:rgba(34,51,43,.06);font-weight:600;line-height:1;user-select:none}
+.blk{font-size:10.5px;font-weight:700;letter-spacing:2px;color:var(--gold);text-transform:uppercase}
+.done{position:absolute;top:28px;right:32px;font-size:11px;color:var(--gold);font-weight:600;opacity:0;transition:opacity .5s}
+.card.filled .done{opacity:1}
+h2{font-family:Georgia,serif;font-weight:500;font-size:25px;margin:8px 0 10px}
+.desc{font-size:14.5px;color:#3f3a30;max-width:60ch;margin-bottom:12px}
+details{margin-bottom:16px;border:1px solid var(--hair);border-radius:12px;background:#FAF5EA;overflow:hidden;transition:background .25s}
+details:hover{background:#F5EDDD}
+summary{list-style:none;display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:13.5px;font-weight:600;color:#6E5320;cursor:pointer;user-select:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'▸';color:var(--gold);font-size:12px;transition:transform .25s}
+details[open] summary::before{transform:rotate(90deg)}
+details[open]{background:#FAF5EA}
+.think{font-size:13.5px;color:#4c4638;margin:0;padding:2px 18px 15px 38px;max-width:62ch}
+.scale{border-top:1px solid #F0E8D8;padding:16px 0 10px}
+.q{font-size:13.5px;color:#3f3a30;margin-bottom:13px;max-width:66ch}
+.qtag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:4px;padding:3px 9px;margin-right:8px;position:relative;top:-1px}
+.qi{background:linear-gradient(135deg,#F3E2C3,#EBD3A8);color:#7A5A1E}
+.qw{background:linear-gradient(135deg,#DCE6E0,#C8D8CE);color:var(--deep)}
+.sl{display:flex;align-items:center;gap:18px}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:26px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(90deg,var(--amber) var(--p,50%),#EAE0CC var(--p,50%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:2.5px solid var(--amber);margin-top:-9px;box-shadow:0 2px 8px rgba(0,0,0,.18);transition:transform .15s}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.22)}
+input.wrange::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--deep) var(--p,50%),#EAE0CC var(--p,50%))}
+input.wrange::-webkit-slider-thumb{border-color:var(--deep)}
+.val{font-family:Georgia,serif;font-size:23px;width:34px;text-align:center;font-variant-numeric:tabular-nums}
+.vi{color:#B27B22}.vw{color:var(--deep)}
+.result{background:var(--paper);border:1px solid var(--hair);border-radius:24px;padding:46px 44px;margin-top:76px;color:var(--ink);box-shadow:0 18px 44px -24px rgba(34,51,43,.25)}
+.result h2{color:var(--ink);font-size:29px;margin-bottom:4px}
+.rsub{font-size:13.5px;color:var(--mut);margin-bottom:18px;font-style:italic}
+.rlegend{display:flex;gap:26px;font-size:13px;margin-bottom:6px}
+.rlegend span::before{content:'';display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
+.rlegend .li::before{background:var(--amber)}
+.rlegend .lw::before{background:#3E5C4B}
+.radarwrap{display:flex;justify-content:center;margin-bottom:8px}
+.rrow{display:flex;align-items:baseline;gap:14px;padding:12px 0;border-top:1px solid #F0E8D8}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.rname{font-family:Georgia,serif;font-size:16px;min-width:156px;color:var(--ink)}
+.rstat{font-size:13px;flex:1;color:#55503f;max-width:50ch}
+.rstat b{color:var(--ink)}
+.rgap{font-size:13px;font-weight:700;flex:none;width:90px;text-align:right;font-variant-numeric:tabular-nums}
+.legendtxt{font-size:12.5px;color:var(--mut);margin-top:16px;max-width:66ch;font-style:italic}
+.cta{margin-top:30px;text-align:center}
+.cta button{background:linear-gradient(135deg,var(--gold2),#B8863B);color:#1B2A23;border:none;border-radius:14px;padding:16px 40px;font-size:15.5px;font-weight:600;font-family:inherit;cursor:pointer;box-shadow:0 10px 26px -10px rgba(201,161,92,.55);transition:transform .18s,box-shadow .18s}
+.cta button:hover{transform:translateY(-2px);box-shadow:0 16px 32px -10px rgba(201,161,92,.7)}
+.cta .note{font-size:11px;color:var(--mut);margin-top:12px;letter-spacing:1px}
+svg text{font-family:Inter,sans-serif}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+@media (max-width:900px){.layout{flex-direction:column;gap:0}.rail{position:static;width:100%;height:auto;padding:24px 0 0}.railcard{flex-direction:column}.tl{max-height:none}h1{font-size:32px}}
+</style></head>
+<body><div class="layout">
+<aside class="rail"><div class="railcard">
+  <div class="rt">Маршрут аудита</div>
+  <div class="tl"><div class="tblock"><div class="tnum">I · ДНК</div><div class="titem" data-el="0" onclick="go(0)"><span class="tdot"></span><span class="tname">Миссия</span></div><div class="titem" data-el="1" onclick="go(1)"><span class="tdot"></span><span class="tname">Ценности</span></div><div class="titem" data-el="2" onclick="go(2)"><span class="tdot"></span><span class="tname">Видение</span></div></div><div class="tblock"><div class="tnum">II · ТОЖ</div><div class="titem" data-el="3" onclick="go(3)"><span class="tdot"></span><span class="tname">Текущий образ жизни</span></div></div><div class="tblock"><div class="tnum">III · НОЖ</div><div class="titem" data-el="4" onclick="go(4)"><span class="tdot"></span><span class="tname">Новый образ жизни</span></div></div><div class="tblock"><div class="tnum">IV · СДВИГ</div><div class="titem" data-el="5" onclick="go(5)"><span class="tdot"></span><span class="tname">Сдвиг</span></div><div class="titem" data-el="6" onclick="go(6)"><span class="tdot"></span><span class="tname">Стратегирование</span></div></div></div>
+  <div class="rbar"><div class="rfill" id="rfill"></div></div>
+  <div class="rcount"><span id="pcount">0</span> из 7 оценено</div>
+</div></aside>
+<main class="main">
+<div class="kicker">Счастье в деятельности · личная стратегия</div>
+<h1>Аудит личной стратегии</h1>
+<div class="sub">Семь элементов личной стратегии в четырёх блоках. По каждому — две оценки от 1 до 10: <b>важность</b> и <b>степень проработки</b>. Карта строится сама по мере ответов.</div>
+
+  <div class="card" id="el0">
+    <div class="ghost">01</div>
+    <div class="blk">I · ДНК</div>
+    <div class="done">оценено</div>
+    <h2>Миссия</h2>
+    <p class="desc">Центральный и высший смысл жизни человека: зачем я пришел в эту жизнь. Пересечение талантов человека и потребностей мира в текущем моменте.</p>
+    <details><summary>Вопросы на подумать</summary><p class="think">Для чего я создан? Ради чего я живу?<br>Какой след я хочу оставить в сердцах других?<br>Есть ли у меня организующий смысл? <br>Могу ли я его сформулировать?<br>Чувствую ли я, что моя миссия заряжает и придаёт смысл моим действиям?<br>Проживается ли миссия в моих поступках и решениях?</p></details>
+    <div class="scale">
+      <div class="q"><span class="qtag qi">Важность</span>Насколько вам важно чувствовать свою Миссию внутри того, как вы живете и что вы делаете?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="imp0" oninput="touch(0);upd()"><span class="val vi" id="impv0">5</span></div>
+    </div>
+    <div class="scale">
+      <div class="q"><span class="qtag qw">Проработка</span>Насколько вы ощущаете, что живете из своей личной миссии каждый день?<br>Насколько Миссия проявляется через то, что вы делаете?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="wrk0" oninput="touch(0);upd()" class="wrange"><span class="val vw" id="wrkv0">5</span></div>
+    </div>
+  </div>
+  <div class="card" id="el1">
+    <div class="ghost">02</div>
+    <div class="blk">I · ДНК</div>
+    <div class="done">оценено</div>
+    <h2>Ценности</h2>
+    <p class="desc">Ценности – глубоко прожитые человеком ценнейшие состояния жизни, которые максимально наполняют энергией и формируют руководящие принципы как фундамент личной стратегии и опору в принятии решений.</p>
+    <details><summary>Вопросы на подумать</summary><p class="think">Что для меня важно в жизни? Какие состояния я хочу проживать?<br>Когда я чувствую, что живу «правильно»? <br>Есть ли проживаемые телом ощущения от моих ценностей?<br>Где у меня такие виды контакта с жизнью, от которых поет душа, где я максимально говорю жизни ДА?<br>Из каких ценностных состояний я хочу жить эту жизнь?<br>Без чего любой успех будет казаться пустым?</p></details>
+    <div class="scale">
+      <div class="q"><span class="qtag qi">Важность</span>Насколько вам важно понимать свои ценности и быть в контакте с ними?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="imp1" oninput="touch(1);upd()"><span class="val vi" id="impv1">5</span></div>
+    </div>
+    <div class="scale">
+      <div class="q"><span class="qtag qw">Проработка</span>Насколько сейчас ваши ценности для вас ясны?  <br>Насколько вы их чувствуете, какое качество контакта с ними? <br>Насколько они живые и удается выстраивать жизнь в соответствии с ними? <br>Насколько ваша текущая деятельность позволяет вам жить в соответствии с вашими главными ценностями?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="wrk1" oninput="touch(1);upd()" class="wrange"><span class="val vw" id="wrkv1">5</span></div>
+    </div>
+  </div>
+  <div class="card" id="el2">
+    <div class="ghost">03</div>
+    <div class="blk">I · ДНК</div>
+    <div class="done">оценено</div>
+    <h2>Видение</h2>
+    <p class="desc">Мечта, вдохновляющий образ, большая картинка будущего, большая перспектива., 5-7 ключевых фактов, описывающих «Кто я через X лет?»</p>
+    <details><summary>Вопросы на подумать</summary><p class="think">Какие 5–7 ключевых фактов описывают жизнь моей мечты? <br>Что я построил, создал, привнес в мир, инициировал или поддержал?<br>Как выглядит моя жизнь, когда я живу в согласии с миссией и ценностями?<br>Что я вижу в своем большом будущем? Вокруг себя, в своей жизни, в мире? Чем я горжусь? какими отношениями? Какими результатами? Каким качеством жизни или какими качественными изменениями в большой системе, в компании, в отрасли, в мире?<br>Какое наследие я оставлю, чтобы мои потомки или окружение могли<br>этим гордиться и вдохновляться?</p></details>
+    <div class="scale">
+      <div class="q"><span class="qtag qi">Важность</span>Насколько вам важно, чтобы у вас было мощное масштабное видение?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="imp2" oninput="touch(2);upd()"><span class="val vi" id="impv2">5</span></div>
+    </div>
+    <div class="scale">
+      <div class="q"><span class="qtag qw">Проработка</span>Насколько сейчас оно вами прочувствовано, продумано, понятно для вас, проговорено и направляет вас? <br>Насколько образ будущего заряжает вас энергией?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="wrk2" oninput="touch(2);upd()" class="wrange"><span class="val vw" id="wrkv2">5</span></div>
+    </div>
+  </div>
+  <div class="card" id="el3">
+    <div class="ghost">04</div>
+    <div class="blk">II · ТОЖ</div>
+    <div class="done">оценено</div>
+    <h2>ТОЖ</h2>
+    <p class="desc">Текущий образ жизни – честный взгляд в настоящее, ясное, глубокое и целостное понимание, где я сейчас, как выглядит мой жизненный контекст и что происходит в значимых сферах жизни Я-СЕМЬЯ-ДЕЛО.</p>
+    <details><summary>Вопросы на подумать</summary><p class="think">Какие у меня есть факты о себе сегодня, чтобы простроить свое завтра?<br>Где в моей жизни есть опора и энергия? А где энергия утекает и есть напряжение? Где я чувствую наибольшее раздражение, фрустрацию или истощение? А где чувство «дома» и настоящести?<br>Какие у меня сильные стороны? Насколько получается жить с опорой на свои сильные стороны, следовать своей естественной природе? <br>В чем я чувствую свою слабость? Какие есть внутренние ограничения? Что меня сдерживает, тормозит в значимых изменениях? Какие есть страхи? Какие повторяющиеся сценарии или паттерны я наблюдаю? Где я чувствую, что живу чужой сценарий, а не свой?<br>Какие я вижу возможности? <br>Какие замечаю угрозы? <br>В каких внутренних ролях я выступаю? Какие из них меня истощают, а какие — наполняют? Из каких я вырос или живу по инерции? Что я уже перерос, но еще не отпустил? В каких ролях или ситуациях я ощущаю себя максимально настоящим?</p></details>
+    <div class="scale">
+      <div class="q"><span class="qtag qi">Важность</span>Насколько это важно сейчас опереться на реальность, приземлиться в конкретные факты жизни и принимать решения с опорой на трезвый взгляд? <br>Насколько сейчас в вашей жизни пришло время качественной ревизии вашего текущего способа жить, аудита всех сфер жизни?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="imp3" oninput="touch(3);upd()"><span class="val vi" id="impv3">5</span></div>
+    </div>
+    <div class="scale">
+      <div class="q"><span class="qtag qw">Проработка</span>Насколько сейчас у вас есть полный SWOT-анализ ваших внутренних ресурсов и ограничений, возможностей и угроз?<br>Насколько есть ясность и согласие с вашими внутренними ролями в разных сферах жизни?<br>Насколько вы удовлетворены тем, как распределяете свою энергию между “Я — Семья — Дело”?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="wrk3" oninput="touch(3);upd()" class="wrange"><span class="val vw" id="wrkv3">5</span></div>
+    </div>
+  </div>
+  <div class="card" id="el4">
+    <div class="ghost">05</div>
+    <div class="blk">III · НОЖ</div>
+    <div class="done">оценено</div>
+    <h2>НОЖ</h2>
+    <p class="desc">Новый образ жизни - зона целей, яркое и целостное понимание целевого состояния, к чему вы идете и что проявляется во всех сферах жизни на определенном горизонте. Конкретные, четкие, фокусирующие цели на год-три-пять лет, ключевые среднесрочные ударные фокусные вектора личной стратегии.</p>
+    <details><summary>Вопросы на подумать</summary><p class="think">На каком горизонте я чувствую, что можно реализовать значимое, качественное, мощное изменение в моей жизни?<br>Какие изменения я хочу увидеть в всех сферах жизни Я-СЕМЬЯ-ДЕЛО? <br>Куда я хочу прийти?<br>Какие стратегические цели мне важно реализовать?</p></details>
+    <div class="scale">
+      <div class="q"><span class="qtag qi">Важность</span>Насколько вам важна конкретная фокусировка и качественные, глубокие, дающие энергию и ясность цели?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="imp4" oninput="touch(4);upd()"><span class="val vi" id="impv4">5</span></div>
+    </div>
+    <div class="scale">
+      <div class="q"><span class="qtag qw">Проработка</span>Насколько на данном этапе есть определенность в ваших целях во всех сферах жизни и какое текущее качество их проработки?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="wrk4" oninput="touch(4);upd()" class="wrange"><span class="val vw" id="wrkv4">5</span></div>
+    </div>
+  </div>
+  <div class="card" id="el5">
+    <div class="ghost">06</div>
+    <div class="blk">IV · СДВИГ</div>
+    <div class="done">оценено</div>
+    <h2>Сдвиг</h2>
+    <p class="desc">Ключевое изменение, которое качественно меняет жизнь. Значимое преобразование,  за счет которого происходит переход от ТОЖ к НОЖ.</p>
+    <details><summary>Вопросы на подумать</summary><p class="think">Где у меня в жизни есть ключевые вызовы? С чем мне важно справиться?<br>Чему важно научиться? Что важно преодолеть? Что важно освоить?<br>Где у меня 3–5 основных линий трансформации, сдвига, изменения в сферах: я-семья-дело? <br>Какое ключевое изменение просится произойти со мной или во мне, чтобы я вышел в качественно новый масштаб, другую глубину, на новый уровень?</p></details>
+    <div class="scale">
+      <div class="q"><span class="qtag qi">Важность</span>Насколько вы считаете важным находить и понимать свои точки сдвига, понимать свою сдвиговую механику?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="imp5" oninput="touch(5);upd()"><span class="val vi" id="impv5">5</span></div>
+    </div>
+    <div class="scale">
+      <div class="q"><span class="qtag qw">Проработка</span>Насколько вы понимаете на данном этапе жизни, за счет каких 2-3 сдвиговых действий вы сделаете качественный переход от ТОЖ к НОЖ?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="wrk5" oninput="touch(5);upd()" class="wrange"><span class="val vw" id="wrkv5">5</span></div>
+    </div>
+  </div>
+  <div class="card" id="el6">
+    <div class="ghost">07</div>
+    <div class="blk">IV · СДВИГ</div>
+    <div class="done">оценено</div>
+    <h2>Стратегирование</h2>
+    <p class="desc">Наработанный навык регулярно подниматься над суетой и смотреть на себя и свой путь сверху, из позиции Стратега, соединяться с собой  и определять свой дальнейший вектор движения.</p>
+    <details><summary>Вопросы на подумать</summary><p class="think">Насколько мне привычно время от времени подниматься над суетой и из роли Стратега смотреть на свой путь? <br>Как часто я обращаюсь к значимым для меня смыслам, дополняю или пересматриваю их? <br>Какой у меня ритм стратегирования?<br>Есть ли у меня регулярные ритуалы и практики, которые меня в этом поддерживают?<br>Есть ли у меня какие либо артефакты, которые описывают, отражают, визуализируют мою личную стратегию?</p></details>
+    <div class="scale">
+      <div class="q"><span class="qtag qi">Важность</span>Насколько для вас важна регулярная практика стратегирования?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="imp6" oninput="touch(6);upd()"><span class="val vi" id="impv6">5</span></div>
+    </div>
+    <div class="scale">
+      <div class="q"><span class="qtag qw">Проработка</span>Насколько у вас развита привычка стратегировать и есть ли практика регулярной сонастройки с собой в векторе движения?</div>
+      <div class="sl"><input type="range" min="1" max="10" value="5" id="wrk6" oninput="touch(6);upd()" class="wrange"><span class="val vw" id="wrkv6">5</span></div>
+    </div>
+  </div>
+<div class="result">
+  <h2>Карта личной стратегии</h2>
+  <div class="rsub">Просто смотрите и чувствуйте. Что вы видите, когда смотрите на эту карту?</div>
+  <div class="rlegend"><span class="li">важность</span><span class="lw">степень проработки</span></div>
+  <div class="radarwrap"><svg id="radar" width="480" height="430" viewBox="0 0 480 430"></svg></div>
+  <div id="rows"></div>
+  <div class="legendtxt">Приоритет = важность − проработка: чем больше разрыв, тем сильнее сигнал. Где зреет перемена? Что требует внимания? Где уже есть опора?</div>
+  <div class="cta"><button onclick="alert('Черновик: здесь будет запись на живой аудит со специалистом')">Разобрать мою карту на живом аудите</button>
+  <div class="note">ЦЕЛЕВОЕ ДЕЙСТВИЕ ВОРОНКИ — ЗАПИСЬ НА АУДИТ ЛС</div></div>
+</div>
+</main>
+</div>
+<script>
+const NAMES=["Миссия", "Ценности", "Видение", "ТОЖ", "НОЖ", "Сдвиг", "Стратегирование"];
+const SHORT=["Миссия","Ценности","Видение","ТОЖ","НОЖ","Сдвиг","Стратегирование"];
+const touched=new Set();
+const ST={
+ crit:{t:"Критическая зона",c:"#B3261E",d:"болит и ограничивает — приоритетная зона изменений"},
+ rez:{t:"Скрытый резерв",c:"#E8A94A",d:"работает не на максимум — наращивать ясность"},
+ sila:{t:"Зона силы",c:"#2D7D46",d:"работает и даёт силу — использовать как опору"},
+ slep:{t:"Слепая зона",c:"#9aa0a8",d:"не проработано, но «как будто неважно» — переоценить"},
+ izb:{t:"Избыточный фокус",c:"#A08BC8",d:"перерасход усилий на второстепенное — перераспределить"}
+};
+function status(im,wr){ if(im>=7) return wr<=5?ST.crit:(wr<=7?ST.rez:ST.sila); return wr<=6?ST.slep:ST.izb; }
+function go(i){document.getElementById('el'+i).scrollIntoView({behavior:'smooth',block:'center'})}
+function touch(i){touched.add(i);
+  document.getElementById('el'+i).classList.add('filled');
+  document.querySelector('.titem[data-el="'+i+'"]').classList.add('ok');
+  document.getElementById('pcount').textContent=touched.size;
+  document.getElementById('rfill').style.width=(touched.size/7*100)+'%';
+}
+// scrollspy: подсветка текущего элемента
+const obs=new IntersectionObserver(es=>{es.forEach(en=>{
+  const i=en.target.id.replace('el','');
+  const t=document.querySelector('.titem[data-el="'+i+'"]');
+  if(en.isIntersecting){document.querySelectorAll('.titem.act').forEach(x=>x.classList.remove('act'));t.classList.add('act');}
+})},{rootMargin:'-40% 0px -50% 0px'});
+for(let i=0;i<7;i++)obs.observe(document.getElementById('el'+i));
+const CX=240,CY=210,R=152;
+function pt(i,v){const a=-Math.PI/2+i*2*Math.PI/7;const r=R*v/10;return [CX+r*Math.cos(a),CY+r*Math.sin(a)]}
+function poly(vals){return vals.map((v,i)=>pt(i,v).map(x=>x.toFixed(1)).join(',')).join(' ')}
+function drawRadar(imps,wrks){
+  let s='';
+  for(let ring=2;ring<=10;ring+=2){s+='<polygon points="'+poly(Array(7).fill(ring))+'" fill="none" stroke="#E9DFC9" stroke-width="1"/>';}
+  for(let i=0;i<7;i++){
+    const p10=pt(i,10);
+    s+='<line x1="'+CX+'" y1="'+CY+'" x2="'+p10[0]+'" y2="'+p10[1]+'" stroke="#E9DFC9" stroke-width="1"/>';
+    const pl=pt(i,12.5);
+    s+='<text x="'+pl[0]+'" y="'+pl[1]+'" text-anchor="middle" font-size="12.5" font-weight="600" fill="#4a4438">'+SHORT[i]+'</text>';
+  }
+  s+='<polygon points="'+poly(imps)+'" fill="rgba(232,169,74,.26)" stroke="#E8A94A" stroke-width="2.5" stroke-linejoin="round"/>';
+  s+='<polygon points="'+poly(wrks)+'" fill="rgba(62,92,75,.14)" stroke="#3E5C4B" stroke-width="2.5" stroke-linejoin="round"/>';
+  for(let i=0;i<7;i++){
+    const a=pt(i,imps[i]), b=pt(i,wrks[i]);
+    s+='<circle cx="'+a[0]+'" cy="'+a[1]+'" r="4" fill="#E8A94A"/>';
+    s+='<circle cx="'+b[0]+'" cy="'+b[1]+'" r="4" fill="#3E5C4B"/>';
+  }
+  document.getElementById('radar').innerHTML=s;
+}
+function upd(){
+  const imps=[],wrks=[],rows=[];
+  for(let i=0;i<7;i++){
+    const ei=document.getElementById('imp'+i), ew=document.getElementById('wrk'+i);
+    const im=+ei.value, wr=+ew.value;
+    ei.style.setProperty('--p',(im-1)/9*100+'%');
+    ew.style.setProperty('--p',(wr-1)/9*100+'%');
+    document.getElementById('impv'+i).textContent=im;
+    document.getElementById('wrkv'+i).textContent=wr;
+    imps.push(im);wrks.push(wr);
+    rows.push({n:NAMES[i],gap:im-wr,st:status(im,wr)});
+  }
+  drawRadar(imps,wrks);
+  rows.sort((a,b)=>b.gap-a.gap);
+  document.getElementById('rows').innerHTML=rows.map(r=>
+    '<div class="rrow"><span class="dot" style="background:'+r.st.c+'"></span><span class="rname">'+r.n+'</span><span class="rstat"><b>'+r.st.t+'</b> — '+r.st.d+'</span><span class="rgap" style="color:'+(r.gap>=5?'#B3261E':(r.gap>=3?'#E8A94A':'#8C8272'))+'">разрыв '+(r.gap>0?'+':'')+r.gap+'</span></div>').join('');
+}
+upd();
+</script>
+</body></html>

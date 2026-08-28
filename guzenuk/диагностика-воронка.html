@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Диагностика перехода · стратегический профиль</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23F2EEE6'/><path d='M22 76 C22 40 48 22 58 44 C65 58 43 64 43 46 C43 30 68 28 82 20' fill='none' stroke='%23C08424' stroke-width='7' stroke-linecap='round'/></svg>">
+<style>
+  :root{--paper:#FFFFFF;--card:#FFFFFF;--ink:#17161A;--ink2:#4A4D52;--accent:#F2B600;--accent-ink:#8A5A12;--accent-lit:#F2B600;
+    --green:#2F5A2A;--green-ink:#2F5A2A;--muted:#8C8677;--wash:#EFEDE8;--sel:#F4F2ED;--rule:rgba(23,22,26,.12);--rule2:rgba(23,22,26,.16)}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:'Golos Text',sans-serif;line-height:1.55;overflow-x:hidden;display:flex;flex-direction:column;min-height:100vh}
+  .wrap{max-width:920px;margin:0 auto;padding:0 clamp(24px,4vw,44px);width:100%}
+  .top{position:sticky;top:0;z-index:10;background:var(--paper);border-bottom:1px solid var(--rule2);padding:14px 0}
+  .top .wrap{display:flex;align-items:center;gap:16px;max-width:1080px}
+  .brand{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+  .prog{flex:1;display:flex;gap:4px}
+  .prog span{flex:1;height:3px;background:var(--rule2)}
+  .prog span.f{background:var(--accent)}
+  .stepn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--ink2);white-space:nowrap}
+  main{flex:1;display:flex;align-items:center;padding:40px 0}
+  #app{width:100%}
+  .kick{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:16px}
+  h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(36px,5.2vw,72px);line-height:1;letter-spacing:0;text-transform:uppercase;margin:0}
+  h2{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(30px,4vw,54px);line-height:1.02;letter-spacing:0;text-transform:uppercase;margin:0 0 6px}
+  .acc{color:var(--accent)}
+  p.lead{font-size:clamp(15px,1.6vw,18px);color:var(--ink2);max-width:64ch;margin:16px 0 0}
+  p.q{font-size:15px;color:var(--ink2);margin:8px 0 26px;max-width:66ch}
+  .btn{display:inline-flex;align-items:center;gap:10px;background:var(--green);color:#fff;border:0;font-family:'JetBrains Mono',monospace;font-weight:500;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;padding:15px 26px;cursor:pointer;transition:background .18s}
+  .btn:hover{background:var(--ink)}
+  .btn[disabled]{background:var(--wash);color:var(--ink2);cursor:default}
+  .btn.ghost{background:transparent;color:var(--ink2);border:1px solid rgba(23,22,26,.25)}
+  .btn.ghost:hover{border-color:var(--ink);color:var(--ink)}
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:30px;gap:14px}
+  .nav .hint{font-size:13px;color:var(--ink2)}
+
+  /* зов карусель */
+  .cardwrap{display:flex;align-items:center;gap:16px;margin-top:8px}
+  .arrow{flex:none;width:44px;height:44px;border:1px solid var(--rule2);background:transparent;color:var(--ink);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .18s}
+  .arrow:hover{border-color:var(--accent)}
+  .card{flex:1;background:var(--card);border:1px solid var(--rule);padding:34px 36px;min-height:230px;display:flex;flex-direction:column;justify-content:center;position:relative}
+  .card .num{position:absolute;top:18px;right:22px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink2);letter-spacing:.14em}
+  .zicon{width:58px;height:58px;margin-bottom:16px}.zicon svg{width:100%;height:100%;display:block}
+  .card .name{font-family:'Oswald',sans-serif;font-weight:500;font-size:clamp(26px,3.4vw,38px);margin:0 0 12px}
+  .card .line{font-size:clamp(16px,2vw,20px);color:var(--accent-ink)}
+  .dots{display:flex;gap:7px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .dot{width:8px;height:8px;background:var(--rule2);cursor:pointer}.dot.on{background:var(--accent)}
+  .check{display:inline-flex;align-items:center;gap:12px;margin-top:24px;cursor:pointer;user-select:none;border:1px solid var(--rule2);padding:13px 20px;transition:border-color .15s,background .15s}
+  .check:hover{border-color:var(--ink)}
+  .check .box{width:19px;height:19px;border:1.6px solid var(--ink);flex:none;position:relative;transition:all .15s}
+  .check.on{background:var(--green);border-color:var(--green)}
+  .check.on .box{background:#fff;border-color:#fff}
+  .check.on .box::after{content:"";position:absolute;left:5.5px;top:1px;width:6px;height:11px;border:solid var(--green);border-width:0 2.6px 2.6px 0;transform:rotate(45deg)}
+  .check .lab{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:500}
+  .check.on .lab{color:#fff}
+
+  /* выбор / опции */
+  .opts{display:grid;gap:10px;margin-top:8px}
+  .opt{text-align:left;background:var(--card);border:1px solid var(--rule);padding:18px 20px;cursor:pointer;font:inherit;color:var(--ink);transition:border-color .18s,background .18s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.sel{background:var(--sel);border-color:var(--accent)}
+  .opt .ot{font-family:'Oswald',sans-serif;font-size:20px;margin-bottom:4px}
+  .opt .od{font-size:14px;color:var(--ink2)}
+
+  /* уровень ряд */
+  .lrow{display:flex;gap:10px;margin-top:14px}
+  .lcell{flex:1;display:flex;flex-direction:column;align-items:center;background:var(--card);border:1px solid var(--rule);padding:16px 8px 14px;cursor:pointer;transition:border-color .18s,background .18s;min-width:0}
+  .lcell:hover{border-color:var(--accent)}.lcell.sel{border-color:var(--accent);background:var(--sel)}
+  .lnum{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink2);margin-bottom:10px}.lcell.sel .lnum{color:var(--accent-ink)}
+  .lbox{width:clamp(40px,5vw,54px);height:clamp(40px,5vw,54px);display:flex;align-items:center;justify-content:center;margin-bottom:12px}.lbox svg{width:100%;height:100%}
+  .lname{font-family:'Oswald',sans-serif;font-size:15px;margin-bottom:4px;text-align:center;line-height:1.08}
+  .ldesc{font-size:11px;color:var(--ink2);text-align:center;line-height:1.3}
+  @media(max-width:560px){.ldesc{display:none}}
+
+  /* элемент аудита */
+  .elhead{display:flex;align-items:baseline;gap:14px}
+  .elblk{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink)}
+  .pitch{font-size:15.5px;color:var(--ink2);max-width:64ch;margin:14px 0 4px}
+  .scale{border-top:1px solid var(--rule2);padding:20px 0 6px;margin-top:18px}
+  .slq{font-size:14.5px;color:var(--ink);margin-bottom:14px;max-width:66ch}
+  .slq .tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:6px}
+  .sl{display:flex;align-items:center;gap:18px}
+  input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:26px;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:3px;background:linear-gradient(90deg,var(--accent) var(--p,50%),var(--wash) var(--p,50%))}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--card);border:2px solid var(--accent);margin-top:-9px}
+  input.w2::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--ink) var(--p,50%),var(--wash) var(--p,50%))}
+  input.w2::-webkit-slider-thumb{border-color:var(--ink)}
+  .val{font-family:'Oswald',sans-serif;font-size:22px;width:32px;text-align:center}
+  /* аудит — новая механика */
+  .elico{flex:none;width:30px;height:30px}.elico svg{width:100%;height:100%}
+  .elnum{margin-left:auto;font-family:'Oswald',sans-serif;font-weight:600;font-size:clamp(40px,6vw,72px);line-height:.8;color:var(--accent)}
+  .tgl{display:inline-flex;align-items:center;gap:9px;margin-top:20px;padding:11px 15px;border:1px solid var(--rule2);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+  .tgl:hover{border-color:var(--ink);color:var(--ink)}
+  .tglbox{border:1px solid var(--rule2);border-top:0;padding:16px 18px;font-size:14.5px;line-height:1.6;color:var(--ink2)}
+  .tglbox div{padding:3px 0}
+  .auditgrid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:26px;padding-top:22px;border-top:1px solid var(--ink)}
+  @media(max-width:640px){.auditgrid{grid-template-columns:1fr;gap:24px}}
+  .acol .atag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fff;padding:5px 9px}
+  .acol .aq{font-size:15px;line-height:1.5;color:var(--ink2);margin:12px 0 0;min-height:4.4em}
+  .arow{display:flex;align-items:center;gap:14px;margin-top:6px}
+  .cells{flex:1;display:flex;gap:4px}
+  .cell{flex:1;height:38px;cursor:pointer;transition:background .12s}
+  .anum{font-family:'Oswald',sans-serif;font-weight:600;font-size:30px;width:40px;text-align:center}
+  .deep{border:1px solid var(--rule);background:var(--card);padding:14px 18px;margin-top:10px}
+  .deep .dq{font-size:14px;color:var(--ink2);line-height:1.5}
+  .deep textarea{width:100%;margin-top:8px;background:var(--paper);border:1px solid var(--rule);padding:11px 13px;font:inherit;font-size:14px;color:var(--ink);resize:vertical;min-height:56px;border-radius:0}
+  .deep textarea:focus{outline:none;border-color:var(--accent)}
+
+  /* карта */
+  .maprow{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--rule2)}
+  .maprow .mn{font-family:'Oswald',sans-serif;font-size:16px;flex:none;width:190px}
+  .barwrap{flex:1;position:relative;height:20px;background:var(--wash)}
+  .barwrap .imp{position:absolute;top:0;left:0;height:100%;background:rgba(192,132,36,.35)}
+  .barwrap .dev{position:absolute;top:5px;left:0;height:10px;background:var(--ink)}
+  .mgap{font-family:'JetBrains Mono',monospace;font-size:12px;flex:none;width:74px;text-align:right}
+  .blkband{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);margin:20px 0 2px}
+  .headline{background:var(--ink);color:#FFFFFF;padding:24px 26px;margin-top:22px}
+  .headline .t{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-lit);margin-bottom:10px}
+  .headline .x{font-family:'Oswald',sans-serif;font-size:clamp(19px,2.3vw,26px);line-height:1.3}
+  .legend{display:flex;gap:22px;margin-top:14px;font-size:12.5px;color:var(--ink2)}
+  .legend span{display:flex;align-items:center;gap:7px}.legend i{width:12px;height:12px;display:inline-block}
+
+  /* логики */
+  .ladder{display:grid;gap:2px;margin-top:14px;border:1px solid var(--rule);background:var(--rule)}
+  .rung{background:var(--card);padding:15px 20px;display:flex;gap:16px;align-items:baseline}
+  .rung.focus{background:var(--sel)}
+  .rung .rl{font-family:'Oswald',sans-serif;font-size:19px;flex:none;width:170px}
+  .rung.focus .rl{color:var(--accent-ink)}
+  .rung .rd{font-size:14px;color:var(--ink2)}
+  .osrow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+  @media(max-width:600px){.osrow{grid-template-columns:1fr}}
+  .oscard{border:1px solid var(--rule);background:var(--card);padding:22px 24px}
+  .oscard .ot{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
+  .oscard .oh{font-family:'Oswald',sans-serif;font-size:22px;margin-bottom:8px}
+  .oscard .ox{font-size:14.5px;color:var(--ink2)}
+
+  /* форма / профиль */
+  .field{margin:0 0 16px}
+  .field label{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
+  .field input,.field textarea{width:100%;background:var(--card);border:1px solid var(--rule);padding:13px 15px;font:inherit;font-size:15px;color:var(--ink);border-radius:0}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+  .profile{border:1px solid var(--ink);background:var(--card);padding:24px 26px;margin-top:6px}
+  .profile h4{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);margin:0 0 14px}
+  .pline{display:flex;gap:14px;padding:9px 0;border-top:1px solid var(--rule2);font-size:14px}
+  .pline .pk{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2);flex:none;width:150px;letter-spacing:.04em}
+  .pline .pv{color:var(--ink2)}
+  .todo{border:1px dashed var(--accent);background:var(--sel);padding:14px 18px;margin-top:14px;font-size:13.5px;color:var(--accent-ink);font-family:'JetBrains Mono',monospace;letter-spacing:.02em}
+
+  /* герой + петля */
+  .hero{display:grid;grid-template-columns:1fr 1.04fr;align-items:center;gap:clamp(28px,5vw,64px)}
+  @media(max-width:760px){.hero{grid-template-columns:1fr;text-align:center;justify-items:center}.hero img{max-width:74%}}
+  .hero img{width:100%;max-height:74vh;object-fit:contain;display:block;margin:0 auto}
+  .ibody{display:grid;grid-template-columns:1fr 300px;gap:20px;margin-top:20px;align-items:start}
+  @media(max-width:860px){.ibody{grid-template-columns:1fr}}
+  .gcard{background:var(--card);border:1px solid var(--rule)}
+  .canvas{width:100%;cursor:grab;touch-action:none;display:block}.canvas.drag{cursor:grabbing}
+  .canvas svg{width:100%;aspect-ratio:1000/400;height:auto;display:block}
+  .rail{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--rule)}
+  .rcell{cursor:pointer;padding:13px 8px;text-align:center;border-right:1px solid var(--rule);transition:background .18s}
+  .rcell:last-child{border-right:0}.rcell:hover,.rcell.on{background:var(--sel)}
+  .rcell svg{width:30px;height:30px}
+  .rcell .rn{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;color:var(--accent-ink);margin-top:6px}
+  .rcell .rnm{font-family:'Oswald',sans-serif;font-size:14px;line-height:1.12;margin-top:2px}
+  .pcard{background:var(--ink);color:#FFFFFF;padding:22px 24px}
+  .pcard .m{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-lit)}
+  .pcard .h{font-family:'Oswald',sans-serif;font-size:26px;line-height:1.1;margin-top:10px}
+  .pcard .x{font-size:14.5px;line-height:1.55;color:#CFC9BB;margin-top:10px}
+
+  /* мост — метрики 7 лет / 2-3 года */
+  .duo{display:flex;align-items:center;gap:clamp(18px,4vw,50px);margin-top:32px;flex-wrap:wrap}
+  .metric .mnum{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(44px,7vw,88px);line-height:.86;color:var(--ink);text-transform:uppercase}
+  .metric.hot .mnum{color:var(--green)}
+  .metric .ms{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-top:10px;max-width:24ch;line-height:1.5}
+  .marrow{font-family:'Oswald',sans-serif;font-weight:700;font-size:38px;color:var(--accent);line-height:1}
+  .qnote{margin-top:32px;background:var(--wash);padding:22px 26px;font-size:clamp(15px,1.8vw,18px);line-height:1.55;color:var(--ink);max-width:66ch}
+  .qsrc{display:block;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+</style>
+
+<div class="top"><div class="wrap">
+  <div class="brand">Диагностика перехода</div>
+  <div class="prog" id="prog"></div>
+  <div class="stepn" id="stepn"></div>
+</div></div>
+
+<main><div class="wrap"><div id="app"></div></div></main>
+
+<script>
+/* ==================================================================
+   DATA / CONFIG — вся методология здесь. Компоненты не содержат текста.
+   Источники: Книга-13авг.txt · самоаудит-черновик.html ·
+   25-элементов-стратсессии.pdf (Дисплей стратега) · ТЗ.
+   ================================================================== */
+var DATA = {
+
+  /* ---- ОБЛОЖКА + ИНТЕРАКТИВНАЯ ПЕТЕЛЬКА ---- */
+  hero:{ title1:"Кризис это вход,", title2:"а не обрыв", sub:"Развитие лидера идёт не прямой, а Петелькой.", cta:"Пройти по траектории" },
+  loop:{
+    kick:"Карта перехода",
+    title1:"Ведите точку по траектории", title2:"и увидите, где вы сейчас",
+    instr:"Тяните точку слева направо или кликните по фазе внизу. Пять состояний перехода, остановитесь там, где узнаёте себя.",
+    path:"M60 338 C 180 338, 250 92, 356 72 C 442 56, 466 168, 372 198 C 300 220, 268 140, 372 112 C 512 74, 592 296, 720 278 C 856 258, 900 116, 944 58",
+    nodes:[[60,338],[356,72],[372,198],[720,278],[944,58]],
+    names:["Подъём","Надлом","Распад","Коридор","Новая логика"],
+    phases:[
+      {meta:"Фаза 01 · подъём",title:"Достигатель бежит вверх",text:"Берёт высоту за высотой. Прежние инструменты работают.",t:0.10},
+      {meta:"Фаза 02 · надлом",title:"Вершина перестаёт держать",text:"Результат есть, а опоры под ним больше нет.",t:0.30},
+      {meta:"Фаза 03 · распад",title:"Ночь души",text:"Прежняя конструкция разбирается, новой ещё нет.",t:0.45},
+      {meta:"Фаза 04 · коридор",title:"Идёшь без карты",text:"Пробуешь новое, но старым способом мерить уже нельзя.",t:0.72},
+      {meta:"Фаза 05 · новая логика",title:"Другой уровень сложности",text:"Появляется способ видеть, которого раньше не было.",t:0.97}]
+  },
+
+  /* ---- МОСТ ПЕРЕД ДИАГНОСТИКОЙ — Книга стр.314, 270 ---- */
+  bridge:{ kick:"Перед диагностикой",
+    title1:"Вы пройдёте этот переход", title2:"в любом случае",
+    text:"Траектория неизбежно снова идёт вверх: вы находите новые опоры и начинаете жить в иной логике. Вопрос не «получится ли», а сколько это займёт.",
+    n1:"7 лет", n1s:"самостоятельно, в среднем на каждую логику",
+    n2:"2–3 года", n2s:"в профессиональном сопровождении",
+    quote:"Самостоятельно человек проходит каждую эпоху в среднем за 7 лет. В профессиональном сопровождении этот процесс можно ускорить до 2–3 лет на проживание и интеграцию каждой логики.",
+    src:"«От достигателя к стратегу» · более 20 лет практики и 7 лет исследований вертикального развития" },
+
+  /* ---- ШАГ 1. ЗОВ — Книга стр.150-156, 159-226 ---- */
+  calls: {
+    kick:"Шаг 1 · Зов",
+    title:"Какой зов сейчас ваш?",
+    q:"Зов вы ни с чем не спутаете. Пролистайте и остановитесь там, где узнаёте себя.",
+    items:[
+      {name:"Большая игра", line:"Масштаб не тот, играю не с теми.", interp:"Тесно в текущем масштабе: тянет на уровень, которого сейчас нет."},
+      {name:"В меня не помещается", line:"Мне всё надо, но я не вывожу.", interp:"Энергии и запросов больше, чем вмещает нынешняя конструкция жизни."},
+      {name:"Кризис", line:"Всё горит, а я анекдоты рассказываю.", interp:"Внешнее давление растёт, а прежние способы реагировать перестали работать."},
+      {name:"Золотая клетка", line:"Как будто варёную тряпку жую.", interp:"Внешне всё хорошо, но вкус к жизни ушёл: «а где во всём этом я?»"},
+      {name:"Витязь на распутье", line:"Куда ни пойдёшь, по голове.", interp:"Точка выбора, где любой прежний ход ведёт в тупик."},
+      {name:"Трудоголизм", line:"За успех плачу собой и близкими.", interp:"Работа сожрала всё: цена успеха — вы сами и ваша семья."},
+      {name:"Новая эпоха", line:"Порох в пороховницах ещё есть.", interp:"Внутренний запрос на новую большую главу, перемен требует сердце."},
+      {name:"Творческий импульс", line:"Я беременный своим талантом.", interp:"Внутри зреет то, что просится наружу и требует формы."},
+      {name:"Что-то упускаю", line:"Готов к рывку, но не за что ухватиться.", interp:"Есть колоссальная сила и готовность, но не найдена точка приложения."},
+      {name:"Поиск себя", line:"Свою ли жизнь я живу?", interp:"Вопрос идентичности: кто я и зачем на самом деле пришёл."}
+    ]
+  },
+
+  /* ---- ШАГ 2. УРОВЕНЬ ЗОВА — Книга стр.1055-1064 ---- */
+  level: {
+    kick:"Шаг 2 · Уровень зова",
+    title:"Насколько громко он звучит?",
+    q:"Лучше следовать за белым кроликом, чем ждать пушистого песца. Пять уровней, от тихого сигнала до крайнего.",
+    items:[
+      {name:"Интерес", desc:"Тянет к новому через вдохновение, но заглушается новой порцией работы."},
+      {name:"Эмоции", desc:"Негативные эмоции: апатия, скука, агрессия, вина. Работа не даёт удовлетворения."},
+      {name:"Неуспехи", desc:"На ровном месте начинаются неудачи, всё валится из рук."},
+      {name:"Отношения", desc:"Разрушение отношений в семье и бизнесе, крах в личной жизни."},
+      {name:"Тело", desc:"Соматика, болезни. «С утреннего совещания увозят на скорой»."}
+    ],
+    weak:"Сигнал уже появился. Не обязательно ждать момента, когда изменения станут вынужденными.",
+    strong:"Сигнал уже достаточно силён, чтобы переходить от наблюдения к стратегическому решению.",
+    weakMax:2 /* уровень <= weakMax считаем слабым (настраивается) */
+  },
+
+  /* ---- ШАГ 3. ГЛАВНЫЙ ПОВОРОТ — из ТЗ ---- */
+  transition: {
+    kick:"Шаг 3 · Главный поворот",
+    title:"Где находится главное ограничение вашего следующего перехода?",
+    options:[
+      {key:"self", t:"Во мне", d:"Пересмотра требует моя собственная стратегия, роль или направление движения."},
+      {key:"biz", t:"В бизнесе", d:"Изменения прежде всего нужны в стратегии и будущем бизнеса."},
+      {key:"both", t:"И там, и там", d:"Изменения во мне и изменения бизнеса уже трудно разделить."}
+    ],
+    thought:"Переход лидера и переход бизнеса связаны. Изменение одного неизбежно начинает перестраивать другое. Но начать полезнее с той системы, где напряжение сейчас ощущается сильнее.",
+    choiceTitle:"С какого аудита начнём?",
+    choiceSelf:"С себя", choiceBiz:"С бизнеса"
+  },
+
+  /* ---- ВЕТКА А. ЛИЧНАЯ СТРАТЕГИЯ — самоаудит-черновик.html ---- */
+  personal: {
+    kick:"Ветка · Личная стратегия",
+    intro:{title:"Начнём с вас", text:"Не будем пока искать причины или что-то менять. Сначала посмотрим на вашу личную стратегию целиком и увидим, где сегодня основное напряжение."},
+    impTag:"Важность", devTag:"Проработка",
+    elements:[
+      {g:0,block:"I · ДНК", name:"Миссия",
+       pitch:"Центральный и высший смысл жизни человека: зачем я пришёл в эту жизнь. Пересечение талантов человека и потребностей мира в текущем моменте.",
+       impQ:"Насколько вам важно чувствовать свою Миссию внутри того, как вы живёте и что делаете?",
+       devQ:"Насколько вы ощущаете, что живёте из своей личной миссии каждый день?",
+       think:["Для чего я создан? Ради чего я живу?","Какой след я хочу оставить в сердцах других?","Есть ли у меня организующий смысл? Могу ли я его сформулировать?","Проживается ли миссия в моих поступках и решениях?"]},
+      {g:1,block:"I · ДНК", name:"Ценности",
+       pitch:"Глубоко прожитые ценнейшие состояния жизни, которые наполняют энергией и формируют руководящие принципы — фундамент личной стратегии и опору в решениях.",
+       impQ:"Насколько вам важно понимать свои ценности и быть в контакте с ними?",
+       devQ:"Насколько ваши ценности ясны, живы и удаётся выстраивать жизнь в соответствии с ними?",
+       think:["Что для меня важно в жизни? Какие состояния я хочу проживать?","Когда я чувствую, что живу «правильно»?","Где такие виды контакта с жизнью, от которых поёт душа?","Без чего любой успех будет казаться пустым?"]},
+      {g:2,block:"I · ДНК", name:"Видение",
+       pitch:"Мечта, вдохновляющий образ, большая картинка будущего: 5–7 ключевых фактов, описывающих «кто я через X лет».",
+       impQ:"Насколько вам важно, чтобы у вас было мощное масштабное видение?",
+       devQ:"Насколько оно прочувствовано, продумано, проговорено и направляет вас?",
+       think:["Какие 5–7 ключевых фактов описывают жизнь моей мечты?","Что я построил, создал, привнёс в мир, инициировал или поддержал?","Как выглядит моя жизнь в согласии с миссией и ценностями?","Какое наследие я оставлю?"]},
+      {g:3,block:"II · ТОЖ", name:"ТОЖ",
+       pitch:"Текущий образ жизни — честный взгляд в настоящее: где я сейчас, как выглядит мой контекст и что происходит в сферах Я — Семья — Дело.",
+       impQ:"Насколько важно сейчас опереться на реальность и принимать решения с трезвым взглядом?",
+       devQ:"Насколько есть полный анализ ресурсов и ограничений, ясность с ролями и распределением энергии?",
+       think:["Какие факты о себе сегодня есть, чтобы простроить своё завтра?","Где есть опора и энергия, а где энергия утекает?","В каких ролях я истощаюсь, а в каких наполняюсь?","Где я живу чужой сценарий, а не свой?"]},
+      {g:4,block:"III · НОЖ", name:"НОЖ",
+       pitch:"Новый образ жизни — зона целей: целевое состояние, к чему вы идёте. Конкретные фокусирующие цели на год–три–пять лет.",
+       impQ:"Насколько вам важна конкретная фокусировка и цели, дающие энергию и ясность?",
+       devQ:"Насколько есть определённость в целях во всех сферах и какое качество их проработки?",
+       think:["На каком горизонте я чувствую возможность значимого изменения?","Какие изменения хочу увидеть в сферах Я — Семья — Дело?","Куда я хочу прийти? Какие стратегические цели важно реализовать?"]},
+      {g:5,block:"IV · Сдвиг", name:"Сдвиг",
+       pitch:"Ключевое изменение, которое качественно меняет жизнь: преобразование, за счёт которого происходит переход от ТОЖ к НОЖ.",
+       impQ:"Насколько важно находить свои точки сдвига и понимать свою сдвиговую механику?",
+       devQ:"Насколько вы понимаете, за счёт каких 2–3 действий сделаете переход от ТОЖ к НОЖ?",
+       think:["Где в жизни ключевые вызовы? С чем важно справиться?","Чему важно научиться, что преодолеть, что освоить?","Где мои 3–5 линий трансформации в сферах Я — Семья — Дело?","Какое изменение просится, чтобы выйти в новый масштаб?"]},
+      {g:6,block:"IV · Сдвиг", name:"Стратегирование",
+       pitch:"Наработанный навык регулярно подниматься над суетой и смотреть на свой путь из позиции Стратега, определяя дальнейший вектор движения.",
+       impQ:"Насколько для вас важна регулярная практика стратегирования?",
+       devQ:"Насколько развита привычка стратегировать и есть ли практика сонастройки с собой?",
+       think:["Насколько привычно подниматься над суетой и смотреть из роли Стратега?","Как часто я обращаюсь к значимым смыслам, пересматриваю их?","Какой у меня ритм стратегирования?","Есть ли ритуалы и практики, которые меня поддерживают?"]}
+    ]
+  },
+
+  /* ---- ВЕТКА Б. БИЗНЕС — 25-элементов-стратсессии.pdf «Дисплей стратега» ----
+     ⚠ В методологии НЕТ числовой шкалы. Есть линия «Насколько важно для вас…»
+        и линия текущего состояния («работает как система или отдано на самотёк?»).
+        Числовая шкала 1-10 — техника digital-визуализации, настраивается. */
+  business: {
+    kick:"Ветка · Бизнес-стратегия",
+    intro:{title:"Теперь посмотрим на бизнес как на систему", text:"16-факторный «Дисплей стратега». По каждому элементу две линии: насколько он важен для бизнеса сейчас и насколько сегодня работает как система, а не отдан на самотёк."},
+    impTag:"Важность", devTag:"Текущее состояние",
+    impQ:"Насколько это важно для вашего бизнеса сейчас?",
+    devQ:"Насколько это сегодня работает как система, а не отдано на самотёк?",
+    scaleTodo:"TODO: точная механика оценки бизнес-элементов не задана в методологии «Дисплей стратега». Шкала 1-10 — техническая. Уточнить у Филиппа критерии оценки.",
+    blocks:[
+      {block:"1 · ДНК", els:[
+        {name:"Миссия", pitch:"Основная причина существования организации, её главное предназначение. Зачем существует компания?"},
+        {name:"Видение", pitch:"Долгосрочная цель развития. Куда мы идём, какую компанию строим?"},
+        {name:"Ценности", pitch:"Нравственные и деловые принципы, которые разделяют сотрудники. Какие мы, как у нас принято?"}
+      ]},
+      {block:"2 · Стратегия", els:[
+        {name:"Вопросы и развилки", pitch:"Ключевые проблемы и альтернативы. На какие вызовы отвечаем, какие выборы стоят?"},
+        {name:"Стратегические ориентиры", pitch:"Фокусы внимания компании. На чём сфокусироваться, чтобы достичь успеха?"},
+        {name:"Инициативы и эксперименты", pitch:"Декомпозиция стратегии в конкретные проекты и гипотезы развития."}
+      ]},
+      {block:"3 · Внешняя среда", els:[
+        {name:"PESTEL", pitch:"Анализ дальнего окружения: политические, экономические, социальные, технологические, экологические, юридические факторы."},
+        {name:"Стейкхолдеры", pitch:"Ближнее окружение: все участники, заинтересованные в деятельности компании."}
+      ]},
+      {block:"4 · Рыночная стратегия", els:[
+        {name:"Клиентские сегменты", pitch:"Сегменты клиентов, на которых фокусируемся. Где играем, кто наши целевые клиенты?"},
+        {name:"Ценность для клиента", pitch:"Особая ценность и уникальные преимущества. Почему клиент выбирает именно нас?"},
+        {name:"Клиентский опыт", pitch:"Опыт, который создаём: продукт, сервис, коммуникация, каналы сбыта и поставки."}
+      ]},
+      {block:"5 · Внутренняя среда", els:[
+        {name:"Организационные компетенции", pitch:"Ключевые навыки и способности компании, дающие конкурентное преимущество."},
+        {name:"Система управления", pitch:"Структура управления и бизнес-процессы. Как мы организованы?"},
+        {name:"Культура", pitch:"Мягкая составляющая: философия, традиции, стиль коммуникации, корпоративные мифы."},
+        {name:"Команда", pitch:"Команда организации, играющая ключевую роль в создании и реализации стратегии."},
+        {name:"Лидер", pitch:"Первое лицо или группа лиц, ответственных за формирование и реализацию стратегии."}
+      ]}
+    ]
+  },
+
+  /* ---- ПОСЛЕ АУДИТА + ВЕРТИКАЛЬНОЕ РАЗВИТИЕ — Книга стр.245, 3665 ---- */
+  postAudit:{kick:"Первая карта перехода", title:"Теперь у вас есть первая карта перехода",
+    text:"Вы увидели не только то, что изменения необходимы, но и где именно сегодня находится стратегическое напряжение."},
+  vertical:{kick:"Вертикальное развитие", title:"Не каждый разрыв закрывается новым планом",
+    text:"Иногда следующий переход требует изменить сам способ, которым лидер воспринимает ситуацию и принимает решения.",
+    app:{t:"Новое приложение", x:"Новый навык или инструмент. Мы становимся компетентнее, но смотрим на мир из той же логики."},
+    os:{t:"Новая операционная система", x:"Изменение самой логики взаимодействия с миром. Как гусенице пора не отращивать ноги, а стать бабочкой."}},
+
+  /* ---- ЛОГИКИ ДЕЙСТВИЯ — Книга стр.283-289 (Торберт) ---- */
+  logics:{kick:"Логики действия", title:"Семь логик действия",
+    q:"В вертикальном развитии выделяют семь логик действия. Задача этого экрана — не поставить вам диагноз, а показать природу перехода.",
+    focus:["Достигатель","Индивидуалист","Стратег"],
+    items:[
+      {name:"Оппортунист", desc:"Старается выиграть любой ценой, не задумываясь о последствиях. «После нас хоть потоп!»"},
+      {name:"Дипломат", desc:"Идеальный командный игрок, хранитель правил и традиций, избегает конфликтов."},
+      {name:"Эксперт", desc:"Ценит точное знание и строгую логику, не решает без неопровержимых рациональных оснований."},
+      {name:"Достигатель", desc:"Волей и целеустремлённостью добивается успеха и ведёт к нему команду. «Быстрее! Выше! Сильнее!»"},
+      {name:"Индивидуалист", desc:"Отказывается тратить жизнь на гонку, учится жить в моменте и глубже познавать себя."},
+      {name:"Стратег", desc:"Системное и интегральное мышление, решает проблемы на всех уровнях, видит отдалённые эффекты."},
+      {name:"Алхимик", desc:"Люди «не от мира сего», участвуют в трансформациях исторического масштаба."}
+    ],
+    insight:"Возможно, следующий уровень невозможно построить исключительно инструментами той логики, которая привела вас к текущему результату."},
+
+  /* ---- ФИНАЛ — из ТЗ ---- */
+  cta:{kick:"Верификация", title:"Верифицировать свою стратегию",
+    text:"Самодиагностика позволяет увидеть карту. Следующий шаг: проверить, правильно ли вы определили главную точку напряжения и какой переход за ней стоит.",
+    button:"Разобрать карту перехода с командой"}
+};
+
+/* пиктограммы (официальный знаковый слой) */
+var K="#17161A",A="#F2B600";
+function sg(inner,st,w){return '<svg viewBox="0 0 48 48" fill="none" stroke="'+(st||K)+'" stroke-width="'+(w||1.8)+'" stroke-linecap="round" stroke-linejoin="round">'+inner+'</svg>';}
+var ZSIGN=[
+ '<circle cx="24" cy="24" r="12"/><circle cx="24" cy="24" r="4"/>',
+ '<rect x="12" y="14" width="24" height="20"/><path d="M12 20 H4 M36 28 H44 M20 14 V6 M28 34 V42"/>',
+ '<path d="M10 38 L20 20 L26 28 L32 12 L40 30"/><path d="M6 42 H42"/>',
+ '<path d="M12 10 V38 M20 10 V38 M28 10 V38 M36 10 V38"/><path d="M8 10 H40 M8 38 H40"/>',
+ '<path d="M24 40 V24"/><path d="M24 24 L10 8 M24 24 L38 8"/><circle cx="24" cy="24" r="2.4"/>',
+ '<circle cx="24" cy="24" r="14"/><path d="M24 14 V24 L32 29"/><path d="M24 24 L18 32"/>',
+ '<path d="M6 34 C 14 34, 16 18, 24 18 C 32 18, 34 34, 42 34"/><path d="M24 18 V6"/>',
+ '<path d="M24 8 V40"/><path d="M24 16 C 16 16, 12 22, 12 28 C 20 28, 24 22, 24 16"/><path d="M24 20 C 32 20, 36 26, 36 32 C 28 32, 24 26, 24 20"/>',
+ '<path d="M8 34 L28 24"/><path d="M22 21 L28 24 L25 30"/><circle cx="38" cy="19" r="4"/>',
+ '<circle cx="24" cy="24" r="13"/><circle cx="27" cy="20" r="2.6"/>'];
+var PHSIGN=[
+ '<path d="M8 38 C 16 38, 22 14, 40 10"/><circle cx="40" cy="10" r="2.8"/>',
+ '<path d="M8 36 C 16 36, 20 14, 27 13"/><path d="M33 13 C 40 14, 42 24, 42 30"/><path d="M27 8 L27 19 M33 8 L33 19"/>',
+ '<circle cx="24" cy="24" r="13" stroke-dasharray="4 5"/><path d="M18 30 L30 18"/>',
+ '<path d="M10 12 V36"/><path d="M38 12 V36"/><path d="M16 24 H32"/><path d="M28 20 L32 24 L28 28"/>',
+ '<circle cx="24" cy="24" r="8"/><path d="M24 4 V10 M24 38 V44 M4 24 H10 M38 24 H44 M10 10 L14 14 M34 34 L38 38 M38 10 L34 14 M14 34 L10 38"/>'];
+var PGLYPH=[
+ '<circle cx="24" cy="24" r="12"/><circle cx="24" cy="24" r="4"/>',
+ '<path d="M24 10 V38"/><path d="M24 16 C 16 16, 12 22, 12 28 C 20 28, 24 22, 24 16"/><path d="M24 20 C 32 20, 36 26, 36 32 C 28 32, 24 26, 24 20"/>',
+ '<path d="M6 34 C 14 34, 16 18, 24 18 C 32 18, 34 34, 42 34"/><path d="M24 18 V6"/>',
+ '<path d="M12 36 V22 M24 36 V14 M36 36 V26"/><path d="M8 40 H40"/>',
+ '<path d="M24 10 V38"/><path d="M14 20 L24 10 L34 20"/>',
+ '<path d="M10 12 V36"/><path d="M38 12 V36"/><path d="M16 24 H32"/><path d="M28 20 L32 24 L28 28"/>',
+ '<circle cx="24" cy="24" r="8"/><path d="M24 4 V10 M24 38 V44 M4 24 H10 M38 24 H44 M10 10 L14 14 M34 34 L38 38 M38 10 L34 14 M14 34 L10 38"/>'];
+var LVLI=[
+ '<svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="2.4" fill="'+K+'"/></svg>',
+ '<svg viewBox="0 0 30 30"><rect x="10" y="10" width="10" height="10" fill="'+K+'"/></svg>',
+ '<svg viewBox="0 0 30 30"><rect x="7" y="7" width="16" height="16" fill="'+K+'"/><path d="M15 3 L18 14 L12 14 L16 27" fill="none" stroke="'+A+'" stroke-width="2.6"/></svg>',
+ '<svg viewBox="0 0 30 30"><rect x="4" y="5" width="18" height="20" fill="'+K+'"/><polygon points="18,4 28,4 28,26" fill="'+A+'"/></svg>',
+ '<svg viewBox="0 0 30 30"><rect x="2" y="2" width="26" height="26" fill="'+K+'"/></svg>'];
+
+/* ==================================================================
+   ДВИЖОК — состояние + рендер экранов. Тексты берутся только из DATA.
+   ================================================================== */
+var LP = JSON.parse(localStorage.getItem('leadProfile')||'null') || {
+  zov:null, zovInterp:null, level:null, levelName:null, constraint:null, branch:null,
+  personal:{imp:[],dev:[],deep:{}}, business:{imp:[],state:[],deep:{}},
+  contact:{}, done:false
+};
+function saveLP(){ localStorage.setItem('leadProfile', JSON.stringify(LP)); }
+
+var app=document.getElementById('app');
+// линейный список шагов маршрута (для прогресса)
+function route(){
+  var r=['hero','loop','bridge','call','callRes','level','levelRes','transition','transThought'];
+  if(LP.constraint==='both') r.push('choice');
+  if(LP.branch==='self'){ r.push('pIntro','pAudit'); }
+  else if(LP.branch==='biz'){ r.push('bIntro','bAudit','bMap'); }
+  r.push('logics','lead','cta');
+  return r;
+}
+var state={screen:'call', zi:0, el:0};
+
+function setProg(){
+  var r=route(), idx=r.indexOf(state.screen); if(idx<0)idx=0;
+  var prog=document.getElementById('prog'); prog.innerHTML='';
+  for(var i=0;i<r.length;i++){ var s=document.createElement('span'); if(i<=idx)s.className='f'; prog.appendChild(s); }
+  document.getElementById('stepn').textContent=(idx+1)+' / '+r.length;
+}
+function nav(back,next,hint,nextEnabled,label){
+  var h='<div class="nav">';
+  h+= back? '<button class="btn ghost" onclick="'+back+'">Назад</button>':'<span></span>';
+  h+= hint? '<span class="hint">'+hint+'</span>':'';
+  h+= next? '<button class="btn" id="nextBtn" '+(nextEnabled===false?'disabled':'')+' onclick="'+next+'">'+(label||'Далее')+' →</button>':'<span></span>';
+  return h+'</div>';
+}
+function esc(s){return (s||'').replace(/"/g,'&quot;');}
+
+/* ---- ОБЛОЖКА ---- */
+function scHero(){
+  var h=DATA.hero;
+  app.innerHTML='<div class="hero"><div>'+
+    '<div class="kick">Идея книги</div>'+
+    '<h1>'+h.title1+'<br><span class="acc">'+h.title2+'</span></h1>'+
+    '<p class="lead" style="font-size:clamp(17px,2vw,22px);max-width:34ch">'+h.sub+'</p>'+
+    '<div style="margin-top:30px"><button class="btn" onclick="go(\'loop\')">'+h.cta+' →</button></div>'+
+    '</div><img src="петелька.png?v=6" alt="Петелька"></div>';
+  setProg();
+}
+
+/* ---- ИНТЕРАКТИВНАЯ ПЕТЛЯ ---- */
+var lpLen=0, lpSamp=[], lpT=0.10, lpDrag=false, lpPath=null;
+function scLoop(){
+  var L=DATA.loop;
+  app.innerHTML='<div class="kick">'+L.kick+'</div><h2>'+L.title1+' <span class="acc">'+L.title2+'</span></h2>'+
+    '<p class="q">'+L.instr+'</p>'+
+    '<div class="ibody"><div class="gcard"><div class="canvas" id="lpCanvas"><svg id="lpSvg" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet">'+
+      '<line x1="52" y1="352" x2="948" y2="352" stroke="rgba(23,22,26,0.18)" stroke-width="1"></line>'+
+      '<path id="lpBase" d="'+L.path+'" fill="none" stroke="#EFEDE8" stroke-width="20" stroke-linecap="round"></path>'+
+      '<path id="lpProg" d="'+L.path+'" fill="none" stroke="#F2B600" stroke-width="3" stroke-linecap="round" stroke-dasharray="0 9999"></path>'+
+      '<circle cx="60" cy="338" r="6.5" fill="#FFFFFF" stroke="#17161A" stroke-width="2.4"></circle>'+
+      '<circle cx="356" cy="72" r="6.5" fill="#FFFFFF" stroke="#17161A" stroke-width="2.4"></circle>'+
+      '<circle cx="372" cy="198" r="6.5" fill="#17161A"></circle>'+
+      '<circle cx="720" cy="278" r="6.5" fill="#17161A"></circle>'+
+      '<circle cx="944" cy="58" r="8" fill="#2F5A2A"></circle>'+
+      '<text x="60" y="318" style="font-family:\'JetBrains Mono\';font-size:11px;letter-spacing:.14em;fill:#5D5A52">01 ПОДЪЁМ</text>'+
+      '<text x="356" y="52" text-anchor="middle" style="font-family:\'JetBrains Mono\';font-size:11px;letter-spacing:.14em;fill:#5D5A52">02 НАДЛОМ</text>'+
+      '<text x="372" y="222" text-anchor="middle" style="font-family:\'JetBrains Mono\';font-size:11px;letter-spacing:.14em;fill:#5D5A52">03 РАСПАД</text>'+
+      '<text x="720" y="302" text-anchor="middle" style="font-family:\'JetBrains Mono\';font-size:11px;letter-spacing:.14em;fill:#5D5A52">04 КОРИДОР</text>'+
+      '<text x="944" y="38" text-anchor="end" style="font-family:\'JetBrains Mono\';font-size:11px;letter-spacing:.14em;fill:#2F5A2A">05 НОВАЯ ЛОГИКА</text>'+
+      '<circle id="lpDot" cx="60" cy="338" r="12" fill="#F2B600" stroke="#FFFFFF" stroke-width="3"></circle>'+
+    '</svg></div><div class="rail" id="lpRail"></div></div>'+
+    '<div class="pcard"><div class="m" id="lpMeta"></div><div class="h" id="lpTitle"></div><div class="x" id="lpText"></div></div></div>'+
+    nav("go('hero')","go('bridge')");
+  setProg();
+  lpPath=document.getElementById('lpBase');
+  var rail=document.getElementById('lpRail'); rail.innerHTML='';
+  DATA.loop.phases.forEach(function(p,i){ var c=document.createElement('div'); c.className='rcell'; c.dataset.i=i;
+    c.innerHTML='<div id="lpRp'+i+'">'+sg(PHSIGN[i],K,1.8)+'</div><div class="rn">0'+(i+1)+'</div><div class="rnm">'+DATA.loop.names[i]+'</div>';
+    c.onclick=function(){ lpSet(DATA.loop.phases[i].t); }; rail.appendChild(c); });
+  requestAnimationFrame(function(){ lpBuild(); lpRender(); });
+  var cv=document.getElementById('lpCanvas');
+  cv.addEventListener('pointerdown',function(e){ cv.classList.add('drag'); try{e.target.setPointerCapture&&e.target.setPointerCapture(e.pointerId);}catch(x){} lpSet(lpAt(e)); lpDrag=true; });
+  cv.addEventListener('pointermove',function(e){ if(lpDrag)lpSet(lpAt(e)); });
+  cv.addEventListener('pointerup',function(){lpDrag=false;cv.classList.remove('drag');});
+  cv.addEventListener('pointerleave',function(){lpDrag=false;cv.classList.remove('drag');});
+}
+function lpBuild(){ if(!lpPath)return; lpLen=lpPath.getTotalLength(); if(!lpLen)return; lpSamp=[];
+  for(var k=0;k<=1000;k++){ var p=lpPath.getPointAtLength(lpLen*k/1000); lpSamp.push([p.x,p.y]); }
+  DATA.loop.nodes.forEach(function(n,i){ var best=0,bd=Infinity; for(var k=0;k<lpSamp.length;k++){ var dd=(lpSamp[k][0]-n[0])*(lpSamp[k][0]-n[0])+(lpSamp[k][1]-n[1])*(lpSamp[k][1]-n[1]); if(dd<bd){bd=dd;best=k;} } DATA.loop.phases[i].t=best/1000; }); }
+function lpAt(e){ var svg=document.getElementById('lpSvg'), r=svg.getBoundingClientRect(); var sc=Math.min(r.width/1000,r.height/400);
+  var ox=(r.width-1000*sc)/2, oy=(r.height-400*sc)/2, x=(e.clientX-r.left-ox)/sc, y=(e.clientY-r.top-oy)/sc;
+  var best=0,bd=Infinity; for(var k=0;k<lpSamp.length;k++){ var dd=(lpSamp[k][0]-x)*(lpSamp[k][0]-x)+(lpSamp[k][1]-y)*(lpSamp[k][1]-y); if(dd<bd){bd=dd;best=k;} } return best/1000; }
+function lpNearest(){ var i=0,d=Infinity; DATA.loop.phases.forEach(function(p,k){ var dd=Math.abs(p.t-lpT); if(dd<d){d=dd;i=k;} }); return i; }
+function lpSet(t){ lpT=Math.max(0,Math.min(1,t)); lpRender(); }
+function lpRender(){ if(!lpLen)return; var q=lpPath.getPointAtLength(lpLen*lpT);
+  var dot=document.getElementById('lpDot'); if(dot){dot.setAttribute('cx',q.x);dot.setAttribute('cy',q.y);}
+  document.getElementById('lpProg').setAttribute('stroke-dasharray',(lpLen*lpT)+' '+lpLen);
+  var i=lpNearest(), ph=DATA.loop.phases[i];
+  document.getElementById('lpMeta').textContent=ph.meta; document.getElementById('lpTitle').textContent=ph.title; document.getElementById('lpText').textContent=ph.text;
+  var rail=document.getElementById('lpRail'); [].forEach.call(rail.children,function(c,k){ c.className='rcell'+(k===i?' on':'');
+    var stroke=(k===i)?(k===4?'#2F5A2A':'#8A5A12'):K; var rp=document.getElementById('lpRp'+k); if(rp)rp.innerHTML=sg(PHSIGN[k],stroke,1.8); }); }
+
+/* ---- МОСТ ПЕРЕД ДИАГНОСТИКОЙ ---- */
+function scBridge(){
+  var b=DATA.bridge;
+  app.innerHTML='<div class="kick">'+b.kick+'</div>'+
+    '<h2>'+b.title1+'<br><span class="acc">'+b.title2+'</span></h2>'+
+    '<p class="lead" style="max-width:54ch">'+b.text+'</p>'+
+    '<div class="duo"><div class="metric"><div class="mnum">'+b.n1+'</div><div class="ms">'+b.n1s+'</div></div>'+
+    '<div class="marrow">→</div>'+
+    '<div class="metric hot"><div class="mnum">'+b.n2+'</div><div class="ms">'+b.n2s+'</div></div></div>'+
+    '<div class="qsrc" style="margin-top:30px;max-width:60ch">'+b.src+'</div>'+
+    nav("go('loop')","go('call')",null,true,"Посмотреть, где вы сейчас");
+  setProg();
+}
+
+/* ---- ШАГ 1 ЗОВ ---- */
+function scCall(){
+  var c=DATA.calls, z=c.items[state.zi];
+  app.innerHTML='<div class="kick">'+c.kick+'</div><h2>'+c.title+'</h2><p class="q">'+c.q+'</p>'+
+    '<div class="cardwrap"><button class="arrow" onclick="zMove(-1)">‹</button><div class="card">'+
+      '<div class="num">'+(state.zi+1)+' / '+c.items.length+'</div><div class="zicon">'+sg(ZSIGN[state.zi])+'</div>'+
+      '<div class="name">'+z.name+'</div><div class="line">«'+z.line+'»</div>'+
+      '<div class="check'+(LP.zov===state.zi?' on':'')+'" onclick="zPick()"><span class="box"></span><span class="lab">'+(LP.zov===state.zi?'Это мой зов':'Отметить: мой зов')+'</span></div>'+
+    '</div><button class="arrow" onclick="zMove(1)">›</button></div>'+
+    '<div class="dots">'+c.items.map(function(_,i){return '<span class="dot'+(i===state.zi?' on':'')+'" onclick="zGo('+i+')"></span>';}).join('')+'</div>'+
+    nav(null, LP.zov!=null?'go(\'callRes\')':null, LP.zov!=null?null:'Отметьте свой зов, чтобы продолжить');
+  setProg();
+}
+function zMove(d){ state.zi=(state.zi+d+DATA.calls.items.length)%DATA.calls.items.length; scCall(); }
+function zGo(i){ state.zi=i; scCall(); }
+function zPick(){ LP.zov=state.zi; LP.zovInterp=DATA.calls.items[state.zi].interp; saveLP(); scCall(); }
+
+function scCallRes(){
+  var z=DATA.calls.items[LP.zov];
+  app.innerHTML='<div class="kick">'+DATA.calls.kick+' · результат</div><h2>Ваш зов: <span class="acc">'+z.name+'</span></h2>'+
+    '<p class="lead">'+z.interp+'</p>'+nav("go('call')","go('level')");
+  setProg();
+}
+
+/* ---- ШАГ 2 УРОВЕНЬ ---- */
+function scLevel(){
+  var l=DATA.level;
+  app.innerHTML='<div class="kick">'+l.kick+'</div><h2>'+l.title+'</h2><p class="q">'+l.q+'</p>'+
+    '<div class="lrow">'+l.items.map(function(it,i){return '<div class="lcell'+(LP.level===i+1?' sel':'')+'" onclick="lPick('+i+')">'+
+      '<div class="lnum">'+(i+1)+'</div><div class="lbox">'+LVLI[i]+'</div><div class="lname">'+it.name+'</div><div class="ldesc">'+it.desc+'</div></div>';}).join('')+'</div>'+
+    nav("go('callRes')", LP.level?'go(\'levelRes\')':null, LP.level?null:'Выберите уровень');
+  setProg();
+}
+function lPick(i){ LP.level=i+1; LP.levelName=DATA.level.items[i].name; saveLP(); scLevel(); }
+function scLevelRes(){
+  var l=DATA.level, weak=LP.level<=l.weakMax;
+  app.innerHTML='<div class="kick">'+l.kick+' · результат</div><h2>Уровень '+LP.level+' · <span class="acc">'+LP.levelName+'</span></h2>'+
+    '<p class="lead">'+(weak?l.weak:l.strong)+'</p>'+nav("go('level')","go('transition')");
+  setProg();
+}
+
+/* ---- ШАГ 3 ПОВОРОТ ---- */
+function scTransition(){
+  var t=DATA.transition;
+  app.innerHTML='<div class="kick">'+t.kick+'</div><h2>'+t.title+'</h2>'+
+    '<div class="opts" style="margin-top:24px">'+t.options.map(function(o){return '<button class="opt'+(LP.constraint===o.key?' sel':'')+'" onclick="tPick(\''+o.key+'\')"><div class="ot">'+o.t+'</div><div class="od">'+o.d+'</div></button>';}).join('')+'</div>'+
+    nav("go('levelRes')", LP.constraint?'go(\'transThought\')':null, LP.constraint?null:'Выберите вариант');
+  setProg();
+}
+function tPick(k){ LP.constraint=k; if(k!=='both')LP.branch=k; saveLP(); scTransition(); }
+function scTransThought(){
+  var t=DATA.transition;
+  app.innerHTML='<div style="max-width:640px"><div class="kick">'+t.kick+' · связка</div>'+
+    '<p style="font-weight:500;font-size:clamp(20px,2.4vw,28px);line-height:1.4;margin:0;color:var(--ink)">'+t.thought+'</p></div>'+
+    nav("go('transition')","afterTransition()");
+  setProg();
+}
+function afterTransition(){ if(LP.constraint==='both'){ go('choice'); } else { go(LP.branch==='self'?'pIntro':'bIntro'); } }
+function scChoice(){
+  var t=DATA.transition;
+  app.innerHTML='<div class="kick">'+t.kick+'</div><h2>'+t.choiceTitle+'</h2><p class="q">'+t.thought+'</p>'+
+    '<div class="opts"><button class="opt" onclick="choose(\'self\')"><div class="ot">'+t.choiceSelf+'</div></button>'+
+    '<button class="opt" onclick="choose(\'biz\')"><div class="ot">'+t.choiceBiz+'</div></button></div>'+
+    nav("go('transition')",null);
+  setProg();
+}
+function choose(b){ LP.branch=b; saveLP(); go(b==='self'?'pIntro':'bIntro'); }
+
+/* ---- ВЕТКА А ЛИЧНАЯ ---- */
+function scPIntro(){
+  var p=DATA.personal;
+  app.innerHTML='<div class="kick">'+p.kick+'</div><h2>'+p.intro.title+'</h2><p class="lead">'+p.intro.text+'</p>'+
+    nav("go('transition')","startAudit('self')");
+  setProg();
+}
+function startAudit(b){ state.el=0; go(b==='self'?'pAudit':'bAudit'); }
+
+var auditOpen=false;
+function pad(n){ return n<10?('0'+n):(''+n); }
+/* ЛИЧНЫЙ АУДИТ — файл автора один в один (самоаудит-методология.html) через iframe */
+function scPAudit(){
+  app.innerHTML='<div style="position:fixed;inset:0;z-index:50;background:#fff;display:flex;flex-direction:column">'+
+    '<div style="flex:none;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:10px 20px;border-bottom:1px solid var(--rule);background:var(--paper)">'+
+      '<button class="btn ghost" onclick="go(\'pIntro\')">← Воронка</button>'+
+      '<span class="brand">Аудит личной стратегии</span>'+
+      '<button class="btn" onclick="go(\'logics\')">Далее →</button>'+
+    '</div>'+
+    '<iframe src="самоаудит-методология.html" title="Аудит личной стратегии" style="flex:1;width:100%;border:0;background:#fff;display:block"></iframe>'+
+  '</div>';
+  setProg();
+}
+function cellCol(branch,id,tag,q,val,tone){
+  var col=tone==='green'?'var(--green)':'var(--ink)', cells='';
+  for(var k=1;k<=10;k++){ cells+='<div class="cell" style="background:'+(k<=val?col:'var(--wash)')+'" onclick="setCell(\''+branch+'\',\''+id+'\','+k+')"></div>'; }
+  return '<div class="acol"><span class="atag" style="background:'+col+'">'+tag+' · 1–10</span>'+
+    '<p class="aq">'+q+'</p><div class="arow"><div class="cells">'+cells+'</div><span class="anum" style="color:'+col+'">'+val+'</span></div></div>';
+}
+function setCell(branch,id,k){
+  if(branch==='self'){ LP.personal[id==='imp'?'imp':'dev'][state.el]=k; }
+  else { LP.business[id==='imp'?'imp':'state'][state.el]=k; }
+  saveLP(); (branch==='self'?scPAudit:scBAudit)();
+}
+function toggleAudit(){ auditOpen=!auditOpen; scBAudit(); }
+function nextEl(branch){
+  var list=branch==='self'?DATA.personal.elements:flatBiz();
+  if(branch==='self'){ if(LP.personal.imp[state.el]==null)LP.personal.imp[state.el]=5; if(LP.personal.dev[state.el]==null)LP.personal.dev[state.el]=5; }
+  else { if(LP.business.imp[state.el]==null)LP.business.imp[state.el]=5; if(LP.business.state[state.el]==null)LP.business.state[state.el]=5; }
+  saveLP(); auditOpen=false;
+  if(state.el<list.length-1){ state.el++; go(branch==='self'?'pAudit':'bAudit'); }
+  else { go(branch==='self'?'pMap':'bMap'); }
+}
+function prevEl(branch){ if(state.el>0){state.el--; auditOpen=false; go(branch==='self'?'pAudit':'bAudit');} }
+
+function gaps(imp,dev){ var r=[]; for(var i=0;i<imp.length;i++)r.push({i:i,gap:(imp[i]||5)-(dev[i]||5)}); return r; }
+function scPMap(){
+  var p=DATA.personal, imp=LP.personal.imp, dev=LP.personal.dev;
+  for(var i=0;i<p.elements.length;i++){ if(imp[i]==null)imp[i]=5; if(dev[i]==null)dev[i]=5; }
+  var g=gaps(imp,dev).sort(function(a,b){return b.gap-a.gap;});
+  var top=g[0];
+  var rows=p.elements.map(function(e,i){ return mapRow(e.name,imp[i],dev[i]); }).join('');
+  app.innerHTML='<div class="kick">Карта личной стратегии</div><h2>Карта вашей личной стратегии</h2>'+
+    '<div class="legend"><span><i style="background:rgba(192,132,36,.35)"></i>важность</span><span><i style="background:#17161A"></i>проработка</span></div>'+
+    rows+
+    '<div class="headline"><div class="t">Самый большой разрыв</div><div class="x">Сейчас он здесь: '+p.elements[top.i].name+' ('+imp[top.i]+' / '+dev[top.i]+').</div></div>'+
+    deepBlock('self',top.i)+
+    nav("go('pAudit')","go('postAudit')");
+  setProg();
+}
+function mapRow(name,imp,dev){
+  return '<div class="maprow"><div class="mn">'+name+'</div><div class="barwrap"><div class="imp" style="width:'+(imp*10)+'%"></div><div class="dev" style="width:'+(dev*10)+'%"></div></div>'+
+    '<div class="mgap">'+imp+' / '+dev+'</div></div>';
+}
+function deepBlock(branch,i){
+  var e=(branch==='self'?DATA.personal.elements:flatBiz())[i];
+  if(!e.think||!e.think.length)return '';
+  var st=branch==='self'?LP.personal.deep:LP.business.deep;
+  return '<div style="margin-top:22px"><div class="kick">Глубже по зоне разрыва · '+e.name+'</div>'+
+    e.think.slice(0,3).map(function(q,k){ return '<div class="deep"><div class="dq">'+q+'</div><textarea placeholder="Пара строк, по желанию" oninput="LP.'+(branch==='self'?'personal':'business')+'.deep[\''+i+'_'+k+'\']=this.value;saveLP()">'+esc(st[i+'_'+k]||'')+'</textarea></div>'; }).join('')+'</div>';
+}
+
+/* ---- ВЕТКА Б БИЗНЕС ---- */
+function flatBiz(){ var r=[]; DATA.business.blocks.forEach(function(b){ b.els.forEach(function(e){ r.push(Object.assign({block:b.block},e)); }); }); return r; }
+function scBIntro(){
+  var b=DATA.business;
+  app.innerHTML='<div class="kick">'+b.kick+'</div><h2>'+b.intro.title+'</h2><p class="lead">'+b.intro.text+'</p>'+
+    '<div class="todo">'+b.scaleTodo+'</div>'+nav("go('transition')","startAudit('biz')");
+  setProg();
+}
+function scBAudit(){
+  var b=DATA.business, list=flatBiz(), e=list[state.el], n=list.length;
+  var imp=LP.business.imp[state.el]||5, stt=LP.business.state[state.el]||5;
+  app.innerHTML='<div class="elhead"><span class="elblk">'+e.block+' · элемент '+pad(state.el+1)+' из '+pad(n)+'</span><span class="elnum">'+pad(state.el+1)+'</span></div>'+
+    '<h2>'+e.name+'</h2><p class="pitch">'+e.pitch+'</p>'+
+    '<div class="auditgrid">'+cellCol('biz','imp',b.impTag,b.impQ,imp,'ink')+cellCol('biz','dev',b.devTag,b.devQ,stt,'green')+'</div>'+
+    nav(state.el>0?"prevEl('biz')":"go('bIntro')","nextEl('biz')");
+  setProg();
+}
+function scBMap(){
+  var b=DATA.business, list=flatBiz(), imp=LP.business.imp, stt=LP.business.state;
+  for(var i=0;i<list.length;i++){ if(imp[i]==null)imp[i]=5; if(stt[i]==null)stt[i]=5; }
+  var ti=0,tv=-99; for(var i=0;i<list.length;i++){ var d=imp[i]-stt[i]; if(d>tv){tv=d;ti=i;} }
+  var html='', curBlk='';
+  list.forEach(function(e,i){ if(e.block!==curBlk){ curBlk=e.block; html+='<div class="blkband">'+curBlk+'</div>'; } html+=mapRow(e.name,imp[i],stt[i]); });
+  app.innerHTML='<div class="kick">Дисплей стратега</div><h2>Где сейчас напряжение</h2>'+
+    '<p class="q">Точки напряжения там, где элемент важен, но как система пока не работает.</p>'+
+    '<div class="legend"><span><i style="background:rgba(242,182,0,.5)"></i>важность</span><span><i style="background:#17161A"></i>текущее состояние</span></div>'+
+    html+
+    '<div class="headline"><div class="t">Заметнее всего напряжение</div><div class="x">'+list[ti].name+' · '+list[ti].block+'</div></div>'+
+    nav("go('bAudit')","go('logics')");
+  setProg();
+}
+
+/* ---- ПОСЛЕ АУДИТА / ВЕРТИКАЛЬ / ЛОГИКИ ---- */
+function scPostAudit(){
+  var d=DATA.postAudit;
+  app.innerHTML='<div class="kick">'+d.kick+'</div><h2>'+d.title+'</h2><p class="lead">'+d.text+'</p>'+
+    nav(LP.branch==='self'?"go('pAudit')":"go('bMap')","go('vertical')");
+  setProg();
+}
+function scVertical(){
+  var v=DATA.vertical;
+  app.innerHTML='<div class="kick">'+v.kick+'</div><h2>'+v.title+'</h2><p class="lead">'+v.text+'</p>'+
+    '<div class="osrow"><div class="oscard"><div class="ot">'+v.app.t+'</div><div class="oh">Приложение</div><div class="ox">'+v.app.x+'</div></div>'+
+    '<div class="oscard" style="border-color:var(--accent)"><div class="ot" style="color:var(--accent-ink)">'+v.os.t+'</div><div class="oh">Операционная система</div><div class="ox">'+v.os.x+'</div></div></div>'+
+    nav("go('postAudit')","go('logics')");
+  setProg();
+}
+function scLogics(){
+  var l=DATA.logics;
+  app.innerHTML='<div class="kick">'+l.kick+'</div><h2>'+l.title+'</h2><p class="q">'+l.q+'</p>'+
+    '<div class="ladder">'+l.items.map(function(it){var f=l.focus.indexOf(it.name)>=0;return '<div class="rung'+(f?' focus':'')+'"><div class="rl">'+it.name+'</div><div class="rd">'+it.desc+'</div></div>';}).join('')+'</div>'+
+    '<div class="headline"><div class="t">Ключевой инсайт</div><div class="x">'+l.insight+'</div></div>'+
+    nav(LP.branch==='self'?"go('pAudit')":"go('bMap')","go('lead')");
+  setProg();
+}
+
+/* ---- ЛИД / ПРОФИЛЬ / CTA ---- */
+function scLead(){
+  var c=LP.contact||{};
+  app.innerHTML='<div class="kick">'+DATA.cta.kick+'</div><h2>Ваш стратегический профиль</h2>'+
+    '<p class="q">Эксперт увидит не просто заявку, а карту вашего перехода. Оставьте контакт.</p>'+
+    '<div class="grid2"><div class="field"><label>Имя</label><input id="c_name" value="'+esc(c.name)+'" placeholder="Как обращаться"></div>'+
+    '<div class="field"><label>Роль</label><input id="c_role" value="'+esc(c.role)+'" placeholder="Собственник / CEO"></div>'+
+    '<div class="field"><label>Компания</label><input id="c_comp" value="'+esc(c.comp)+'" placeholder="Название"></div>'+
+    '<div class="field"><label>Контакт</label><input id="c_contact" value="'+esc(c.contact)+'" placeholder="Телефон / телеграм / почта"></div></div>'+
+    profileCard()+
+    nav("go('logics')","go('cta')");
+  setProg();
+}
+function collectContact(){ LP.contact={name:v('c_name'),role:v('c_role'),comp:v('c_comp'),contact:v('c_contact')}; saveLP(); }
+function v(id){ var e=document.getElementById(id); return e?(e.value||'').trim():''; }
+function profileCard(){
+  var branch=LP.branch==='self'?'Личная стратегия':(LP.branch==='biz'?'Бизнес-стратегия':'—');
+  var gapName='—';
+  if(LP.branch==='self'){ try{ var sa=JSON.parse(localStorage.getItem('samoaudit.v2')||'null'); if(sa&&sa.imp){ var bi=0,bg=-99; for(var k=0;k<7;k++){ var gg=sa.imp[k]-sa.wrk[k]; if(gg>bg){bg=gg;bi=k;} } gapName=DATA.personal.elements[bi].name; } }catch(e){} }
+  else if(LP.branch==='biz'&&LP.business.imp.length){ var g2=gaps(LP.business.imp,LP.business.state).sort(function(a,b){return b.gap-a.gap;})[0]; gapName=flatBiz()[g2.i].name; }
+  var cons={self:'Во мне',biz:'В бизнесе',both:'И там, и там'}[LP.constraint]||'—';
+  var lvlW=LP.level!=null?(LP.level<=DATA.level.weakMax?'слабый':'сильный'):'—';
+  return '<div class="profile"><h4>Профиль для команды продаж</h4>'+
+    pl('Зов', LP.zov!=null?DATA.calls.items[LP.zov].name:'—')+
+    pl('Уровень зова', LP.level!=null?(LP.level+' / 5 · '+LP.levelName+' · '+lvlW):'—')+
+    pl('Где ограничение', cons)+
+    pl('Ветка аудита', branch)+
+    pl('Точка напряжения', gapName)+
+    pl('Завершённость', LP.done?'диагностика пройдена':'в процессе')+
+    '</div>';
+}
+function pl(k,val){ return '<div class="pline"><div class="pk">'+k+'</div><div class="pv">'+val+'</div></div>'; }
+function scCTA(){
+  var c=DATA.cta; LP.done=true; collectContactSafe(); saveLP();
+  app.innerHTML='<div class="kick">'+c.kick+'</div><h2>'+c.title+'</h2><p class="lead">'+c.text+'</p>'+
+    profileCard()+
+    '<div class="nav"><button class="btn ghost" onclick="go(\'lead\')">Назад</button><button class="btn" onclick="alert(\'Прототип: профиль ушёл бы в CRM. Backend не подключён.\')">'+c.button+' →</button></div>';
+  setProg();
+}
+function collectContactSafe(){ if(document.getElementById('c_name'))collectContact(); }
+
+/* ---- роутер ---- */
+var SCREENS={hero:scHero,loop:scLoop,bridge:scBridge,call:scCall,callRes:scCallRes,level:scLevel,levelRes:scLevelRes,transition:scTransition,transThought:scTransThought,choice:scChoice,
+  pIntro:scPIntro,pAudit:scPAudit,pMap:scPMap,bIntro:scBIntro,bAudit:scBAudit,bMap:scBMap,
+  postAudit:scPostAudit,vertical:scVertical,logics:scLogics,lead:scLead,cta:scCTA};
+function go(s){ if(state.screen==='lead')collectContactSafe(); state.screen=s; window.scrollTo(0,0); SCREENS[s](); }
+go('hero');
+</script>

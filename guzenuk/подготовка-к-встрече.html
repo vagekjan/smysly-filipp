@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<!-- v20: сворачивание меню через onclick -->
+<html lang="ru">
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>План работы · Гузенюк</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%239B3B1A'/%3E%3Cpath d='M20 16h25v8H28v24h-8z' fill='%23F9F5F0'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%239B3B1A'/%3E%3Cpath d='M20 16h25v8H28v24h-8z' fill='%23F9F5F0'/%3E%3C/svg%3E">
+<style>
+  :root{--terra:#8A5A12;--green:#2F5A2A;--blue:#2c5aa0;--cream:#FBFAF7;--ink:#17161A;--ink2:#4A4D52;--mut:#8C8677;--line:#E7E3D8;--accent:#F2B600;--disp:'Oswald',sans-serif;--sans:'Golos Text',-apple-system,Segoe UI,Roboto,sans-serif;--mono:'JetBrains Mono',ui-monospace,Menlo,monospace}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);line-height:1.5;display:flex}
+  .side{flex:none;width:210px;padding:62px 14px 40px;position:sticky;top:0;height:100vh;border-right:1px solid var(--line)}
+  .side h1{font-family:var(--disp);font-weight:600;font-size:20px;letter-spacing:.01em;margin:0 0 24px;padding:0 12px;color:var(--ink)}
+  .side button{display:block;width:100%;text-align:left;background:none;border:none;padding:10px 12px;border-radius:10px;font-family:inherit;font-size:14px;color:var(--mut);cursor:pointer;margin-bottom:4px}
+  .side button.active{background:#fff;color:var(--terra);font-weight:600}
+  .side-sep{border-top:1px solid #E8DFD2;margin:14px 12px 10px}
+  .side-cap{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);padding:0 12px;margin-bottom:6px}
+.side-grp{margin:11px 0 2px}
+.side-grp .side-cap{font-family:var(--mono);color:#6B5F4D;font-size:11px;font-weight:500;letter-spacing:.7px;white-space:nowrap;margin-bottom:5px;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;border-radius:8px}
+.side-grp .side-cap:hover{background:#fff;color:var(--terra)}
+.side-grp .side-cap .chev{font-size:9px;color:#A99D8C;transition:transform .15s;flex:none}
+.side-grp.collapsed .side-cap{margin-bottom:0}
+.side-grp.collapsed .side-cap .chev{transform:rotate(-90deg)}
+.side-grp.collapsed .side-items{display:none}
+.side-grp .side-items{margin-left:14px;padding-left:8px;border-left:1px solid #E3D8C8}
+.side-grp .side-items .tab{padding-left:12px;font-size:13.5px}
+  .side a.side-link{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-radius:10px;font-size:13.5px;color:#4a4438;text-decoration:none;margin-bottom:2px;border:1px solid transparent}
+  .side a.side-link:hover{background:#fff;color:var(--terra);border-color:#EADFD2}
+  .side a.side-link .arr{color:var(--terra);font-size:12px;flex:none}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 28px 120px;flex:1}
+  .page{display:none}
+  .page.active{display:block}
+  h1{font-family:var(--disp);font-weight:500;font-size:34px;letter-spacing:-.01em;margin:0 0 4px;color:var(--ink)}
+  .sub{color:var(--mut);font-size:14px;margin-bottom:8px}
+  .block-h{font-family:var(--disp);font-size:23px;font-weight:500;margin:34px 0 12px;color:var(--ink)}
+  .block-h:first-of-type{margin-top:0}
+  .sec{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-bottom:16px}
+  .sec-h{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .sec-t{font-family:var(--disp);font-size:19px;font-weight:600}
+  .item{display:flex;gap:11px;padding:9px 0;border-top:1px solid #F0E9E0;align-items:flex-start}
+  .item:first-of-type{border-top:none}
+  .item input[type=checkbox]{margin-top:3px;width:17px;height:17px;accent-color:var(--terra);flex:none;cursor:pointer}
+  .item .q{flex:1}
+  .item .q .txt{font-size:14.5px}
+  .item .q .hint{font-size:12.5px;color:var(--mut);margin-top:2px}
+  .item.done .txt{text-decoration:line-through;color:#aaa}
+  .note{width:100%;margin-top:6px;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13.5px;color:var(--ink);background:#FCFAF7;resize:vertical;min-height:34px}
+  .note::placeholder{color:#bbb}
+  .fixed{background:#FCF6DC}
+  #p-materials{counter-reset:mat}
+  .mats{display:flex;flex-direction:column;gap:9px;margin-top:8px}
+  .mhead{display:flex;gap:9px;margin-bottom:2px}
+  .mhead span{width:16px;flex:none;font-size:9px;font-weight:700;color:var(--mut);text-align:center;letter-spacing:.3px}
+  .mat{display:flex;gap:9px;align-items:baseline;cursor:pointer;counter-increment:mat}
+  .mat input{width:16px;height:16px;accent-color:var(--terra);flex:none;cursor:pointer;position:relative;top:2px}
+  .mat input.vg{accent-color:var(--green)}
+  .mat input.cl{accent-color:var(--terra);pointer-events:none}
+  .mat .mt{font-size:13.5px;flex:1}
+  .cb{flex:none;align-self:center;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;white-space:nowrap;font-family:inherit;border:none}
+  .cok{background:#E4F0E8;color:#2D7D46;cursor:pointer}
+  .cok:hover{background:#d5e8db}
+  .cok.open{background:var(--terra);color:#fff}
+  .cno{background:#EFEAE3;color:#9a8d7d}
+  .kn-inline{display:none;margin:2px 0 4px 0;background:#FBF8F4;border:1px solid var(--line);border-radius:12px;padding:14px 18px 16px}
+  .kn-inline.open{display:block}
+  .kn-inline .knsec:first-child{margin-top:0}
+  .mat .mt::before{content:counter(mat) ". ";font-weight:700;color:var(--terra)}
+  .mat .mt a{color:var(--blue);text-decoration:none}
+  .mat .mt a:hover{text-decoration:underline}
+  .mat.done .mt{color:#aaa}
+  .mat.done .mt::before{color:#c9b8a8}
+  .links{display:flex;flex-direction:column;gap:6px;margin:6px 0 2px 0}
+  .links a,.links .noln{font-size:13.5px;color:var(--blue);text-decoration:none;counter-increment:mat}
+  .links a::before,.links .noln::before{content:counter(mat) ". ";font-weight:700;color:var(--terra)}
+  .links a:hover{text-decoration:underline}
+  .links .noln{color:var(--ink)}
+  .empty{font-size:13.5px;color:var(--mut);font-style:italic}
+  .datebox{background:#F4EFE9;border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .datebox label{font-size:14px;font-weight:600}
+  .datebox input{font-family:inherit;font-size:15px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+  .datebox .dhint{font-size:12.5px;color:var(--mut);flex:1;min-width:200px}
+  .step{display:flex;gap:16px;padding:14px 0;border-top:1px solid #F0E9E0;align-items:flex-start}
+  .step:first-of-type{border-top:none}
+  .step .sdate{flex:none;width:130px;font-size:13.5px;font-weight:700;color:var(--terra);padding-top:1px}
+  .step .sdate.pending{color:#bbb;font-weight:400;font-style:italic}
+  .step .sbody{flex:1}
+  .step .stitle{font-size:14.5px;font-weight:600;margin-bottom:2px}
+  .step .sdesc{font-size:12.5px;color:var(--mut)}
+  .step.key{background:#F4EFE9;border-radius:10px;padding:14px 12px;border-top:none;margin:6px 0}
+  .step.key .stitle{color:var(--terra)}
+  .tirtable{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+  .tirtable th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);padding:8px 10px;border-bottom:1px solid var(--line);font-weight:700}
+  .tirtable td{padding:10px;border-bottom:1px solid #F0E9E0}
+  .tirtable tr:last-child td{border-bottom:none}
+  .tirtable .tnum{font-weight:700;color:var(--terra)}
+  .ask{background:#EAF3ED;border:1px solid #cfe3d6;border-radius:14px;padding:18px 22px;margin-top:20px}
+  .ask h4{margin:0 0 10px;font-family:var(--disp);font-size:16px;color:var(--green)}
+  .ask ol{margin:0;padding-left:20px}
+  .ask p{font-size:13.5px;margin:0 0 14px}
+  .ask h4:not(:first-child){margin-top:14px}
+  .ask li{font-size:13.5px;margin-bottom:6px}
+  .kn{background:#fff;border:1px solid var(--line);border-radius:16px;padding:0;margin-bottom:16px;overflow:hidden}
+  .kn>summary{list-style:none;cursor:pointer;padding:18px 22px;display:flex;align-items:baseline;gap:10px;font-family:var(--disp);font-size:17px;font-weight:600}
+  .kn>summary::-webkit-details-marker{display:none}
+  .kn>summary::before{content:'▸';color:var(--terra);font-size:13px;flex:none}
+  .kn[open]>summary::before{content:'▾'}
+  .kn>summary .knmeta{font-family:Inter,sans-serif;font-size:12px;font-weight:400;color:var(--mut);margin-left:auto}
+  .knbody{padding:0 22px 20px 22px}
+  .knsec{margin-top:16px}
+  .knh{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+  .knh.c1{color:var(--blue)}
+  .knh.c2{color:var(--terra)}
+  .knh.c3{color:var(--green)}
+  .knh.c4{color:#c98a2b}
+  .knbody p{font-size:13.5px;margin:0 0 6px}
+  .knbody ul{margin:0;padding-left:18px}
+  .knbody li{font-size:13.5px;margin-bottom:5px}
+  .knbody .lead{color:var(--mut);font-style:italic;font-size:13px}
+  .gl-search{width:100%;max-width:420px;font-family:inherit;font-size:14.5px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);margin-bottom:6px}
+  .gl-search::placeholder{color:#bbb}
+  .gl-count{font-size:12.5px;color:var(--mut);margin-bottom:14px}
+  .gl-item{padding:12px 0;border-top:1px solid #F0E9E0}
+  .gl-item:first-of-type{border-top:none}
+  .gl-t{font-weight:600;font-size:14.5px;margin-bottom:2px}
+  .gl-d{font-size:13.5px;max-width:72ch}
+  .gl-src{font-size:11.5px;color:var(--mut);margin-top:2px}
+  .mm{font-size:13.5px}
+  .mm ul{list-style:none;margin:0;padding:2px 0 2px 26px;position:relative}
+  .mm ul::before{content:'';position:absolute;left:8px;top:0;bottom:12px;border-left:1.5px solid #E2D8CB}
+  .mm li{position:relative;padding:3px 0}
+  .mm li::before{content:'';position:absolute;left:-18px;top:14px;width:14px;border-top:1.5px solid #E2D8CB}
+  .mm-root{font-family:var(--disp);font-size:19px;font-weight:600;margin-bottom:6px}
+  .mm-b{font-weight:600;font-size:14.5px}
+  .mm-b.t1{color:var(--terra)}
+  .mm-node{display:inline-block;padding:3px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;line-height:1.35}
+  .mm-node:hover{border-color:var(--terra);color:var(--terra)}
+  .mm-note{display:inline-block;color:var(--mut);font-size:12px;margin-left:6px}
+  .mm-tg{display:inline-block;width:16px;color:var(--terra);cursor:pointer;user-select:none;font-size:11px;text-align:center;margin-right:2px}
+  .mm-tg.leaf{color:transparent;cursor:default}
+  .mm li.closed > ul{display:none}
+  .mm-btns{display:flex;gap:10px;margin-bottom:12px}
+  .mm-btns button{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 14px;color:var(--mut);cursor:pointer;font-family:inherit;font-size:12.5px}
+  .mm-btns button:hover{color:var(--terra);border-color:var(--terra)}
+  .pl-track{margin-bottom:6px}
+  .pl-free{font-size:13px;color:var(--mut);padding:10px 0 14px;border-bottom:1px solid #F0E9E0;margin-bottom:4px}
+  .pl-free b{color:var(--ink);font-weight:600}
+  .pl-step{display:flex;align-items:baseline;gap:14px;padding:13px 0;border-top:1px solid #F0E9E0}
+  .pl-step:first-of-type{border-top:none}
+  .pl-name{font-weight:600;font-size:14.5px;flex:none;min-width:150px}
+  .pl-note{font-size:12.5px;color:var(--mut);flex:1}
+  .pl-price{font-size:14px;font-weight:700;color:var(--terra);flex:none;text-align:right;white-space:nowrap}
+  .pl-price.unk{color:#b0a696;font-weight:400;font-style:italic;font-size:12.5px}
+  .fl-wrap{overflow-x:auto;padding:4px 0}
+  .fl{display:flex;align-items:center;min-width:max-content}
+  .fl-stage{display:flex;flex-direction:column;gap:8px}
+  .fl-cap{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);margin-bottom:2px}
+  .fl-box{border:1.5px solid var(--line);border-radius:10px;padding:7px 12px;background:#fff;min-width:135px;max-width:180px}
+  .fl-box .t{font-weight:600;font-size:13px;line-height:1.3}
+  .fl-box .d{font-size:11px;color:var(--mut);margin-top:1px;line-height:1.35}
+  .fl-box .p{font-size:12px;font-weight:700;color:var(--terra);margin-top:3px}
+  .fl-box.free{background:#FAF7F2;border-style:dashed}
+  .fl-box.free .p{color:#8a9b8f;font-weight:600}
+  .fl-box.ours{border-color:#cfe3d6;background:#F4FAF6}
+  .fl-arr{color:#C9B8A8;font-size:20px;padding:0 10px;flex:none;align-self:center;margin-top:14px}
+  .wrap.wide{max-width:1500px}
+  .subtabs{display:flex;gap:8px;margin:4px 0 20px}
+  .subtabs button{background:none;border:1px solid var(--line);border-radius:10px;padding:9px 20px;font-family:inherit;font-size:14px;color:var(--mut);cursor:pointer}
+  .subtabs button.active{background:#fff;color:var(--terra);font-weight:600;border-color:var(--terra)}
+  .pl-pane{display:none}
+  .pl-pane.active{display:block}
+  #p-products .fl{padding:10px 0}
+  #p-products .fl-box{min-width:210px;max-width:260px;padding:13px 17px}
+  #p-products .fl-box .t{font-size:14.5px}
+  #p-products .fl-box .d{font-size:12px;margin-top:3px}
+  #p-products .fl-box .p{font-size:13.5px;margin-top:6px}
+  #p-products .fl-stage{gap:12px}
+  #p-products .fl-arr{padding:0 22px;font-size:24px}
+  #p-products .fl-cap{font-size:11.5px;margin-bottom:4px}
+
+  #p-kniga,#p-zov{--kdeep:#22332B;--kdeep2:#1B2A23;--kgold:#C9A15C;--kgoldd:#A9772F;--kcream:#F5EFE3}
+  .kb-hero{background:linear-gradient(165deg,var(--kdeep),var(--kdeep2));border-radius:24px;padding:46px 48px 40px;color:#EFE7D5;margin-bottom:28px;box-shadow:0 22px 50px -22px rgba(27,42,35,.55)}
+  .kb-hero .kick{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--kgold);font-weight:600;margin-bottom:14px}
+  .kb-hero h2{font-family:Georgia,serif;font-weight:500;font-size:34px;line-height:1.15;margin:0 0 18px;color:#F5EDDB;max-width:24ch}
+  .kb-hero .thesis{font-family:Georgia,serif;font-style:italic;font-size:18px;line-height:1.5;color:#E5DCC4;max-width:52ch;border-left:2px solid var(--kgold);padding-left:20px;margin-bottom:26px}
+  .kb-stats{display:flex;gap:38px;flex-wrap:wrap}
+  .kb-stat .n{font-family:Georgia,serif;font-size:26px;color:var(--kgold)}
+  .kb-stat .l{font-size:11.5px;color:rgba(239,231,213,.6);letter-spacing:.5px;text-transform:uppercase}
+  .kb-sec{background:#FFFDF8;border:1px solid var(--hair,#E6DBC6);border-radius:20px;padding:34px 38px;margin-bottom:22px}
+  .kb-sec>h3{font-family:Georgia,serif;font-weight:500;font-size:24px;margin:0 0 6px}
+  .kb-sec .lead{font-size:13.5px;color:#8C8272;margin-bottom:22px;font-style:italic}
+  .kb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .kb-zov{border:1px solid #EADFD2;border-radius:14px;padding:16px 18px;background:#FBF7EF}
+  .kb-zov .num{font-family:Georgia,serif;font-size:22px;color:var(--kgold);line-height:1}
+  .kb-zov .t{font-weight:600;font-size:14.5px;margin:6px 0 4px}
+  .kb-zov .q{font-size:12.5px;color:#6b6354;font-style:italic}
+  .kb-epoch{border:1px solid #EADFD2;border-radius:18px;overflow:hidden;margin-bottom:14px;background:#FFFDF8}
+  .kb-epoch>summary{list-style:none;cursor:pointer;padding:20px 26px;display:flex;align-items:baseline;gap:16px;transition:background .25s}
+  .kb-epoch>summary::-webkit-details-marker{display:none}
+  .kb-epoch>summary:hover{background:#FAF4E8}
+  .kb-epoch .rim{font-family:Georgia,serif;font-size:14px;color:var(--kgoldd);letter-spacing:1px;flex:none}
+  .kb-epoch .et{font-family:Georgia,serif;font-size:20px;flex:1}
+  .kb-epoch .em{font-size:12.5px;color:#8C8272;font-style:italic;flex:none}
+  .kb-epoch .arr{color:var(--kgoldd);font-size:13px;transition:transform .25s;flex:none}
+  .kb-epoch[open] .arr{transform:rotate(90deg)}
+  .kb-body{padding:0 26px 24px;border-top:1px solid #F0E8D8}
+  .kb-row{display:flex;gap:18px;padding:14px 0;border-top:1px solid #F5EEE1}
+  .kb-row:first-child{border-top:none}
+  .kb-lbl{flex:none;width:110px;font-size:10.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--kgoldd);padding-top:3px}
+  .kb-val{flex:1;font-size:13.5px;color:#3f3a30;max-width:72ch}
+  .kb-red{background:linear-gradient(165deg,var(--kdeep),var(--kdeep2));color:#EFE7D5;border:none}
+  .kb-red>h3{color:#F5EDDB}
+  .kb-red .lead{color:rgba(239,231,213,.6)}
+  .kb-qr{display:flex;gap:14px;align-items:baseline;padding:12px 0;border-top:1px solid rgba(230,219,198,.15)}
+  .kb-qr:first-of-type{border-top:none}
+  .kb-qr .qn{font-family:Georgia,serif;font-size:20px;color:var(--kgold);flex:none;width:26px}
+  .kb-qr .qt{font-size:14px;color:#F0E8D6;font-weight:600;flex:none;min-width:180px}
+  .kb-qr .qd{font-size:13px;color:rgba(239,231,213,.7);flex:1}
+  .kb-steps{display:flex;gap:0;align-items:stretch;flex-wrap:wrap}
+  .kb-step{flex:1;min-width:220px;padding:18px 22px;border:1px solid #EADFD2;border-radius:14px;background:#FBF7EF;margin-right:14px;margin-bottom:10px}
+  .kb-step .sn{font-family:Georgia,serif;font-size:13px;color:var(--kgoldd);letter-spacing:1px;margin-bottom:6px}
+  .kb-step .st{font-weight:600;font-size:14.5px;margin-bottom:6px}
+  .kb-step .sd{font-size:12.5px;color:#6b6354}
+  .kb-quotes{columns:2;column-gap:34px}
+  .kb-quote{break-inside:avoid;font-family:Georgia,serif;font-style:italic;font-size:15px;line-height:1.5;color:#33302a;padding:12px 0 12px 18px;border-left:2px solid var(--kgold);margin-bottom:14px}
+  .kb-quote .src{display:block;font-family:Inter,sans-serif;font-style:normal;font-size:11px;color:#A99D8C;letter-spacing:.5px;text-transform:uppercase;margin-top:6px}
+  .kb-foot{font-size:12.5px;color:#8C8272;max-width:72ch}
+  @media (max-width:760px){.kb-quotes{columns:1}.kb-hero{padding:30px 24px}.kb-sec{padding:24px 20px}}
+
+  #p-funnel .fn-hero{margin-bottom:18px}
+  #p-funnel .fn-kick{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#A9772F;font-weight:600;margin-bottom:8px}
+  #p-funnel h1{margin-bottom:6px}
+  .fn-canvas{background:linear-gradient(160deg,#22332B,#17231D 70%);border-radius:28px;padding:52px 48px 42px;box-shadow:0 26px 60px -26px rgba(23,35,29,.6);overflow-x:auto;margin-bottom:24px}
+  .fn-flow{display:flex;align-items:stretch;min-width:max-content;gap:0}
+  .fn-stage{display:flex;flex-direction:column;gap:16px;justify-content:flex-start;min-width:280px;max-width:320px}
+  .fn-num{font-size:12px;font-weight:700;color:#C9A15C;letter-spacing:2px;text-transform:uppercase}
+  .fn-what{font-size:13px;color:rgba(239,231,213,.65);margin:2px 0 8px;line-height:1.4;min-height:36px}
+  .fn-box{background:#FFFDF8;border-radius:16px;padding:20px 22px;box-shadow:0 12px 28px -12px rgba(0,0,0,.5)}
+  .fn-box .t{font-family:Georgia,serif;font-size:18px;font-weight:600;color:#1B1B1B;margin-bottom:6px;line-height:1.3}
+  .fn-box .d{font-size:13.5px;color:#57503f;line-height:1.5}
+  .fn-box .p{font-size:14px;font-weight:700;color:#A9772F;margin-top:8px}
+  .fn-box.ours{background:linear-gradient(150deg,#FFFDF8,#F6EEDC);border:1.5px solid #C9A15C}
+  .fn-box.ours .badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#1E1A12;background:#C9A15C;border-radius:4px;padding:2px 7px;margin-bottom:6px}
+  .fn-box.ghost{background:rgba(255,253,248,.07);box-shadow:none;border:1px dashed rgba(201,161,92,.4)}
+  .fn-box.ghost .t{color:#EFE7D5}
+  .fn-box.ghost .d{color:rgba(239,231,213,.65)}
+  .fn-box.cta{background:linear-gradient(135deg,#C9A15C,#B8863B);box-shadow:0 14px 34px -10px rgba(201,161,92,.55)}
+  .fn-box.cta .t{color:#1B1509;font-size:19px}
+  .fn-box.cta .d{color:rgba(27,21,9,.75)}
+  .fn-arr{align-self:center;color:#C9A15C;font-size:32px;padding:0 20px;flex:none;text-shadow:0 0 20px rgba(201,161,92,.5)}
+  .fn-branches{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px;padding-top:22px;border-top:1px solid rgba(201,161,92,.22)}
+  .fn-bcap{width:100%;font-size:10.5px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:rgba(201,161,92,.85)}
+  .fn-branch{flex:1;min-width:240px;background:rgba(255,253,248,.06);border:1px solid rgba(201,161,92,.25);border-radius:14px;padding:14px 16px}
+  .fn-branch .t{font-family:Georgia,serif;font-size:16.5px;color:#EFE7D5;margin-bottom:6px}
+  .fn-branch .d{font-size:13px;color:rgba(239,231,213,.7);line-height:1.5}
+  .fn-rules{background:#FFFDF8;border:1px solid #E6DBC6;border-radius:20px;padding:30px 34px}
+  .fn-rules h3{font-family:Georgia,serif;font-weight:500;font-size:21px;margin:0 0 16px}
+  .fn-rule{display:flex;gap:16px;padding:11px 0;border-top:1px solid #F0E8D8;align-items:baseline}
+  .fn-rule:first-of-type{border-top:none}
+  .fn-rule .n{font-family:Georgia,serif;font-size:20px;color:#C9A15C;flex:none;width:24px}
+  .fn-rule .x{font-size:13.5px;color:#3f3a30;max-width:78ch}
+
+  #side-toggle{position:fixed;top:16px;left:172px;z-index:50;width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:#fff;color:#6e6e73;font-size:16px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:all .2s}
+  #side-toggle:hover{color:var(--terra);border-color:var(--terra)}
+  #side-toggle{display:block}
+  body.nomenu #side-toggle{left:16px}
+  body.nomenu .side{display:none}
+  body.nomenu .wrap{max-width:none;padding-left:70px;padding-right:36px}
+
+  #p-tirazh .tz-cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+  @media(max-width:820px){#p-tirazh .tz-cols{grid-template-columns:1fr}}
+  .tz-card{background:#FFFDF8;border:1px solid var(--line);border-radius:20px;padding:28px 30px}
+  .tz-card h3{font-family:Georgia,serif;font-weight:500;font-size:21px;margin:0 0 4px}
+  .tz-card .lead{font-size:12.5px;color:var(--mut);font-style:italic;margin-bottom:18px}
+  .tz-line{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid #F0E8D8}
+  .tz-line:first-of-type{border-top:none}
+  .tz-name{flex:1;font-size:14px}
+  .tz-name .sub{display:block;font-size:11.5px;color:var(--mut);margin-top:1px}
+  .tz-inp{width:82px;flex:none;font-family:inherit;font-size:15px;font-weight:600;text-align:right;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:#FBF7EF;color:var(--terra)}
+  .tz-inp:focus{outline:none;border-color:var(--terra);background:#fff}
+  .tz-sum{display:flex;justify-content:space-between;align-items:baseline;margin-top:16px;padding-top:16px;border-top:2px solid var(--line)}
+  .tz-sum .l{font-family:Georgia,serif;font-size:17px}
+  .tz-sum .v{font-family:Georgia,serif;font-size:26px;font-weight:600;color:var(--terra)}
+  .tz-total{background:linear-gradient(160deg,#22332B,#1B2A23);border-radius:22px;padding:34px 38px;color:#EFE7D5;margin-top:22px;display:flex;flex-wrap:wrap;gap:32px;align-items:center;justify-content:space-between}
+  .tz-total .big{font-family:Georgia,serif;font-size:15px;color:rgba(239,231,213,.7)}
+  .tz-total .big b{display:block;font-size:40px;color:#C9A15C;font-weight:600;line-height:1.1;margin-top:4px}
+  .tz-total .rec{font-size:13.5px;color:rgba(239,231,213,.85);max-width:44ch;line-height:1.5}
+  .tz-note{font-size:12.5px;color:var(--mut);margin-top:6px;font-style:italic}
+  .tz-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle}
+  .tz-known{background:#E4F0E8;color:#2D7D46}
+  .tz-wait{background:#F6EAD6;color:#9A6410}
+
+  .zov-konsp{background:#FFFDF8;border:1px solid var(--line);border-radius:20px;padding:34px 40px;margin-bottom:22px;max-width:80ch}
+  .zov-konsp h3{font-family:Georgia,serif;font-weight:500;font-size:22px;margin:0 0 4px}
+  .zov-konsp .zk-sub{font-size:12.5px;color:var(--mut);font-style:italic;margin-bottom:20px}
+  .zov-konsp h4{font-size:14px;font-weight:700;color:var(--terra);margin:22px 0 8px;letter-spacing:.2px}
+  .zov-konsp p{font-size:14.5px;line-height:1.6;color:#3c3c43;margin:0 0 12px}
+  .zov-konsp b{color:var(--ink)}
+  .zov-konsp ul{margin:0 0 12px;padding-left:22px}
+  .zov-konsp li{font-size:14.5px;line-height:1.55;color:#3c3c43;margin-bottom:7px}
+
+  #p-svyaz .sv-hero{background:linear-gradient(160deg,#22332B,#17231D);border-radius:24px;padding:40px 44px;color:#EFE7D5;margin-bottom:22px}
+  #p-svyaz .sv-hero .k{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#C9A15C;font-weight:600;margin-bottom:12px}
+  #p-svyaz .sv-hero h2{font-family:Georgia,serif;font-weight:500;font-size:30px;margin:0 0 14px;color:#F5EDDB}
+  #p-svyaz .sv-hero p{font-size:14px;line-height:1.55;color:rgba(239,231,213,.8);max-width:66ch;margin:0}
+  #p-svyaz .sv-hero .warn{margin-top:14px;font-size:12.5px;color:#E6B96A;font-style:italic}
+  .sv-layer{background:#FFFDF8;border:1px solid var(--line);border-radius:20px;padding:30px 34px;margin-bottom:18px;position:relative}
+  .sv-tag{position:absolute;top:-11px;left:26px;background:#22332B;color:#C9A15C;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 14px;border-radius:20px}
+  .sv-layer h3{font-family:Georgia,serif;font-weight:500;font-size:21px;margin:8px 0 4px}
+  .sv-layer .lead{font-size:13px;color:var(--mut);font-style:italic;margin-bottom:20px;max-width:70ch}
+  .sv-spine{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+  .sv-stage{flex:1;min-width:180px;background:linear-gradient(150deg,#FBF7EF,#F4EBD9);border:1.5px solid #C9A15C;border-radius:16px;padding:18px 20px}
+  .sv-stage .n{font-family:Georgia,serif;font-size:12px;color:#A9772F;letter-spacing:1px;margin-bottom:4px}
+  .sv-stage .t{font-family:Georgia,serif;font-size:19px;font-weight:600;margin-bottom:6px}
+  .sv-stage .d{font-size:12.5px;color:#57503f;line-height:1.45}
+  .sv-zov{flex:none;align-self:center;display:flex;flex-direction:column;align-items:center;padding:0 16px}
+  .sv-zov .arr{color:#C9A15C;font-size:26px;line-height:1}
+  .sv-zov .lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#B3261E;margin-top:4px;white-space:nowrap}
+  .sv-lens{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.sv-lens{grid-template-columns:1fr}}
+  .sv-what{border:1px solid var(--line);border-radius:16px;padding:22px 24px;background:#FBF7EF}
+  .sv-what .h{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#A9772F;margin-bottom:4px}
+  .sv-what .big{font-family:Georgia,serif;font-size:20px;margin-bottom:10px}
+  .sv-what .q{font-size:13px;color:#57503f;line-height:1.5;margin-bottom:12px}
+  .sv-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .sv-chip{font-size:12px;background:#fff;border:1px solid #EADFD2;border-radius:16px;padding:4px 11px;color:#3c3c43}
+  .sv-ladder{display:flex;flex-direction:column;gap:3px}
+  .sv-rung{display:flex;align-items:center;gap:12px;padding:7px 0}
+  .sv-rung .bar{height:8px;border-radius:4px;background:linear-gradient(90deg,#E8A94A,#B3261E)}
+  .sv-rung .rt{font-size:12.5px;color:#3c3c43}
+  .sv-take{background:linear-gradient(160deg,#22332B,#1B2A23);border-radius:22px;padding:32px 38px;color:#EFE7D5;margin-top:20px}
+  .sv-take h3{font-family:Georgia,serif;font-weight:500;font-size:20px;margin:0 0 18px;color:#F5EDDB}
+  .sv-row{display:flex;gap:14px;padding:10px 0;border-top:1px solid rgba(230,219,198,.15);align-items:baseline}
+  .sv-row:first-of-type{border-top:none}
+  .sv-row .w{flex:none;width:130px;font-family:Georgia,serif;font-size:16px;color:#C9A15C}
+  .sv-row .x{flex:1;font-size:13.5px;color:rgba(239,231,213,.85);line-height:1.5}
+
+  #p-infog .ig-lead{font-size:13.5px;color:#6b6354;font-style:italic;max-width:70ch;margin-bottom:24px}
+  .ig-item{margin-bottom:34px}
+  .ig-cap{display:flex;align-items:baseline;gap:12px;margin-bottom:10px}
+  .ig-cap .n{font-family:Georgia,serif;font-size:20px;color:#A9772F}
+  .ig-cap .t{font-family:Georgia,serif;font-size:19px}
+  .ig-cap .m{font-size:12.5px;color:var(--mut);margin-left:auto}
+  .ig-frame{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 14px 34px -20px rgba(34,51,43,.28)}
+  .ig-frame img{display:block;width:100%;height:auto}
+  .ig-tools{margin-top:8px;font-size:12px}
+  .ig-tools a{color:var(--blue);text-decoration:none}
+  .ig-tools a:hover{text-decoration:underline}
+  .foot{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 28px;display:flex;justify-content:center;gap:24px;font-size:13px;color:var(--mut)}
+  .foot b{color:var(--terra)}
+  button.reset{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 14px;color:var(--mut);cursor:pointer;font-family:inherit;font-size:12.5px}
+  .tl-row{padding:20px 0 26px;border-top:1px solid #F0E9E0}
+  .tl-row:first-of-type{border-top:none}
+  .tl-lbl{font-size:13px;color:var(--mut);margin-bottom:10px;font-weight:600}
+  .tl-track{height:6px;background:#F4EFE9;border-radius:3px;position:relative;margin:0 6px}
+  .tl-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+  .tl-tag{position:absolute;top:-30px;transform:translateX(-50%);font-size:11px;color:#fff;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+  .tl-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin:6px 6px 22px}
+
+  /* ── СОЧНОСТЬ по дизайн-коду «Вкладыш» ── */
+  /* заголовок страницы = герой: Oswald капсом + жёлтая ударная черта */
+  .page h1,.page .stitle{font-family:var(--disp);text-transform:uppercase;font-size:clamp(28px,3.6vw,44px);font-weight:600;line-height:1.0;letter-spacing:-.01em;color:var(--ink);display:inline-block;padding-bottom:12px;border-bottom:4px solid var(--accent);margin-bottom:8px}
+  /* заголовки секций/блоков капсом с жёлтым маркером */
+  .block-h,.sec-t{text-transform:uppercase;letter-spacing:.005em}
+  .block-h{display:flex;align-items:center;gap:11px}
+  .block-h::before{content:"";width:10px;height:10px;background:var(--accent);border-radius:2px;flex:none}
+  /* активная вкладка — тёмная заливка, как контраст слайда */
+  .side button.active{background:var(--ink)!important;color:#fff!important;font-weight:600}
+  /* акцентные числа/метки — жёлтая заливка-чип */
+  .accent-num{background:var(--accent);color:var(--ink);font-family:var(--mono);font-weight:500;padding:1px 8px;border-radius:5px}
+  /* mono-надзаголовок над героем, если проставлен вручную */
+  .kick{font-family:var(--mono);text-transform:uppercase;letter-spacing:.24em;font-size:11px;color:var(--mut);display:block;margin-bottom:10px}
+  .home-h{font-family:var(--disp);font-weight:600;text-transform:uppercase;font-size:21px;letter-spacing:.005em;color:var(--ink);margin:32px 0 12px}
+  /* ── обложка-слайд Главной ── */
+  .cover{min-height:74vh;display:flex;align-items:center;gap:34px;padding:10px 0}
+  .cover-txt{flex:1;min-width:0}
+  .cv-kick{font-family:var(--mono);text-transform:uppercase;letter-spacing:.22em;font-size:13px;color:var(--green);display:block;margin-bottom:22px}
+  .cv-title{font-family:var(--disp);font-weight:700;text-transform:uppercase;font-size:clamp(44px,6.2vw,86px);line-height:.9;letter-spacing:-.01em;color:var(--ink)}
+  .cv-title .y{color:var(--accent)}
+  .cv-body{font-size:17px;color:var(--ink2);max-width:44ch;line-height:1.5;margin:28px 0 30px}
+  .cv-body b{color:var(--ink);font-weight:600}
+  .cv-q{font-family:var(--disp);font-weight:600;text-transform:uppercase;font-size:clamp(20px,2.5vw,32px);line-height:1.05;color:var(--green);padding-left:58px;position:relative}
+  .cv-q .dash{position:absolute;left:0;top:.5em;width:40px;height:4px;background:var(--green)}
+  .cover-img{flex:none;width:42%;max-width:540px;pointer-events:none}
+  .cover-img img{width:100%;display:block}
+  @media(max-width:820px){.cover{flex-direction:column;align-items:flex-start}.cover-img{width:64%;margin:20px auto 0}}
+
+  .home-hero{background:#17161A;border-radius:18px;padding:64px 56px;min-height:360px;display:flex;align-items:center;gap:40px;margin:0 0 30px;overflow:hidden}
+  .hh-text{flex:1;min-width:0}
+  .hh-kick{font-family:var(--mono);text-transform:uppercase;letter-spacing:.24em;font-size:12.5px;color:#8C8677;display:block;margin-bottom:20px}
+  .hh-title{font-family:var(--disp);font-weight:700;text-transform:uppercase;font-size:clamp(42px,5.6vw,76px);line-height:.96;letter-spacing:-.01em;color:#fff}
+  .hh-sub{color:#B9B3A3;font-size:15.5px;margin-top:22px}
+  .hh-img{flex:none;width:340px}
+  .hh-img img{width:100%;display:block}
+  @media(max-width:680px){.home-hero{flex-direction:column;align-items:flex-start}.hh-img{width:150px;align-self:center}}
+
+</style>
+</head>
+<body>
+<button id="side-toggle" title="Меню" onclick="document.body.classList.toggle('nomenu')">☰</button>
+<div class="side">
+  <div style="margin:0 0 26px;padding:0 12px"><div style="font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--mut);margin-bottom:5px">Проект · запуск книги</div><div style="font-family:var(--disp);font-weight:600;font-size:18px;line-height:1.05;color:var(--ink)">Филипп Гузенюк</div><div style="font-size:12px;color:var(--mut);margin-top:3px">«От достигателя к стратегу»</div></div>
+  <button class="tab active" data-p="p-home" style="font-weight:600;font-size:15px"><span style="display:inline-flex;align-items:center;gap:10px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg>Главная</span></button>
+  <button class="tab" data-p="p-infog" style="font-weight:600;font-size:15px"><span style="display:inline-flex;align-items:center;gap:10px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>Артефакты</span></button>
+  <div class="side-grp">
+    <div class="side-cap"><span style="display:flex;align-items:center;gap:9px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Смыслы и модель</span></div>
+    <div class="side-items">
+      <button class="tab" data-p="p-kniga">Книга</button>
+      <button class="tab" data-p="p-zov">ЗОВ</button>
+      <button class="tab" data-p="p-svyaz">Связь моделей</button>
+      <button class="tab" data-p="p-principles">Принципы</button>
+      <button class="tab" data-p="p-products">Продукты</button>
+      <button class="tab" data-p="p-portraits">Портреты</button>
+    </div>
+  </div>
+  <div class="side-grp">
+    <div class="side-cap"><span style="display:flex;align-items:center;gap:9px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg>Воронка</span></div>
+    <div class="side-items">
+      <button class="tab" data-p="p-funnel">Воронка 1</button>
+    </div>
+  </div>
+  <div class="side-grp">
+    <div class="side-cap"><span style="display:flex;align-items:center;gap:9px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 3c3 1 5 4.5 5 8.5L15 16H9L7 11.5C7 7.5 9 4 12 3z"/><path d="M9 16l-2 4M15 16l2 4"/><circle cx="12" cy="9.5" r="1.4"/></svg>Запуск</span></div>
+    <div class="side-items">
+      <button class="tab" data-p="p-plan">План работы</button>
+      <button class="tab" data-p="p-timeline">Таймлайн книги</button>
+      <button class="tab" data-p="p-tirazh">Тираж</button>
+    </div>
+  </div>
+  <div class="side-grp">
+    <div class="side-cap"><span style="display:flex;align-items:center;gap:9px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M5 4h9a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M8 4v13"/></svg>Справка</span></div>
+    <div class="side-items">
+      <button class="tab" data-p="p-materials">Материалы</button>
+      <button class="tab" data-p="p-mindmap">Майнд-карта</button>
+      <button class="tab" data-p="p-glossary">Словарь</button>
+      <button class="tab" data-p="p-notes">Заметки</button>
+    </div>
+  </div>
+</div>
+<div class="wrap">
+
+<div id="p-plan" class="page">
+  <h1>План работы</h1>
+  <div class="sub">По итогам созвона с Оксаной и Ольгой</div>
+
+  <div class="block-h">Оргвопросы · зафиксировано</div>
+  <div class="sec">
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Общий чат в Telegram на четверых: ты, Оля, Мага, Филипп</div><div class="hint">Создаёт Ольга</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Регулярные встречи — пятница, 13:00, на июль</div><div class="hint">Дальше по необходимости, реже или чаще</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Следующая встреча — 17 июля</div></div></div>
+    <div class="item"><div class="q"><div class="txt">Отпуска: Оксана 20.07–02.08, Ольга 03–16.08</div><div class="hint">Взаимно подменяют друг друга</div></div></div>
+    <div class="item"><div class="q"><div class="txt">Схема согласований</div><div class="hint">Финальное решение всегда за Филиппом. Оксана — воронка личной стратегии, Ольга — форум «Стратегируй» и канвас стратегирования. Обе снимают промежуточные согласования, чтобы не грузить Филиппа</div></div></div>
+  </div>
+
+  <div class="block-h">Воронка · личная стратегия (Оксана)</div>
+  <div class="sec">
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Распаковка и изучение материалов</div><div class="hint">До 21 июля</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Встреча с Филиппом на распаковку</div><div class="hint">Ставит Ольга, ориентир 23–24 июля (16-го у него ДР, 17–21 без связи)</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Возможный доп. носитель экспертизы — Лена Нестерова</div><div class="hint">Под вопросом, уточняет Оксана</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Свести и обработать материалы в проработанную схему (этапы, элементы, логика)</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Согласовать схему с Филиппом</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Версия 1.0 воронки</div><div class="hint">Сдвинуто с 4 на 11 августа, ориентир не финал</div></div></div>
+  </div>
+
+  <div class="block-h">Воронка · канвас стратегирования (Ольга)</div>
+  <div class="sec">
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Носители экспертизы: Филипп, Илья, Евгений</div><div class="hint">Пишут книгу про дисплей стратега, есть презентация ~500 слайдов</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Финал: держим ориентир — обе воронки готовы до 31 августа</div><div class="hint">Филипп предупредил, что сроки могут скорректироваться после встреч</div></div></div>
+  </div>
+
+  <div class="block-h">Форум «Стратегируй» (Ольга)</div>
+  <div class="sec">
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Портрет инфлюенсера</div><div class="hint">Оля асинхронно выгрузит критерии в чат: соответствие ценностям, политическая нейтральность</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Финальное утверждение инфлюенсеров — за Филиппом</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Цена билета: 85–86к базовый, VIP ~100+</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Дать экспресс-оценку по сайту и воронке форума</div><div class="hint">В течение недели</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Первая партия инфлюенсеров (~10 человек) — 21 июля</div></div></div>
+  </div>
+
+  <div class="block-h">Предзаказ и дистрибуция</div>
+  <div class="sec">
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Оплата по дистрибуции — от нас, чтобы стартовали</div></div></div>
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Созвон с отделом дистрибуции на этой неделе</div><div class="hint">К следующему вторнику — таймлайн по этому блоку</div></div></div>
+  </div>
+
+  <div class="block-h">Договор</div>
+  <div class="sec">
+    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Оксана возвращается с комментариями юриста</div></div></div>
+  </div>
+
+</div>
+
+<div id="p-home" class="page active">
+  <div class="cover">
+    <div class="cover-txt">
+      <span class="cv-kick">Продюсирование запуска · воронка книги</span>
+      <div class="cv-title">От достигателя<br><span class="y">к стратегу</span></div>
+      <p class="cv-body">Запуск книги Филиппа Гузенюка: <b>предзаказ, воронка и диагностика перехода</b>. Здесь собрано всё, что готовим к выходу.</p>
+      <div class="cv-q"><span class="dash"></span>Как привести читателя<br>от книги к личной стратегии?</div>
+    </div>
+    <div class="cover-img"><img src="materials/петелька.png" alt=""></div>
+  </div>
+</div>
+<div id="p-materials" class="page">
+  <h1>Материалы</h1>
+  <div class="sub">Материалы от Оксаны и Ольги</div>
+
+  <div class="hint" style="margin-bottom:14px">Две галочки у каждого материала: <b>первая, зелёная</b> — изучил Вагэ (кликаешь сам, сохраняется), <b>вторая, терракотовая</b> — изучил Claude (ставлю я). Кнопка «Конспект» — мой разбор, клик по строке разворачивает.</div>
+
+    <div class="sec">
+    <div class="sec-h"><div class="sec-t">Счастье в деятельности · личная стратегия (Воронка 1)</div></div>
+    <div class="mats"><div class="mhead"><span title="Изучил Вагэ">ВГ</span><span title="Изучил Claude">CL</span></div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-ltr-dizayn" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Изучил Claude" checked><span class="mt"><a href="materials/ЛТР-описание-продукта.pptx">ЛТР — Описание продукта, в дизайне (PPTX)</a></span><button class="cb cok" data-kn="kn-ltr">Конспект</button></div>
+      <div class="kn-inline" id="kn-ltr">
+        <p class="lead">Флагманский продукт Филиппа. Индивидуальная коучинговая программа: 3 месяца, 6 сессий online раз в 2 недели + микро-практики + база знаний (300+ практик). Разбор двух версий описания продукта вместе (эта + «Корп ЛТР» ниже).</p>
+        <div class="knsec"><div class="knh c1">Что внутри — ★ ядро методологии (слайд 9)</div>
+          <ul>
+            <li><b>ТОЖ</b> (текущий образ жизни) — «Кто я? От чего?»: роли, сильные/слабые стороны, возможности, угрозы, корни.</li>
+            <li><b>НОЖ</b> (новый образ жизни) — «К чему я иду?»: новые роли, стратегические цели.</li>
+            <li><b>СДВИГ</b> — «За счёт чего?»: сдвиговые задачи, практики, привычки.</li>
+            <li><b>ДНК</b> — миссия, видение, ценности (стержень).</li>
+            <li>5 сегментов боли с готовыми формулировками: «нужна стратегия», «тесно, хочется большего», «нет энергии», «тонет в операционке», «вопросы к команде».</li>
+            <li>Рамка Я — Семья — Дело (баланс сфер жизни).</li>
+            <li>Уже есть оффлайн-воронка продаж: Аудит личной стратегии → знакомство с коучем → оплата → старт.</li>
+            <li>Цены: 199 500 / 305 000 / 475 000 / 945 000 ₽ за 6 сессий (по коучу, сам Филипп — верхний тариф).</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c2">Что берём для воронки</div>
+          <ul>
+            <li>Модель ТОЖ/НОЖ/СДВИГ/ДНК — готовый скелет диагностики для квиза.</li>
+            <li>5 сегментов боли — ветки квиза или персонализация оффера.</li>
+            <li>ToV: «тепло и бережно», «с верой в человека», «глубоко и точно», «до результата». Не жёсткий коучинг, а бережное усиление сильных.</li>
+            <li>Кейсы клиентов (Евгений, Алексей, Елена) — соц. доказательство для воронки.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c3">Мои выводы</div>
+          <p>Это самый богатый материал: у продукта уже есть проверенная методология и проверенная оффлайн-воронка продаж. Наша задача не изобретать новое, а оцифровать «Аудит личной стратегии» в онлайн-квиз. Это резко снижает риск — не гадаем, что зайдёт, а переносим то, что уже продаёт вживую.</p>
+        </div>
+        <div class="knsec"><div class="knh c4">Вопросы к Филиппу</div>
+          <ul>
+            <li>Книга — это вход в Аудит личной стратегии (лид-магнит)?</li>
+            <li>Финальный шаг воронки — запись на бесплатный Аудит или сразу продажа программы?</li>
+            <li>Нужна ли в воронке вилка цен по коучам, или ведём всех на Филиппа/на аудит?</li>
+          </ul>
+        </div>
+      </div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-ltr-korp" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Изучил Claude" checked><span class="mt"><a href="materials/Корп-ЛТР-описание-продукта.pptx">Корп. ЛТР — Описание продукта, 01.12.25 (PPTX)</a></span><button class="cb cok" data-kn="kn-ltr-korp">Конспект</button></div>
+      <div class="kn-inline" id="kn-ltr-korp">
+        <p class="lead">Корпоративная версия того же продукта ЛТР (B2B-акцент на ROI для компании). Смыслы и методология те же, что в файле «ЛТР в дизайне» выше — см. конспект там. Здесь отдельно только экономика.</p>
+        <div class="knsec"><div class="knh c1">Что добавляет этот файл</div>
+          <ul>
+            <li>ROI-аргументы для продажи компании (не человеку): экономия 1.5–2 годовых окладов на замене; +25–50% вовлечённость; −20–30% риск выгорания; −25–50% текучесть; +30% рабочего времени из конфликтов; +20–30% скорость стратегических инициатив.</li>
+            <li>Формат «личные треки для 10–20 ключевых лидеров компании одновременно» — вариант для B2B-продажи пакетом.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c2">Что берём для воронки</div>
+          <p>Если часть трафика — HR/CEO, покупающие ЛТР для команды (не для себя), эти цифры ROI — готовый блок аргументов для отдельной ветки/лендинга B2B.</p>
+        </div>
+        <div class="knsec"><div class="knh c4">Вопрос к Филиппу</div>
+          <p>Нужна ли в воронке отдельная B2B-ветка (для HR/CEO, покупающих для команды), или фокус только на личной продаже?</p>
+        </div>
+      </div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-audit-ls" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Изучил Claude" checked><span class="mt"><a href="materials/Аудит-ЛС-основной-фрейм.pptx">Аудит ЛС — Основной фрейм (PPTX)</a></span><button class="cb cok" data-kn="kn-audit">Конспект</button></div>
+      <div class="kn-inline" id="kn-audit">
+        <p class="lead">Не описание, а рабочий сценарий продающей встречи-аудита. По сути — готовый скрипт воронки, который нужно просто оцифровать. ★ Самый ценный материал.</p>
+        <div class="knsec"><div class="knh c1">Что внутри</div>
+          <ul>
+            <li>Структура встречи: контакт (3–5 мин) → аудит по 7 элементам (20–25 мин) → продажа программы (7–10 мин).</li>
+            <li>7 элементов: Миссия, Ценности, Видение (это ДНК), ТОЖ, НОЖ, СДВИГ, Навыки стратегирования.</li>
+            <li>Механика на каждый элемент (3 мин): краткий питч → оценка по 10-балльной шкале по двум осям (важность / степень проработки) → запрос клиента.</li>
+            <li>Пример реальной карты клиента: Миссия 10/3, Ценности 10/4, Видение 10/7, ТОЖ 8/8, НОЖ 10/10, СДВИГ 10/1, Навыки 8/6.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c2">Что берём для воронки</div>
+          <ul>
+            <li><b>Ключевой инсайт:</b> разрыв между «важностью» и «проработкой» = осознанная боль = то, что продаёт программу без давления — человек сам видит цифры.</li>
+            <li>Язык питчей поэтичный, не корпоративный: «миссия — пересечение талантов человека и потребностей мира», «зона гения стыкуется с тем, что нужно миру», «живая вода для сухой земли пустыни».</li>
+            <li>Прямая механика квиза: 7 шагов × 2 ползунка = итоговая карта-паутинка с разрывами.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c3">Мои выводы</div>
+          <p>Это самый ценный материал для проектирования — фактически ТЗ на квиз уже написано самим Филиппом, просто в оффлайн-формате. Единственный открытый вопрос — влезут ли все 7 элементов в холодный онлайн-трафик, или нужно сокращать до 3–4 для конверсии, отдавая полный аудит уже на живой встрече.</p>
+        </div>
+        <div class="knsec"><div class="knh c4">Вопросы к Филиппу</div>
+          <ul>
+            <li>В онлайн-квизе — все 7 элементов или сокращаем?</li>
+            <li>Результат — полная карта-паутинка или топ-3 зоны разрыва?</li>
+            <li>Финал квиза — на встречу с менеджером или сразу на программу?</li>
+          </ul>
+        </div>
+      </div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-tablica1" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Изучил Claude" checked><span class="mt"><a href="materials/Самоаудит-ЛС.xlsx">Самоаудит ЛС — таблица (XLSX)</a></span><button class="cb cok" data-kn="kn-tablica">Конспект</button></div>
+      <div class="kn-inline" id="kn-tablica">
+        <p class="lead">Рабочая таблица самодиагностики по 7 элементам личной стратегии. DIY-версия живого аудита: человек проходит её сам, без коуча.</p>
+        <div class="knsec"><div class="knh c1">Что внутри</div>
+          <ul>
+            <li>Шаг 1: самооценка 7 элементов (Миссия, Ценности, Видение, ТОЖ, НОЖ, Сдвиг, Стратегирование) по двум шкалам 1–10: важность и степень проработки. К каждому элементу — описание и вопросы для диагностики.</li>
+            <li>Шаг 2: автоматический расчёт приоритета = важность минус проработка. Цветовая маркировка по 5 статусам: критическая зона, скрытый резерв, зона силы, слепая зона, избыточный фокус — с интерпретацией и рекомендацией по каждому.</li>
+            <li>Шаг 3: запрос по каждому элементу + план действий по 1–3 приоритетам (что начать / усилить / сократить).</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c2">Что берём для воронки</div>
+          <ul>
+            <li>Это готовая логика квиза Воронки 1 в цифре: 7 элементов × 2 оценки → разрыв → цветовой статус → рекомендация. Не надо изобретать — надо перенести в веб с авторасчётом.</li>
+            <li>Формулировки вопросов для диагностики уже написаны — берём как тексты вопросов квиза.</li>
+            <li>5 цветовых статусов — готовая структура результата: карта зон, которую человек получает на выходе.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c3">Мои выводы</div>
+          <p>Шаг 3 («сформулируйте решения сами») в воронке заменяем на целевое действие: «запишись на живой аудит с коучем» — разрыв уже осознан, дальше должна продавать встреча, а не таблица.</p>
+        </div>
+        <div class="knsec"><div class="knh c4">Вопросы к Филиппу</div>
+          <ul>
+            <li>Где граница между бесплатным самоаудитом и живым аудитом, чтобы квиз не каннибализировал запись на встречу?</li>
+            <li>Даём ли квизу полную карту зон сразу или часть интерпретации оставляем на живую встречу?</li>
+          </ul>
+        </div>
+      </div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-bot" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Claude изучил только структуру 17 уроков со скриншота, сами видео и таблицу — нет"><span class="mt"><a href="materials/Бот-личная-стратегия.xlsx" target="_blank">Бот «Личная стратегия» — таблица со ссылками на видео-уроки (17 уроков)</a></span><button class="cb cok" data-kn="kn-bot" title="Структуру 17 уроков разобрал из скриншота">Конспект</button></div>
+      <div class="kn-inline" id="kn-bot">
+        <p class="lead">Учебный курс, разворачивающий 7 элементов аудита в 17 видео-уроков. Восстановлено из присланного скриншота таблицы (сам бот частично сломан).</p>
+        <div class="knsec"><div class="knh c1">Что внутри</div>
+          <ul>
+            <li>ТОЖ раскрывается через: роли, сильные стороны, возможности, ограничения, угрозы, корни + метафора.</li>
+            <li>НОЖ раскрывается через: новые роли, цели, новая метафора.</li>
+            <li>Отдельный урок 15 — СДВИГ, урок 17 — «как продолжить работу над стратегией».</li>
+            <li>Авторский приём: метафора ТОЖ → метафора перехода → новая метафора (сквозная линия через весь курс).</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c2">Что берём для воронки</div>
+          <ul>
+            <li>Подтверждает и детализирует модель из Аудита ЛС — можно опираться уверенно, это не разовая метафора, а системная методология.</li>
+            <li>Приём «метафора» — потенциальный творческий элемент для воронки (визуальная метафора пути в квизе).</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c3">Мои выводы</div>
+          <p>Разобрано не из самого материала, а из твоего скриншота структуры — сами уроки (видео) не смотрел. Для контентных деталей (что именно говорится внутри урока) нужен доступ к боту или транскрипты.</p>
+        </div>
+        <div class="knsec"><div class="knh c4">Вопрос к команде</div>
+          <p>Нужен ли личный доступ в бот (Оксана обещала на созвоне) — для более глубокого разбора содержания уроков.</p>
+        </div>
+      </div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-film28" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Изучил Claude по транскрипту" checked><span class="mt"><a href="https://rutube.ru/video/f0defe6ee58fd7aee93fe2494facddc6/?r=wd" target="_blank">Фильм «Личная стратегия. 28 принципов» (он же «Стратегия жизни»)</a> · <a href="materials/Фильм-28-принципов-транскрипт.txt" target="_blank">транскрипт</a></span><button class="cb cok" data-kn="kn-film28">Конспект</button></div>
+      <div class="kn-inline" id="kn-film28">
+        <p class="lead">Публичная версия всей методологии личной стратегии — Филипп на камеру раскладывает принципы. Это существующий верхний контент воронки 1: под видео уже стоят CTA.</p>
+        <div class="knsec"><div class="knh c1">Что внутри</div>
+          <ul>
+            <li>Ядро: стратегия ≠ план и ≠ хотелки; это механизм «где играем / за счёт чего победим». ТОЖ → НОЖ → СДВИГ.</li>
+            <li>Модель «трёх женитьб»: Я — Семья — Дело, синергия сфер; провал одной рушит остальные.</li>
+            <li>Принципы: предназначение = таланты × потребности мира; стратегия про «нет»; принцип батарейки (где живое/мёртвое); якорные стратегии из прошлого; 3R Голви (результат · развитие · радость); ритм Кови (10 мин/день → неделя/год); внешняя vs внутренняя стратегия; «разучиваться старому»; big now.</li>
+            <li>Топ-5 причин, почему сам не сможешь (усидчивость, слив с больных тем, нет мостика в день, не видишь свои сильные стороны, нет поддержки) → продаёт сопровождение.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c2">Что берём для воронки</div>
+          <ul>
+            <li><b>В видео уже вшита воронка:</b> «чек-лист аудита личной стратегии по ссылке под видео» (= наш самоаудит) и «подробный курс» (= ЛТР). Фильм — готовый верхний этаж, надо только заменить/дополнить ссылки на квиз.</li>
+            <li><b>Фремиум — прямая формула стратегии Филиппа:</b> «много пользы открыто и бесплатно, работать с лучшими — дорого, глубоко и лично». Это философия всей воронки, цитировать в обсуждениях с командой.</li>
+            <li>«Топ-5 причин, почему не получится самому» — готовый продающий блок для лендинга ЛТР.</li>
+            <li>Финал видео: вовлечение через метафоры в комментах + подарки — приём для контент-плана.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c3">Мои выводы</div>
+          <p>Воронка 1 в черновом виде уже существует в этом видео: контент → чек-лист → курс. Наша работа — превратить чек-лист в интерактивный квиз и сшить звенья. Аргумент для Филиппа: «мы не строим новое, мы оцифровываем то, что вы уже делаете».</p>
+        </div>
+      </div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-zov" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Прочитан целиком по транскрипту 06.08" checked><span class="mt">Вебинар «ЗОВ» (самый конвертящий, 90 мин): <a href="materials/Вебинар-ЗОВ-транскрипт.txt" target="_blank">транскрипт</a> · <a href="разбор-вебинара-зов.md" target="_blank">разбор</a></span></div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-gayd" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Изучил Claude" checked><span class="mt"><a href="materials/Гайд-личная-стратегия.pdf" target="_blank">Гайд как построить личную стратегию (PDF, 9 стр.)</a></span><button class="cb cok" data-kn="kn-gayd">Конспект</button></div>
+      <div class="kn-inline" id="kn-gayd">
+        <p class="lead">Лид-магнит от Филиппа: «Как построить личную стратегию за 10 минут».</p>
+        <div class="knsec"><div class="knh c1">Что внутри</div>
+          <ul>
+            <li>10 причин создать личную стратегию.</li>
+            <li>3 элемента: ТОЖ (роли, ценности, сильные/слабые стороны, миссия) → НОЖ → СДВИГ, с инструкцией «открой блокнот и запиши».</li>
+            <li>Практика «Стратегическая суббота»: 1–10 мин в день + час в неделю.</li>
+            <li>Выход: обещание email-цепочки («завтра ждите письмо: как вырастить стратегию за минуту в день») + подписка на ТГ-каналы и YouTube.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c2">Что берём для воронки</div>
+          <p>Готовый верхний лид-магнит воронки 1. Гайд и Самоаудит развести по ролям: гайд — вход и прогрев, квиз-аудит — диагностика с CTA на живой аудит.</p>
+        </div>
+        <div class="knsec"><div class="knh c4">Вопросы к Филиппу</div>
+          <ul><li>Email-цепочка из гайда сейчас реально работает? Кто ведёт базу и куда она собирается?</li></ul>
+        </div>
+      </div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-25elem" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Изучил Claude" checked><span class="mt"><a href="materials/25-элементов-стратсессии.pdf" target="_blank">25 элементов эффективной стратсессии (PDF, 95 стр.)</a></span><button class="cb cok" data-kn="kn-25elem">Конспект</button></div>
+      <div class="kn-inline" id="kn-25elem">
+        <p class="lead">КП компании «Счастье в деятельности. Консалтинг»: методология стратсессий, команда 12 консультантов, кейсы (МИФ, МТС, УРАЛ, Илим). Главная ценность для нас — внутри полный «Дисплей стратега».</p>
+        <div class="knsec"><div class="knh c1">Что внутри</div>
+          <ul>
+            <li><b>Дисплей стратега (стр. 11–27):</b> 16-факторный канвас стратегирования, 5 блоков: ДНК (миссия, видение, ценности) · Стратегия (вопросы/развилки, ориентиры, инициативы) · Внешняя среда (PESTEL, стейкхолдеры) · Рыночная стратегия (сегменты, ценность, клиентский опыт) · Внутренняя среда (компетенции, система управления, культура, команда, лидер). К каждому элементу — готовые диагностические вопросы.</li>
+            <li>30 принципов работы в стратсессиях (подготовка, проведение, после) + модель изменений «Папоротник».</li>
+            <li>16 видов сессий в 7 направлениях, включая личную и семейную стратсессию.</li>
+            <li>Вход в продажу: «точная настройка» — запись на интервью-блиц-аудит по 16-факторной модели (контакт: Каролина).</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c2">Что берём для воронки</div>
+          <ul>
+            <li>Механика воронки 2 уже здесь: канвас 16 факторов = корпоративный аналог Аудита ЛС. Оценка по элементам → разрывы → запись на блиц-аудит. Тот же паттерн, что в воронке 1.</li>
+            <li>Диагностические вопросы к 16 элементам — готовые тексты для квиза форума.</li>
+            <li>Существующий CTA «запишитесь на интервью с консультантом» — целевое действие воронки.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c3">Мои выводы</div>
+          <p>Обе воронки строятся по одной схеме «оценил → увидел разрыв → пришёл на живую встречу»: воронка 1 на базе Самоаудита ЛС (7 элементов), воронка 2 на базе Дисплея стратега (16 факторов, возможно сжать до ключевых). Видео и презентация от Ольги остаются желательными, но блокером больше не являются.</p>
+        </div>
+        <div class="knsec"><div class="knh c4">Вопросы к Филиппу</div>
+          <ul>
+            <li>Для квиза форума: все 16 факторов или сжать до 5 блоков, чтобы не перегружать?</li>
+            <li>Куда ведёт квиз форума: на блиц-аудит с консультантом (как в КП) или сразу на билет форума?</li>
+          </ul>
+        </div>
+      </div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-solo" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Изучил Claude" checked><span class="mt"><a href="materials/Соло-стратсессия.pdf" target="_blank">Соло. Личная стратегическая сессия на природе (PDF, 22 стр.)</a></span><button class="cb cok" data-kn="kn-solo">Конспект</button></div>
+      <div class="kn-inline" id="kn-solo">
+        <p class="lead">Презентация премиум-продукта: 24 часа в одиночестве на природе (Ладога). Ведущие: Филипп + Анастасия Лебедева. CTA — бронь через Каролину.</p>
+        <div class="knsec"><div class="knh c1">Что внутри</div>
+          <ul>
+            <li>4 цели Соло: тихий голос, перезагрузка мышления, стратегическая ясность, энергия.</li>
+            <li>Кейсы: Греф (випассана), Дуров, Тиньков, Прохоров, Абрамович.</li>
+            <li>Нейрохимия: кортизол −40%, BDNF +15–20%, тета-ритмы.</li>
+            <li>7 этапов: место силы → запрос → подготовка → сутки в уединении → распаковка → сборка стратегии → интеграция.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c2">Что берём для воронки</div>
+          <p>Премиальная ступень линейки личной стратегии — кандидат на апсейл после аудита/ЛТР. Кейсы и нейрохимия — готовые аргументы для контента.</p>
+        </div>
+        <div class="knsec"><div class="knh c4">Вопросы к Филиппу</div>
+          <ul><li>Место Соло в лестнице продуктов воронки 1: после ЛТР, параллельно, или отдельная ветка для «выгоревших»?</li></ul>
+        </div>
+      </div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-glubina" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Изучил Claude по сайту; презентация-PDF свёрстана картинками, не разбирал" checked><span class="mt"><a href="https://happinessinaction.ru/master" target="_blank">Программа «Глубина»</a> · <a href="materials/Глубина-презентация.pdf" target="_blank">презентация PDF</a></span><button class="cb cok" data-kn="kn-glubina">Конспект</button></div>
+      <div class="kn-inline" id="kn-glubina">
+        <p class="lead">Флагманская программа развития лидеров. 6 месяцев, 4 очных трёхдневных модуля, закрытая группа до 20 человек равного масштаба. Ведущие: Филипп + Анастасия Лебедева. Сейчас набор 4-го потока (2026).</p>
+        <div class="knsec"><div class="knh c1">Что внутри</div>
+          <ul>
+            <li>Аудитория: СЕО, собственники, топы компаний с оборотом 1,5–100 млрд ₽/год, HRD.</li>
+            <li>Три уровня работы: Я (личная стратегия, смысл) · Команда (наставничество, сдвиговые задачи) · Бизнес (стратегия, культура, системы).</li>
+            <li>Между модулями: онлайн-встречи, мастермайнды, распаковка лидерского стиля в парах, домашние задания с сотрудниками.</li>
+            <li>Экспертный совет: Крутов (Skillbox), Дёмин (SPLAT), Гонтарев (VK Tech), Семёнов (КОРУС), Илиопуло (Эконика).</li>
+            <li>Цена: 2 100 000 ₽ (со слов Вагэ, 23.07). Вход через заявку и собеседование.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c2">Что берём для воронки</div>
+          <p>CTA сайта — «бесплатное стратегическое интервью с аудитом развития бизнеса и лидерства». Вся линейка Филиппа (аудит ЛС, блиц-аудит канваса, Глубина) продаётся через один паттерн: аудит → живая встреча → продукт. Глубина — верх лестницы для воронки 1: квиз → аудит → ЛТР → Глубина.</p>
+        </div>
+        <div class="knsec"><div class="knh c4">Вопросы к Филиппу</div>
+          <ul><li>Куда приоритетно ведём воронку 1: ЛТР или Глубина? Они конкурируют за одного клиента или это ступени?</li></ul>
+        </div>
+      </div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-kniga-rukopis" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Прочитана целиком 06.08 (финальная версия, 96,7к слов)" checked><span class="mt">Рукопись книги (финальная версия, 96 700 слов): <a href="materials/Книга-финальная-версия.txt" target="_blank">текст</a> · <a href="карта-смыслов-книги.md" target="_blank">карта смыслов</a></span></div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-vhod-vyhod" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Изучил Claude" checked><span class="mt"><a href="materials/Вход-и-выход-из-книги.txt" target="_blank">Вход и выход из книги (текст введения и заключения)</a></span><button class="cb cok" data-kn="kn-vhod">Конспект</button></div>
+      <div class="kn-inline" id="kn-vhod">
+        <p class="lead">Черновики введения и заключения книги («Вход и выход — версия 2»). Книга — про вертикальное развитие лидера: переход достигатель → индивидуалист → стратег.</p>
+        <div class="knsec"><div class="knh c1">Что внутри</div>
+          <ul>
+            <li>Введение: «зов» + 10 сценариев зова (Большая игра, В меня не помещается, Кризис, Золотая клетка, Витязь на распутье, Трудоголизм, Новая эпоха, Творческий импульс, Я что-то упускаю, Поиск себя).</li>
+            <li>Горизонтальное vs вертикальное развитие, 7 логик действия (по Торберту).</li>
+            <li>Заключение: нить Ариадны, личный трек, приглашение «напишите нам — поможем спроектировать трек».</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c2">Что берём для воронки</div>
+          <ul>
+            <li><b>Главное: в конце макета прямой плейсхолдер авторов «Какие контакты оставляем, куда ведём?»</b> — выход из книги в воронку не спроектирован. Это наша зона, и её надо успеть закрыть до сдачи макета в печать.</li>
+            <li>10 сценариев зова — готовая типология для квиза и сегментации аудитории.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c3">Мои выводы</div>
+          <p>Ответ на вопрос «книга = вход в воронку?» — да, авторы сами оставили под это место: финал книги логично ведёт на самоаудит/личный трек (QR-код на квиз).</p>
+        </div>
+        <div class="knsec"><div class="knh c4">Вопросы к Филиппу</div>
+          <ul><li>Согласовать CTA в конце книги (QR на квиз-аудит?) — до сдачи макета, окно ограничено датой печати.</li></ul>
+        </div>
+      </div>
+      <label class="mat"><input type="checkbox" class="vg" data-mid="m-guzenuk2024" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Claude не изучил: 190 стр, свёрстана картинками, текст без OCR не извлекается"><span class="mt"><a href="materials/Гузенюк-2024-книга.pdf" target="_blank">Гузенюк 2024 (финал-кривые 140-3.12).pdf</a></span></label>
+      <label class="mat"><input type="checkbox" class="vg" data-mid="m-longrid" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Claude не изучил: Ссылка отдаёт 404"><span class="mt"><a href="https://happinessinaction.ru/1904-stratsubbota" target="_blank">Лонгрид по личной стратегии</a> <span style="color:#b00020;font-size:11.5px;font-weight:600">ссылка сломана (404)</span></span></label>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><div class="sec-t">Стратегируй · форум и канвас (Воронка 2)</div></div>
+    <div class="mats"><div class="mhead"><span title="Изучил Вагэ">ВГ</span><span title="Изучил Claude">CL</span></div>
+      <div class="mat"><input type="checkbox" class="vg" data-mid="m-kp2027" title="Изучил Вагэ"><input type="checkbox" class="cl" title="Изучил Claude" checked><span class="mt"><a href="materials/КП-Стратегируй-2027.pdf" target="_blank">КП «Стратегируй 2027» (PDF, 13 стр.)</a></span><button class="cb cok" data-kn="kn-kp2027">Конспект</button></div>
+      <div class="kn-inline" id="kn-kp2027">
+        <p class="lead">Форум «Адаптивность бизнеса и точки опоры 2027», 20–21 ноября, Москва, кампус СберУниверситета. Организатор — «Земля Стратега», ведущий — Филипп Гузенюк.</p>
+        <div class="knsec"><div class="knh c1">Что внутри</div>
+          <ul>
+            <li>Формат — не лекции, а «живая стратегическая сессия»: участники прорабатывают мульти-стратегию своей компании прямо на площадке.</li>
+            <li>Ядро оффера — мульти-стратегия из 3 векторов: эффективность в текущей модели, карманно-нишевой рост (6–12 мес), новые бизнес-модели (12–36 мес).</li>
+            <li>4 сегмента аудитории: собственники, CEO, топ-менеджеры, управленческие команды (3–5 чел).</li>
+            <li>Тарифы: 85–95к стандарт, 155к VIP. Premium-аудитория.</li>
+            <li>Соц. доказательство: 25 лет, 500+ компаний, амбассадоры (Крутов, Айнетдинов, Дёмин и др.).</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c2">Что берём для воронки</div>
+          <ul>
+            <li>«Мульти-стратегия из 3 векторов» — готовый смысловой стержень для диагностики/квиза форума.</li>
+            <li>Готовый язык боли: «зима рынков», «цунами структурных изменений», «узкие окна возможностей» — можно переиспользовать в текстах.</li>
+            <li>Исследование 200+ компаний — сильный лид-магнит на верх воронки.</li>
+          </ul>
+        </div>
+        <div class="knsec"><div class="knh c3">Мои выводы</div>
+          <p>Аудитория premium и малочисленная — воронка должна квалифицировать (собственник/CEO/топ), а не собирать широкий трафик. Механика продающей диагностики (в отличие от Воронки 1) тут ещё не придумана — придётся создавать с нуля, опираясь на 3 вектора.</p>
+        </div>
+        <div class="knsec"><div class="knh c4">Вопросы к Филиппу</div>
+          <ul>
+            <li>Как форум связан с книгой — книга это вход в форум или наоборот?</li>
+            <li>Воронка продаёт билеты, собирает лиды, или греет под книгу?</li>
+            <li>Куда ведут инфлюенсеры — на форум или на книгу/предзаказ?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="empty" style="margin-top:10px">От Ольги ждём: видео и презентация по дисплею стратега, фильм</div>
+  </div>
+</div>
+
+<div id="p-timeline" class="page">
+  <div class="sub">Предзаказ и дистрибуция · как движемся</div>
+
+  <div class="datebox">
+    <label for="pubdate">Дата выхода книги:</label>
+    <input type="date" id="pubdate">
+    <span class="dhint">Назовите дату, и весь план пересчитается в реальные числа. Вся цепочка считается обратным счётом от неё.</span>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><div class="sec-t">Цепочка по датам</div></div>
+
+    <div class="step">
+      <div class="sdate pending" data-off="-45">— 1,5 мес</div>
+      <div class="sbody">
+        <div class="stitle">Старт предзаказа</div>
+        <div class="sdesc">Собираем через сайт (делаю я, в рамках воронки): заказы не теряются, есть CRM. Раньше запускать не надо — за 3 месяца аудитория выгорает, придётся пушить каждый день</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="sdate pending" data-off="-30">— 1 мес</div>
+      <div class="sbody">
+        <div class="stitle">Инфографика для площадок</div>
+        <div class="sdesc">Готовим карточки для Озона и Яндекс Маркета</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="sdate pending" data-off="-14">— 2 недели</div>
+      <div class="sbody">
+        <div class="stitle">Печать тиража</div>
+        <div class="sdesc">Изготовление 1,5–2 недели</div>
+      </div>
+    </div>
+
+    <div class="step key">
+      <div class="sdate pending" data-off="0">День X</div>
+      <div class="sbody">
+        <div class="stitle">Выход книги</div>
+        <div class="sdesc">Книга приезжает на склад, переупаковка, маркировка, выкладка. Продажи на площадках открываются</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="sdate pending" data-off="90">+ 3 мес</div>
+      <div class="sbody">
+        <div class="stitle">Запуск электронной версии</div>
+        <div class="sdesc">Раньше нельзя: электронка дешевле и собьёт продажи бумаги. Минимум 3 месяца после выхода бумажной</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><div class="sec-t">Тираж и себестоимость</div></div>
+    <table class="tirtable">
+      <tr><th>Тираж</th><th>Стоимость печати</th><th>Себестоимость за экз.</th><th>Цена на маркетплейсе</th></tr>
+      <tr><td class="tnum">2000</td><td>1 450 000 ₽</td><td>725 ₽</td><td>3000 ₽</td></tr>
+      <tr><td class="tnum">3000</td><td>1 820 000 ₽</td><td>606 ₽</td><td>2600 ₽</td></tr>
+    </table>
+    <div class="empty" style="margin-top:10px">1000 экз. Соня не советует: себестоимость выходит неадекватной, продаваться будет плохо</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><div class="sec-t">Каналы продаж и роялти автору</div></div>
+    <table class="tirtable">
+      <tr><th>Канал</th><th>Роялти автору</th></tr>
+      <tr><td>Сайт и мероприятия</td><td class="tnum">50%</td></tr>
+      <tr><td>Маркетплейсы (ВБ, Озон, Яндекс)</td><td>30%</td></tr>
+      <tr><td>Литрес, электронная</td><td>25%</td></tr>
+      <tr><td>Литрес, аудио</td><td>25%</td></tr>
+    </table>
+    <div class="empty" style="margin-top:10px">Продвижение на Литресе работает только когда книга уже выложена. От 50 000 ₽ за неделю — решаем отдельно</div>
+  </div>
+
+  <div class="ask">
+    <h4>Дата выхода книги</h4>
+    <p>Жду от агентства. Как только придёт, вбиваем в калькулятор и вся цепочка дат фиксируется</p>
+    <h4>Что нужно от вас сегодня</h4>
+    <ol>
+      <li><b>Тираж</b> — 2000 или 3000. С учётом того, что около 2000 экз. идут на подарки HR и бизнес-клубам, 3000 выглядит логичнее: и на продажи хватит, и себестоимость на 120 ₽ ниже</li>
+      <li><b>Цена на площадке</b> — 3000 ₽ при тираже 2000, либо 2600 ₽ при 3000</li>
+    </ol>
+  </div>
+</div>
+
+<div id="p-products" class="page">
+  <h1>Схема продуктов</h1>
+  <div class="sub">Вся цепочка: от бесплатного входа и диагностик до флагманов. Зелёные блоки — делаем мы, пунктирные — бесплатное. Цифры из материалов</div>
+  <div class="subtabs">
+    <button class="active" data-pl="pl-svd">Счастье в деятельности</button>
+    <button data-pl="pl-zs">Земля Стратега</button>
+  </div>
+
+  <div class="pl-pane active" id="pl-svd">
+  <div class="sec pl-track">
+    <div class="sec-h"><div class="sec-t">Личный трек · «Счастье в деятельности»</div></div>
+    <div class="fl-wrap"><div class="fl"><div class="fl-stage"><div class="fl-cap">Вход · прогрев</div><div class="fl-box free"><div class="t">ТГ-каналы, фильмы, контент</div><div class="d">канал Филиппа, «28 принципов»</div><div class="p">бесплатно</div></div><div class="fl-box free"><div class="t">Гайд «Личная стратегия»</div><div class="d">PDF + email-цепочка</div><div class="p">бесплатно</div></div><div class="fl-box"><div class="t">Книга</div><div class="d">QR из книги ведёт в диагностику; выход ~20 окт</div><div class="p">~3 000 ₽</div></div></div><div class="fl-arr">→</div><div class="fl-stage"><div class="fl-cap">Диагностика</div><div class="fl-box ours"><div class="t">Квиз-самоаудит</div><div class="d">7 элементов × 2 шкалы → карта разрывов. Делаем мы</div><div class="p">бесплатно</div></div><div class="fl-box free"><div class="t">Живой аудит ЛС</div><div class="d">встреча со специалистом, скрипт продажи</div><div class="p">бесплатно</div></div></div><div class="fl-arr">→</div><div class="fl-stage"><div class="fl-cap">Программы</div><div class="fl-box"><div class="t">ЛТР</div><div class="d">6 сессий с коучем, 4 тарифа</div><div class="p">199 500 – 945 000 ₽</div></div><div class="fl-box"><div class="t">Соло</div><div class="d">24 часа на природе, Ладога</div><div class="p">цена не объявлена</div></div><div class="fl-box"><div class="t">Глубина</div><div class="d">флагман: 6 мес, группа до 20</div><div class="p">2 100 000 ₽</div></div></div></div></div>
+    <div class="fl-cap" style="margin-top:18px">Параллельный контур · события (не ступень лестницы, живут рядом круглый год)</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+      <div class="fl-box"><div class="t">Форум «Дело Года»</div><div class="d">ежегодный, январь (9-й год); участники возвращаются по 4–5 лет — работает на удержание</div><div class="p unk" style="color:#b0a696;font-weight:400;font-style:italic">цена не объявлена</div></div>
+      <div class="fl-box"><div class="t">Ретриты и выезды</div><div class="d">Ладога, Китай-стратсессия (окт), Алтай</div><div class="p" style="color:#b0a696;font-weight:400;font-style:italic">цена не объявлена</div></div>
+      <div class="fl-box"><div class="t">Эфиры и воркшопы</div><div class="d">канал «Лучший день», Open Day — бесплатные, греют все продукты</div><div class="p" style="color:#8a9b8f;font-weight:600">бесплатно</div></div>
+    </div>
+    
+    
+    
+    
+  </div>
+
+  </div>
+  <div class="pl-pane" id="pl-zs">
+  <div class="sec pl-track">
+    <div class="sec-h"><div class="sec-t">Корпоративный трек · «Земля Стратега»</div></div>
+    <div class="fl-wrap"><div class="fl"><div class="fl-stage"><div class="fl-cap">Вход · прогрев</div><div class="fl-box free"><div class="t">КП и контент форума</div><div class="d">«зима рынков», исследование 200+ компаний</div><div class="p">бесплатно</div></div></div><div class="fl-arr">→</div><div class="fl-stage"><div class="fl-cap">Диагностика</div><div class="fl-box ours"><div class="t">Квиз по канвасу</div><div class="d">дисплей стратега, 16 факторов. Делаем мы</div><div class="p">бесплатно</div></div><div class="fl-box free"><div class="t">Блиц-аудит компании</div><div class="d">интервью с консультантом по 16-факторной модели</div><div class="p">бесплатно</div></div></div><div class="fl-arr">→</div><div class="fl-stage"><div class="fl-cap">Продукты</div><div class="fl-box"><div class="t">Форум «Стратегируй 2027»</div><div class="d">20–21 ноября, СберУниверситет</div><div class="p">85 000 – 155 000 ₽</div></div><div class="fl-box"><div class="t">Корп. ЛТР</div><div class="d">траектории для команды, B2B</div><div class="p">цена не объявлена</div></div><div class="fl-box"><div class="t">Стратсессии и проекты</div><div class="d">16 видов сессий, «Папоротник»</div><div class="p">цена по запросу</div></div></div></div></div>
+    
+    
+    
+  </div>
+
+  </div>
+  <div class="ask">
+    <h4>Дыры в схеме — снять с Филиппа</h4>
+    <ol>
+      <li>Цены: Соло, корп. ЛТР, стратсессии — без них не посчитать экономику воронок</li>
+      <li>Порядок ступеней: ЛТР → Глубина — это лестница одного клиента или параллельные продукты?</li>
+      <li>Куда приоритетно ведёт воронка 1: ЛТР или Глубина?</li>
+    </ol>
+  </div>
+</div>
+
+<div id="p-principles" class="page">
+  <h1>Принципы сборки воронки</h1>
+  <div class="sub">Верхний уровень: ЧТО строим и КАК работаем. Выжимка из всех материалов и каналов</div>
+
+  <div class="sec">
+    <div class="sec-h"><div class="sec-t">ЧТО · логика воронки</div></div>
+    <div class="gl-item"><div class="gl-t">1. Один паттерн на всё</div><div class="gl-d">Все продажи Филиппа устроены одинаково: контент → диагностика (аудит) → живая встреча → программа. Глубина продаётся через интервью, корп-трек через блиц-аудит, ЛТР через аудит ЛС. Воронка = оцифровка этого паттерна, а не изобретение нового.</div></div>
+    <div class="gl-item"><div class="gl-t">2. Продаёт разрыв, а не контент</div><div class="gl-d">Ядро механики: человек сам оценивает 7 элементов (или 16 факторов) по важности и проработанности. Разрыв между ними = осознанная боль. Квиз доводит до карты разрывов, закрывать её идут на живую встречу.</div></div>
+    <div class="gl-item"><div class="gl-t">3. Воронка уже существует в черновике</div><div class="gl-d">Фильм «28 принципов» уже ведёт на чек-лист и курс. Самоаудит уже есть таблицей. Лендинг входа в Глубину уже работает. Наша работа — сшить звенья и превратить чек-лист в интерактив. Аргумент для команды: «оцифровываем то, что вы уже делаете».</div></div>
+    <div class="gl-item"><div class="gl-t">4. Книга — вход, и окно закрывается</div><div class="gl-d">В конце макета авторы оставили плейсхолдер «какие контакты оставляем, куда ведём». QR на квиз надо согласовать до сдачи макета в печать (~6 октября печать, макет раньше).</div></div>
+    <div class="gl-item"><div class="gl-t">5. Осенний контур — одна кампания</div><div class="gl-d">Предзаказ (сентябрь) → выход книги (20.10) → форум «Стратегируй» (20–21.11) → Дело Года (январь). Плюс параллельный контур событий и эфиров круглый год. Дата 20.10 держит всю связку.</div></div>
+    <div class="gl-item"><div class="gl-t">6. Трафик уже есть</div><div class="gl-d">22,6К тёплых подписчиков у Филиппа + 3,5К корп. Платный трафик на старте не нужен — нужно грамотно распорядиться своими касаниями.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><div class="sec-t">КАК · подход и коммуникация</div></div>
+    <div class="gl-item"><div class="gl-t">1. Тон — жёсткий фильтр</div><div class="gl-d">История → смысл → мягкий переход к продукту. Ни таймеров, ни давления, ни инфобиза: аудитория отторгнет, Филипп не согласует. Проверять каждый текст воронки об этот фильтр.</div></div>
+    <div class="gl-item"><div class="gl-t">2. Фремиум — слова самого Филиппа</div><div class="gl-d">«Много давать пользы открыто и бесплатно, а работать с лучшими — дорого, глубоко и лично». Ответ на любой спор, сколько отдавать в квизе бесплатно: щедро в контенте, дорого в сопровождении.</div></div>
+    <div class="gl-item"><div class="gl-t">3. С Филиппом — прототипами</div><div class="gl-d">Не открытые вопросы, а готовые гипотезы и макеты: он быстро правит и даёт обратку. Проверено на КП и подтверждено командой.</div></div>
+    <div class="gl-item"><div class="gl-t">4. Встраиваемся, не строим параллельно</div><div class="gl-d">Их лендинги, их UTM-разметка (вплоть до даты поста), их контент-конвейер (Марина пишет по своей формуле), их каналы: основной — максимум 1 касание в неделю про книгу, прогрев — в «Лучшем дне».</div></div>
+    <div class="gl-item"><div class="gl-t">5. Говорим их языком</div><div class="gl-d">ТОЖ, НОЖ, СДВИГ, зов, разрывы, стратегирование — термины из словаря. Свои слова не изобретаем, методологию не перекраиваем.</div></div>
+    <div class="gl-item"><div class="gl-t">6. Контур согласований</div><div class="gl-d">Финалит всегда Филипп. Промежуточное: воронка 1 — Оксана (с 1 августа, до этого Лена Нестерова через Олю), воронка 2 — Оля. Филиппа не грузить мелочами.</div></div>
+    <div class="gl-item"><div class="gl-t">7. Всё измеряем</div><div class="gl-d">У них культура трекинга (clck.ru, полные UTM). Сайт предзаказа и квизы сразу закладываем с разметкой, чтобы показывать команде цифры, а не ощущения.</div></div>
+  </div>
+</div>
+
+<div id="p-portraits" class="page">
+  <h1>Портреты аудитории</h1>
+  <div class="sub">Всё из материалов. Одна аудитория описана дважды: маркетингом (сегменты боли ЛТР) и Филиппом-автором (сценарии зова в книге)</div>
+
+  <div class="sec">
+    <div class="sec-h"><div class="sec-t">ЛТР · 6 сегментов боли (презентация, слайды 15–20)</div></div>
+    <div class="gl-item"><div class="gl-t">1. Нужна личная стратегия</div><div class="gl-d">На развилке, в поиске направления; хочется высоту, которая драйвит; нужна опора пройти кризис.</div></div>
+    <div class="gl-item"><div class="gl-t">2. Тесно, хочется большего</div><div class="gl-d">Упёрлись в потолок, сплошная текучка; хотят «в другую лигу»; застряли в карьере; разрываются между наймом и своим делом.</div></div>
+    <div class="gl-item"><div class="gl-t">3. Нет энергии, перегруз</div><div class="gl-d">Выжаты, к концу дня ни сил ни радости; цели есть, смысла нет, всё серое.</div></div>
+    <div class="gl-item"><div class="gl-t">4. Потонул в операционке</div><div class="gl-d">«Работаю много, двигаюсь медленно и не туда»; вечный Zoom; нет времени на себя и семью; некому делегировать.</div></div>
+    <div class="gl-item"><div class="gl-t">5. Вопросы к команде, сложно влиять</div><div class="gl-d">Всё держится на вас, команда имитирует; сложности с руководством и партнёрами.</div></div>
+    <div class="gl-item"><div class="gl-t">6. Новые роли</div><div class="gl-d">Только стал топом / встраивается в роль CEO; резкий рост масштаба; получил обратную связь, не может принять.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><div class="sec-t">Книга · 10 сценариев зова (те же люди, языком Филиппа)</div></div>
+    <div class="gl-item"><div class="gl-t">1. Большая игра</div><div class="gl-d">«Я перерос декорации, хочу в Лигу Чемпионов» ≈ сегмент «Тесно»</div></div>
+    <div class="gl-item"><div class="gl-t">2. В меня не помещается</div><div class="gl-d">28 проектов, всё хочу — не вывожу ≈ «Перегруз»</div></div>
+    <div class="gl-item"><div class="gl-t">3. Кризис</div><div class="gl-d">Идеальный шторм, всё сыпется разом ≈ «Нужна стратегия»</div></div>
+    <div class="gl-item"><div class="gl-t">4. Золотая клетка</div><div class="gl-d">Всё есть, но жизнь потеряла вкус ≈ «Нет энергии»</div></div>
+    <div class="gl-item"><div class="gl-t">5. Витязь на распутье</div><div class="gl-d">Судьбоносный выбор без гарантий ≈ «Нужна стратегия»</div></div>
+    <div class="gl-item"><div class="gl-t">6. Трудоголизм</div><div class="gl-d">Работа сожрала жизнь, плачу собой и семьёй ≈ «Операционка»</div></div>
+    <div class="gl-item"><div class="gl-t">7. Новая эпоха</div><div class="gl-d">Ничего не горит — тянет вперёд, второе дыхание</div></div>
+    <div class="gl-item"><div class="gl-t">8. Творческий импульс</div><div class="gl-d">«Беременен талантом», пора звучать</div></div>
+    <div class="gl-item"><div class="gl-t">9. Что-то упускаю</div><div class="gl-d">Инструменты отполированы, а рычага нет</div></div>
+    <div class="gl-item"><div class="gl-t">10. Поиск себя</div><div class="gl-d">Кризис идентичности: кто я без регалий? ≈ «Новые роли»</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><div class="sec-t">Форум «Стратегируй 2027» · 4 сегмента</div></div>
+    <div class="gl-item"><div class="gl-t">Собственники / основатели</div><div class="gl-d">Найти нишевые карманы роста, пересобрать бизнес-модель под 2027.</div></div>
+    <div class="gl-item"><div class="gl-t">Гендиректора / CEO</div><div class="gl-d">Повысить эффективность ядра, удержать скорость изменений.</div></div>
+    <div class="gl-item"><div class="gl-t">Топ-менеджеры / директора по развитию</div><div class="gl-d">Выйти из операционки, переосмыслить уровень игры.</div></div>
+    <div class="gl-item"><div class="gl-t">Управленческие команды (3–5 чел)</div><div class="gl-d">Проработать мульти-стратегию компании на площадке.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><div class="sec-t">Глубина · верх пирамиды</div></div>
+    <div class="gl-item"><div class="gl-t">СЕО, собственники, топы, HRD</div><div class="gl-d">Компании с оборотом 1,5–100 млрд ₽/год. Закрытая группа до 20 человек «равного масштаба». Вход через собеседование.</div></div>
+  </div>
+</div>
+
+<div id="p-kniga" class="page">
+  <h1>Книга</h1>
+  <div class="kb-hero">
+    <div class="kick">Финальная версия рукописи · прочитана целиком 06.08</div>
+    <h2>Книга о вертикальном развитии лидера</h2>
+    <div class="thesis">На усложнение внешней среды лидер отвечает ростом внутренней ёмкости — переходом к более зрелой логике действия. Вы не сломались. Вы в точке перехода.</div>
+    <div class="kb-stats">
+      <div class="kb-stat"><div class="n">96 700</div><div class="l">слов</div></div>
+      <div class="kb-stat"><div class="n">3</div><div class="l">эпохи</div></div>
+      <div class="kb-stat"><div class="n">~40</div><div class="l">практик</div></div>
+      <div class="kb-stat"><div class="n">10</div><div class="l">сценариев зова</div></div>
+      <div class="kb-stat"><div class="n">5</div><div class="l">QR-плейсхолдеров</div></div>
+    </div>
+  </div>
+
+  <div class="kb-sec">
+    <h3>Зов — 10 сценариев входа</h3>
+    <div class="lead">Первая глава книги. «Способ, которым на связь выходит следующая, более масштабная версия вас самих». Готовая типология для квиза</div>
+    <div class="kb-grid">
+      <div class="kb-zov"><div class="num">01</div><div class="t">Большая игра</div><div class="q">«Я сделан, чтобы канадцев драть, а сижу в Чебаркуле»</div></div>
+      <div class="kb-zov"><div class="num">02</div><div class="t">В меня не помещается</div><div class="q">«Всё хочу. Но я не вывожу»</div></div>
+      <div class="kb-zov"><div class="num">03</div><div class="t">Кризис</div><div class="q">идеальный шторм, всё сыпется разом</div></div>
+      <div class="kb-zov"><div class="num">04</div><div class="t">Золотая клетка</div><div class="q">«Как будто вареную тряпку жую. 40 лет, а я на пенсии»</div></div>
+      <div class="kb-zov"><div class="num">05</div><div class="t">Витязь на распутье</div><div class="q">судьбоносный выбор без гарантий</div></div>
+      <div class="kb-zov"><div class="num">06</div><div class="t">Трудоголизм</div><div class="q">«Я плачу за успех собой и близкими»</div></div>
+      <div class="kb-zov"><div class="num">07</div><div class="t">Новая эпоха</div><div class="q">«А порох-то в пороховницах ещё есть!»</div></div>
+      <div class="kb-zov"><div class="num">08</div><div class="t">Творческий импульс</div><div class="q">«Я как будто беременен своим талантом»</div></div>
+      <div class="kb-zov"><div class="num">09</div><div class="t">Что-то упускаю</div><div class="q">инструменты отполированы — рычага нет</div></div>
+      <div class="kb-zov"><div class="num">10</div><div class="t">Поиск себя</div><div class="q">«Кто я, если убрать регалии и должности?»</div></div>
+    </div>
+  </div>
+
+  <div class="kb-sec" style="padding-bottom:24px">
+    <h3>Три эпохи</h3>
+    <div class="lead">Клик по эпохе раскрывает разбор: сила, тень, симптомы, практики</div>
+
+    <details class="kb-epoch">
+      <summary><span class="arr">▸</span><span class="rim">I</span><span class="et">Достигатель</span><span class="em">мантра: достичь успеха</span></summary>
+      <div class="kb-body">
+        <div class="kb-row"><div class="kb-lbl">Сила</div><div class="kb-val">Невозможное = вызов · самоавторство («я — источник всех результатов») · магия метрик («что измеряем, то улучшается») · фокус · устойчивость к провалам</div></div>
+        <div class="kb-row"><div class="kb-lbl">Тень</div><div class="kb-val">Трудоголизм («иногда он надевает трекинговые ботинки и называет себя отпуском») · гиперконтроль и бизнес на одном человеке · «проще вызвать шторм, чтобы снова выйти победителем» · люди-винтики · идентичность = достижения · отложенное счастье («настоящая жизнь будет потом»)</div></div>
+        <div class="kb-row"><div class="kb-lbl">5 уровней зова</div><div class="kb-val">Лестница исчерпания: 1 — вдохновение к «не-работе» · 2 — апатия, вина · 3 — неуспехи на ровном месте · 4 — разрушение отношений · 5 — соматика. Замечаем на 4–5. «Лучше белый кролик, чем пушистый песец»</div></div>
+        <div class="kb-row"><div class="kb-lbl">Практики</div><div class="kb-val">Цель с энергией · Дневник энергии · «Полёты» · Команда взаимного развития · «Мой учитель»</div></div>
+        <div class="kb-row"><div class="kb-lbl">Истории</div><div class="kb-val">Контракт на 4,5 млрд («нас обнулили») · Шваб и цифра мелом · Хартман: две биографии глазами ребёнка · 5 сожалений умирающих · Жанна: банк → галерея</div></div>
+      </div>
+    </details>
+
+    <details class="kb-epoch">
+      <summary><span class="arr">▸</span><span class="rim">II</span><span class="et">Индивидуалист</span><span class="em">мантра: найти себя</span></summary>
+      <div class="kb-body">
+        <div class="kb-row"><div class="kb-lbl">Вход</div><div class="kb-val">«Всё есть — счастья нет» · обесценивание побед · маски невыносимы · крах самоавторства · тело саботирует (опоздания, переломы, больницы) · тяга к «странным» практикам</div></div>
+        <div class="kb-row"><div class="kb-lbl">Суть</div><div class="kb-val">Упаковка в роль → распаковка себя · фильтр «моё / не моё» · цели-точки → цели-линии · «отдайте Богу 50%» · Мы-лидерство («когда я не могу — вы можете») · состояние как ценность · поток · белая ворона</div></div>
+        <div class="kb-row"><div class="kb-lbl">Тень</div><div class="kb-val">Паралич решений («уже не там, ещё не здесь») · развитийный запой · одиночество («нормальный же был, и вдруг крыша потекла»)</div></div>
+        <div class="kb-row"><div class="kb-lbl">Практики</div><div class="kb-val">Совет директоров внутри · Поиск талантов · Три вдоха · Крест психосинтеза · Большое сердце · 3-2-1 · Прогулки видения (+ Стратегическая суббота) · Транспонирование · Check-in · Принцип удовольствия · Счастливое планирование</div></div>
+        <div class="kb-row"><div class="kb-lbl">Мостик дальше</div><div class="kb-val">Выдержал неопределённость → выбираешь «не из страха, а из своей сути» — вход в эпоху стратега</div></div>
+      </div>
+    </details>
+
+    <details class="kb-epoch">
+      <summary><span class="arr">▸</span><span class="rim">III</span><span class="et">Стратег</span><span class="em">мантра: оставить наследие</span></summary>
+      <div class="kb-body">
+        <div class="kb-row"><div class="kb-lbl">Суть</div><div class="kb-val">«Стратеги запускают волны, которые живут дольше их самих» · мыслит поколениями · неопределённость — топливо · управляет энергией, а не временем · «не предсказывает будущее — создаёт его»</div></div>
+        <div class="kb-row"><div class="kb-lbl">Концепты</div><div class="kb-val">МИССИЯ = СМЫСЛ + МУРАШКИ · эволюционная цель («какой подарок от меня хочет мир за 1–3 года?») · масштаб («проблемы уровня решаются мышлением следующего уровня») · мультистратегии · Большое «И» и полярности · нанодействия (1% в день = 37х за год) · Эффект дисплея (мост к канвасу!) · 99/1 · генеративное слушание · фабрика лидерства · тень власти</div></div>
+        <div class="kb-row"><div class="kb-lbl">Одиночество</div><div class="kb-val">Стратегов ~8% популяции → «своя стая»: Земля Стратега, Стратегируй, Глубина — продажа сообществ вшита автором в текст</div></div>
+        <div class="kb-row"><div class="kb-lbl">Практики</div><div class="kb-val">Точка ВАУ · Время для смыслов · Словарь лидера · Восьмёрка · Тетралемма · Системное отзеркаливание · «Да, и…» · Трёхдоменное дыхание · Садовник · Приглашение на салфетке · Охота за тенью · Красные и зелёные усы</div></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="kb-sec kb-red">
+    <h3>Точки воронки — 5 QR-плейсхолдеров в тексте</h3>
+    <div class="lead">Авторы сами оставили дырки под переходы. Спроектировать все пять — наша работа, до сдачи макета</div>
+    <div class="kb-qr"><div class="qn">1</div><div class="qt">Финал книги</div><div class="qd">плейсхолдер «Какие контакты оставляем, куда ведём?» — сюда встаёт наш квиз</div></div>
+    <div class="kb-qr"><div class="qn">2</div><div class="qt">Форум «Стратегируй»</div><div class="qd">пометка «Вставить QR?»</div></div>
+    <div class="kb-qr"><div class="qn">3</div><div class="qt">Сообщества</div><div class="qd">Земля Стратега / Стратегируй / Глубина — «QR-код»</div></div>
+    <div class="kb-qr"><div class="qn">4</div><div class="qt">Эффект дисплея</div><div class="qd">QR на продукт «Стратегический рисунок»</div></div>
+    <div class="kb-qr"><div class="qn">5</div><div class="qt">Дисплей стратега</div><div class="qd">«добавить инфографикой» — мост к воронке 2</div></div>
+  </div>
+
+  <div class="kb-sec">
+    <h3>Квиз по логике Филиппа</h3>
+    <div class="lead">Сборка с созвона 30.07: не ярлык человека, а уровень его текущей задачи</div>
+    <div class="kb-steps">
+      <div class="kb-step"><div class="sn">ШАГ 1</div><div class="st">Сценарий зова</div><div class="sd">Человек узнаёт себя в одном из 10 сценариев — вопросы из цитат-состояний книги</div></div>
+      <div class="kb-step"><div class="sn">ШАГ 2</div><div class="st">Уровень задачи</div><div class="sd">Достигательская («собраться и взять больше») · индивидуалистская («всё есть — счастья нет») · стратегическая («строю то, что переживёт меня»)</div></div>
+      <div class="kb-step"><div class="sn">ШАГ 3</div><div class="st">Приглашение</div><div class="sd">«Приходите строить личную стратегию» → запись на живой аудит ЛС. Квиз не делает аудит — он продаёт его</div></div>
+    </div>
+  </div>
+
+  <div class="kb-sec">
+    <h3>Банк цитат</h3>
+    <div class="kb-quotes">
+      <div class="kb-quote">«Вы не сломались. Вы в точке перехода от достигателя к стратегу»<span class="src">послание книги</span></div>
+      <div class="kb-quote">«Стратегия — это то, что вы делаете каждый день, когда никто не смотрит»<span class="src">определение</span></div>
+      <div class="kb-quote">«Миссия = смысл + мурашки»<span class="src">формула стратега</span></div>
+      <div class="kb-quote">«Пересобирать двигатель самолёта на лету — без права на посадку»<span class="src">новая норма лидера</span></div>
+      <div class="kb-quote">«Иногда он надевает трекинговые ботинки и называет себя отпуском»<span class="src">трудоголизм</span></div>
+      <div class="kb-quote">«Всё есть — счастья нет»<span class="src">вход индивидуалиста</span></div>
+      <div class="kb-quote">«Настоящая жизнь будет потом — сейчас я слишком занят»<span class="src">отложенное счастье</span></div>
+      <div class="kb-quote">«Гусеница не знает, что станет бабочкой»<span class="src">трансформация</span></div>
+      <div class="kb-quote">«Стратеги запускают волны, которые живут дольше их самих»<span class="src">наследие</span></div>
+      <div class="kb-quote">«Процесс — это и есть сотни тысяч маленьких результатов»<span class="src">кайдзен</span></div>
+      <div class="kb-quote">«Беседой управляет не тот, кто говорит, а тот, кто слушает»<span class="src">слушание</span></div>
+      <div class="kb-quote">«Ниточка уже у вас в руках. Потяните за неё»<span class="src">финал книги</span></div>
+    </div>
+  </div>
+
+  <div class="kb-sec">
+    <h3>Сырость текста — передать команде</h3>
+    <div class="kb-foot">Блок об авторах не финализирован (3 из 4 не прислали обновления) · редакторские комментарии по всему тексту («не верю» к кейсу клея, сомнения по практике 3-2-1, незакрытый источник Сысоева) · дубли и опечатки. Вывод: макет не завтра — окно для проектирования QR есть, размер окна уточнить у команды. Полная версия карты: карта-смыслов-книги.md</div>
+  </div>
+</div>
+
+<div id="p-infog" class="page">
+  <div class="stitle">Артефакты проекта</div>
+  <div class="ig-lead">Все собранные схемы, прототипы и презентации по проекту. Клик открывает в новой вкладке.</div>
+  <div style="margin-bottom:30px"><div style="font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);margin-bottom:12px">Воронка и вкладыш</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"><a href="воронка-прототип.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/воронка-прототип.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Прототип воронки: Книга → вкладыш → Диагностика</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a><a href="вкладыш-макет.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/вкладыш-макет.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Макет вкладыша</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a><a href="карта-воронки.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/карта-воронки.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Карта воронки</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a><a href="воронка-архитектура.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/воронка-архитектура.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Архитектура воронки</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a></div></div><div style="margin-bottom:30px"><div style="font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);margin-bottom:12px">Смыслы и тезисы</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"><a href="презентация-смыслов.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/презентация-смыслов.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Презентация: от достигателя к стратегу (21 тезис)</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a><a href="презентация-цепочка.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/презентация-цепочка.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Цепочка тезисов</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a><a href="мастер-каркас-смыслов.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/мастер-каркас-смыслов.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Мастер-каркас 75 смыслов</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a><a href="доказательная-цепочка.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/доказательная-цепочка.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Доказательная цепочка</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a><a href="experience-map-v5.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/experience-map-v5.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Experience Map</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a></div></div><div style="margin-bottom:30px"><div style="font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);margin-bottom:12px">Диагностика и зов</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"><a href="диагностика-воронка.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/диагностика-воронка.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Диагностика перехода (пиктограммы, глифы)</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a><a href="петелька-интерактив.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/петелька-интерактив.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Собрать свою Петельку</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a><a href="матрица-зовов.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/матрица-зовов.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Матрица зовов × уровни</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a><a href="самоаудит-черновик.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/самоаудит-черновик.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Самоаудит ЛС</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a><a href="petelka.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/petelka.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Квиз по книге</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a></div></div><div style="margin-bottom:30px"><div style="font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);margin-bottom:12px">Спец-визуалы</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"><a href="дисплей-стратега.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/дисплей-стратега.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Дисплей стратега</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a><a href="мудборд-визкод.html" target="_blank" style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;text-decoration:none;color:#2a2620"><div style="aspect-ratio:16/10;overflow:hidden;background:#F3EEE6;border-bottom:1px solid var(--line)"><img src="thumbs/мудборд-визкод.png" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top left"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px"><span style="font-size:13px;line-height:1.3">Визуальный код</span><span style="color:#8A5A12;flex:none;font-size:12px">↗</span></div></a></div></div>
+</div>
+<div id="p-funnel" class="page">
+  <div class="fn-hero">
+    <div class="fn-kick">Счастье в деятельности · воронка личной стратегии</div>
+    <h1>Воронка 1 · схема</h1>
+    <div class="sub">Логика Вагэ + сборка Филиппа (созвон 30.07): зов → уровень задачи → приглашение на аудит</div>
+  </div>
+
+  <div class="fn-canvas">
+    <div class="fn-flow">
+      <div class="fn-stage"><div class="fn-num">Откуда приходит человек</div><div class="fn-what">Все бесплатные точки, где человек встречает ссылку на квиз</div><div class="fn-box ghost"><div class="t">Книга · QR в финале</div><div class="d">плейсхолдер авторов: «какие контакты, куда ведём»</div></div><div class="fn-box ghost"><div class="t">Выступления</div><div class="d">QR со сцены, мероприятия</div></div><div class="fn-box ghost"><div class="t">ТГ-закреп · YouTube</div><div class="d">закреп канала, описания видео</div></div></div>
+      <div class="fn-arr">→</div><div class="fn-stage"><div class="fn-num">Первая развилка</div><div class="fn-what">Один вопрос в начале квиза определяет маршрут</div><div class="fn-box ours"><div class="badge">делаем мы</div><div class="t">Читал книгу?</div><div class="d">читал → глубокий сценарий по книге · не читал → сразу самоаудит. Возможен А/Б-тест</div></div></div>
+      <div class="fn-arr">→</div><div class="fn-stage"><div class="fn-num">Квиз · часть 1</div><div class="fn-what">Человек узнаёт свою ситуацию в одном из сценариев книги</div><div class="fn-box ours"><div class="badge">делаем мы</div><div class="t">Выбор сценария зова</div><div class="d">10 сценариев из книги: «куда меня зовёт жизнь?» — личное и бизнес</div></div></div>
+      <div class="fn-arr">→</div><div class="fn-stage"><div class="fn-num">Квиз · часть 2</div><div class="fn-what">Несколько вопросов уточняют, какого уровня его задача</div><div class="fn-box ours"><div class="badge">делаем мы</div><div class="t">Уровень задачи</div><div class="d">вопросами: достигательская · индивидуалистская · стратегическая. Не ярлык человека — уровень текущей задачи</div></div></div>
+      <div class="fn-arr">→</div><div class="fn-stage"><div class="fn-num">Финальный экран</div><div class="fn-what">Человек получает диагностику и личное приглашение</div><div class="fn-box ours"><div class="badge">делаем мы</div><div class="t">Диагностика + приглашение</div><div class="d">«похоже, ваша задача — стратегическая. Приходите строить личную стратегию»</div></div></div>
+      <div class="fn-arr">→</div><div class="fn-stage"><div class="fn-num">Целевое действие</div><div class="fn-what">Ради этой кнопки существует весь квиз</div><div class="fn-box cta"><div class="t">Запись на живой аудит ЛС</div><div class="d">«исследование»: полчаса со специалистом. Квиз аудит не делает — он его продаёт</div></div></div>
+      <div class="fn-arr">→</div><div class="fn-stage"><div class="fn-num">Что покупают после</div><div class="fn-what">Живой аудит продаёт программы — здесь деньги воронки</div><div class="fn-box"><div class="t">ЛТР</div><div class="d">6 сессий с коучем</div><div class="p">199 500 – 945 000 ₽</div></div><div class="fn-box"><div class="t">Глубина</div><div class="d">флагман, 6 месяцев</div><div class="p">2 100 000 ₽</div></div></div>
+    </div>
+    <div class="fn-branches">
+      <div class="fn-bcap">Параллельные ветки</div>
+      <div class="fn-branch"><div class="t">Не читал книгу</div><div class="d">Короткий путь: сразу самоаудит ЛС (7 элементов → карта разрывов) → та же запись на живой аудит</div></div>
+      <div class="fn-branch"><div class="t">Бизнес-запрос</div><div class="d">Сценарий зова бизнесовый → бизнес-стратегия: канвас, воронка 2 (форум, блиц-аудит)</div></div>
+      <div class="fn-branch"><div class="t">Вирусный контур</div><div class="d">Результатом «уровень задачи» делятся в соцсетях — аккуратно, без ярлыков, «трушно»</div></div>
+    </div>
+  </div>
+
+  <div class="fn-rules">
+    <h3>Правила сборки — от Филиппа</h3>
+    <div class="fn-rule"><div class="n">1</div><div class="x">Никаких ярлыков «ты — достигатель»: тестом уровень человека честно не определить, это контекстно. Диагностируем задачу, не личность</div></div>
+    <div class="fn-rule"><div class="n">2</div><div class="x">Упаковка — «приглашение к развитию»: тон трушный, не инфобиз</div></div>
+    <div class="fn-rule"><div class="n">3</div><div class="x">Квиз не заменяет аудит — он продаёт запись на него</div></div>
+    <div class="fn-rule"><div class="n">4</div><div class="x">Опора на вебинар ЗОВ — самый конвертящий их формат (запись запрошена у команды)</div></div>
+  </div>
+</div>
+
+<div id="p-zov" class="page">
+  <h1>ЗОВ</h1>
+  <div class="kb-hero">
+    <div class="kick">Самый конвертящий вебинар · транскрипт прочитан целиком 06.08</div>
+    <h2>Вебинар «ЗОВ»</h2>
+    <div class="thesis">Как услышать свой зов, отличить истинный от ложного и превратить его в вектор развития. 90 минут, которые приводили клиентов в ЛТР — образец всей механики продаж Филиппа.</div>
+    <div class="kb-stats">
+      <div class="kb-stat"><div class="n">90</div><div class="l">минут</div></div>
+      <div class="kb-stat"><div class="n">3</div><div class="l">мифа-прогрева</div></div>
+      <div class="kb-stat"><div class="n">3</div><div class="l">техники</div></div>
+      <div class="kb-stat"><div class="n">5</div><div class="l">уровней зова</div></div>
+      <div class="kb-stat"><div class="n">60–380к</div><div class="l">цена ЛТР в финале</div></div>
+    </div>
+  </div>
+  <div class="zov-konsp">
+  <h3>Конспект вебинара «ЗОВ» — подробно, своими словами</h3>
+  <div class="zk-sub">Всё, что Филипп говорил на вебинаре, разложено по смыслу. Читается сверху вниз</div>
+
+  <h4>Что такое «зов» и зачем вообще вебинар</h4>
+  <p>«Зов» — это внутреннее ощущение, что жизнь тебя куда-то зовёт, тянет в новое. Не логика, не «надо», а тихий внутренний импульс: чувствуешь, что пора меняться, что текущее уже не твоё. Филипп говорит, что этот голос звучит в нас постоянно, но мы его обычно заглушаем работой и суетой. Весь вебинар — про то, как научиться этот голос слышать, отличать настоящий от ложного, и превратить его в понятное направление развития. А в конце Филипп мягко предлагает свою программу личной работы (ЛТР). Это его самый продающий вебинар — поэтому нам важно понять, как он устроен.</p>
+
+  <h4>Образ, с которого он начинает</h4>
+  <p>Он описывает два типа людей. Первый — лидер, который «идёт по следу, как хорошая гончая»: чувствует своё направление, и у него всё спорится даже в сложных условиях. Второй — человек «в болоте, в буреломе»: снаружи всё отлично (заводы, машины, дачи, «куртки кожаные, три»), а внутри потерял свою ниточку, свой зов — и жизнь меркнет. И рассказывает историю мужчины, который расплакался на консультации: «Я всё построил сам — дом, дачу, бизнес, жене салон открыл. Филипп, почему счастья нет? Почему не радует?»</p>
+
+  <h4>Три мифа, которые он разрушает (его «разогрев»)</h4>
+  <p>Прежде чем дать пользу, он снимает три ложных убеждения. Это приём: расчищает голову человека, чтобы тот принял его подход.</p>
+  <ul>
+    <li><b>Миф 1: предназначение находят один раз и на всю жизнь.</b> Люди ищут идеальное дело, где «ангелы поют» — и, не найдя, бросают хорошие работы, меняют десятки профессий, тратят лучшие годы. Филипп: так не бывает. Правильнее <b>динамическое предназначение</b> — оно меняется каждые 2–3 года.</li>
+    <li><b>Миф 2: нашёл своё — дальше всё пойдёт само.</b> Нет. Предназначение = таланты × то, что нужно миру (Аристотель). Но «миру наплевать на тебя — он отжимает тебя как ресурс»: ему всё равно, счастлив ли ты, что с телом и семьёй. Поэтому кроме миссии нужна <b>целостность</b> — бережность к себе.</li>
+    <li><b>Миф 3: на своём пути будет сплошной кайф.</b> Нет. Сомнения «то ли я делаю» — нормальная часть пути мастера. Его коуч обрадовалась его кризису: «раз сомневаешься — значит растёшь. Перестал — забронзовел и вышел в тираж».</li>
+  </ul>
+
+  <h4>Три техники — как искать свой зов</h4>
+  <ul>
+    <li><b>В прошлом — «Перепросмотр».</b> Выписать 10–15 историй своих прорывов и заметить: как в твою жизнь приходит новое? У каждого свой канал — «гонец» (человек приносит весть), «взрыв бытового газа» (копится напряжение и разносит), природа (ночь под луной → ясность). Вторая часть — честный вопрос <b>«как я сам себя обманываю?»</b> (через страх, «я не достоин», «сначала найду напарника»). Смысл: увидишь, что «уже много раз горел в этом танке» — сегодняшний кризис перестанет пугать.</li>
+    <li><b>В настоящем — «Сбор сигналов».</b> 1–2 недели ловить в заметку всё, что цепляет, <b>не анализируя</b> (анализ включает старые стереотипы и убивает свежесть). Через пару недель разобрать: «если бы я был мудрой вселенной, что бы я себе через эти знаки говорил?». Признак верного пути: вопрос меняется с «а то ли это?» на <b>«как же я раньше этого не понял?!»</b></li>
+    <li><b>В будущем — «Эволюционная цель».</b> Главный вопрос вебинара: <b>«Учитывая мою нынешнюю ситуацию, таланты, ресурсы и вызовы — какой самый ценный подарок от меня хочет получить мир в ближайшие 2–3 года?»</b>. Три момента: (1) опора на реальность, а не мечты из журнала; (2) цель «дать», а не «взять» — «никому не интересно делать тебя успешным, людям интересно, что они получат»; (3) горизонт 2–3 года. Деньги и успех приходят как «бесплатное приложение».</li>
+  </ul>
+
+  <h4>★ 5 уровней зова — вот что это такое</h4>
+  <p>Самая важная для нас модель. Идея: жизнь зовёт к переменам не сразу криком, а по нарастающей. Сначала мягко, и если не слышишь — всё громче и болезненнее. Пять ступеней снизу вверх по силе:</p>
+  <ul>
+    <li><b>1. «Флирт мира».</b> Самый мягкий сигнал. Жизнь как будто заигрывает, подмигивает: вдруг захотелось нового, кольнуло «а вот бы мне туда...», мелькнула идея. Как влюблённость — лёгкое «о, как интересно!». Большинство отмахивается: «не, некогда» — и сигнал уходит. Филипп называет это «отказом от зова».</li>
+    <li><b>2. Негативные эмоции.</b> Не услышал флирт — жизнь давит сильнее: раздражение, скука, апатия, вина. Из жизни уходит радость, всё пресное.</li>
+    <li><b>3. Неуспехи.</b> Всё ещё не слышишь — сбои на ровном месте. Дела, что всегда получались, валятся из рук. «Пропускаешь подачи», всё через силу.</li>
+    <li><b>4. Разрушение отношений.</b> Дальше бьёт по близким: конфликты, срывы в семье, с партнёрами. Близкий как зеркало показывает, что ты не свой, не живёшь свою жизнь.</li>
+    <li><b>5. Тело.</b> Самый жёсткий, последний способ. Когда вообще ничего не слышишь — болезнь, соматика. «С утреннего совещания увозят на скорой».</li>
+  </ul>
+  <p>Вывод Филиппа: большинство просыпается только на 4–5 уровне, когда уже больно. Мастерство — ловить свой зов на первом-втором. Приём: вспомни, где «долбануло по телу» (уровень 5), отмотай назад — найдёшь мягкий «флирт» (уровень 1), который пропустил.</p>
+
+  <h4>Как он продаёт (без давления — образец для нас)</h4>
+  <ul>
+    <li><b>Честный переход:</b> «расскажу про программу, кому неинтересно — можете идти». Не держит силой.</li>
+    <li><b>Авторитет:</b> цитирует Варданяна: «первое лицо, которое не учится месяц в году, — профнепригодно».</li>
+    <li><b>Вход = диагностика по 7 источникам энергии</b> (смысл, поток, любовь-контакт, развитие, игра, оптимизм, влияние) — видишь, где сильные места, а где «чёрные дыры».</li>
+    <li><b>«Антиинтенсив»:</b> против марафонов с горой контента. «Личный сомелье развития» подбирает точечные практики. «Не делать больше — делать меньше, но точнее».</li>
+    <li><b>Коучи как персонажи:</b> 5 коучей ярко и по-разному (Таня — «эльф 80-го уровня» для скептиков, Алексей — природа, Оля — драйв, Лена — «хирург» с MBA, Наташа — тепло). Клиент узнаёт «своего».</li>
+    <li><b>Цена вслух с якорем:</b> обычный формат 60 000 ₽ / 3 мес, лично с ним — 380 000 ₽.</li>
+    <li><b>Отсечка:</b> кому НЕ подойдёт — тем, кто ждёт «волшебных таблеток» и не готов «развернуть пальчик на себя».</li>
+    <li><b>Финал:</b> анкета → консультант созвонится → поможет решить, стоит ли идти.</li>
+  </ul>
+
+  <h4>Что из всего этого — в наш квиз</h4>
+  <p>У Филиппа две линейки описания человека, и они дополняют друг друга:</p>
+  <ul>
+    <li><b>10 сценариев из книги</b> = <b>ЧТО у человека за ситуация</b> (кризис, золотая клетка, «тесно, хочу больше», трудоголизм).</li>
+    <li><b>5 уровней зова</b> = <b>НАСКОЛЬКО у него горит</b> — от лёгкого «флирта» до болезней тела.</li>
+  </ul>
+  <p>Наш квиз честно стоит на двух его родных осях: <b>какая ситуация × насколько остро</b>. Финалом даём вопрос про «подарок миру» и ведём на живой аудит. Диагностику по 7 источникам он уже делает внутри ЛТР — наш квиз встаёт ДО неё, как вход, не дублируя.</p>
+</div>
+
+  <div class="kb-sec">
+    <h3>Драматургия — как построены 90 минут</h3>
+    <div class="lead">Скелет, который можно переносить на любой наш формат: эфир, лендинг, квиз</div>
+    <div class="kb-row"><div class="kb-lbl">1 · Чек-ин</div><div class="kb-val">Плюсики «видно/слышно» → «откуда вы + что с телом, чувствами, мыслями». Сразу задаёт норму активности</div></div>
+    <div class="kb-row"><div class="kb-lbl">2 · Проблема образом</div><div class="kb-val">Лидер-«гончая по следу» (нос холодный, хвост пушистый) против лидера в «болоте»: всё есть — «куртки кожаные, три», а нитку потерял</div></div>
+    <div class="kb-row"><div class="kb-lbl">3 · Актуализация</div><div class="kb-val">«Почему тема ЗОВ актуальна для вас сегодня?» — читает ответы вслух с именами. История плачущего мужчины: «я всё построил — почему счастья нет?»</div></div>
+    <div class="kb-row"><div class="kb-lbl">4 · Три мифа</div><div class="kb-val">Ядро прогрева: рушит представления → освобождает место для своей концепции (см. ниже)</div></div>
+    <div class="kb-row"><div class="kb-lbl">5 · Личная история</div><div class="kb-val">Кризис 2007-08 → «+1% мастерства» → Vision Quest: 9 дней в горах, 3 без еды и воды → ясность на 10 лет</div></div>
+    <div class="kb-row"><div class="kb-lbl">6 · Три техники</div><div class="kb-val">Прошлое (Перепросмотр) → Настоящее (Сбор сигналов) → Будущее (Эволюционная цель) — контентная ценность</div></div>
+    <div class="kb-row"><div class="kb-lbl">7 · Продажа</div><div class="kb-val">Честный переход: «кому неинтересно — можете идти» → ЛТР через диагностику 7 источников → коучи-персонажи → цена вслух → анкета</div></div>
+    <div class="kb-row"><div class="kb-lbl">8 · Q&A</div><div class="kb-val">5 уровней зова · привратник-страх («Я тебя вижу — и я иду») · «делать меньше, но точнее»</div></div>
+  </div>
+
+  <div class="kb-sec" style="padding-bottom:24px">
+    <h3>Три мифа и три техники</h3>
+    <div class="lead">Клик раскрывает подробности</div>
+    <details class="kb-epoch">
+      <summary><span class="arr">▸</span><span class="rim">М</span><span class="et">Три мифа о предназначении</span><span class="em">прогрев через разрушение</span></summary>
+      <div class="kb-body">
+        <div class="kb-row"><div class="kb-lbl">Миф 1</div><div class="kb-val">«Предназначение находят раз и навсегда» → нет: динамическое предназначение, эволюционная цель на 2–3 года. «Об идеальную картинку разбиваются карьеры и тратятся лучшие годы»</div></div>
+        <div class="kb-row"><div class="kb-lbl">Миф 2</div><div class="kb-val">«Нашёл зов — всё автоматом хорошо» → нет: предназначение = таланты × потребности мира (Аристотель), но «эгрегору наплевать на тебя, он отжимает тебя как ресурс». Нужны обе: миссия + целостность (бережность к себе)</div></div>
+        <div class="kb-row"><div class="kb-lbl">Миф 3</div><div class="kb-val">«На пути предназначения будет кайф» → нет: муки творчества = признак пути мастера. «Если не сомневаешься — бронзовеешь и выходишь в тираж»</div></div>
+      </div>
+    </details>
+    <details class="kb-epoch">
+      <summary><span class="arr">▸</span><span class="rim">I</span><span class="et">Перепросмотр</span><span class="em">работа с прошлым</span></summary>
+      <div class="kb-body">
+        <div class="kb-row"><div class="kb-lbl">Механика</div><div class="kb-val">Автоматическим письмом 10–15 историй «как в жизнь приходило новое ценное» + вспомнить состояние. Зов отличается по ТОНУ голоса, не по содержанию (Кэмпбелл)</div></div>
+        <div class="kb-row"><div class="kb-lbl">Вторая часть</div><div class="kb-val">«Как я сам себя развожу?» — 3–5 историй самообмана: страх, «не достоин», логичные доводы, «сначала найду напарника». «Знай свой способ стрелять себе в ногу»</div></div>
+        <div class="kb-row"><div class="kb-lbl">Анализ</div><div class="kb-val">Три корзины: таланты · интересы (где поток) · «мне важно» (ценности)</div></div>
+        <div class="kb-row"><div class="kb-lbl">Эффект</div><div class="kb-val">«Сдвиг точки сборки»: «ты уже много раз горел в этом танке». + сила рода (дедушка, 5 раз горевший в танке: «как тебе твой кризис? — Полная ерунда»)</div></div>
+        <div class="kb-row"><div class="kb-lbl">Корп. кейс</div><div class="kb-val">МИФ: начали не с целей, а с «что такое по-мифовски» → 1 млрд 100 млн на падающем рынке</div></div>
+      </div>
+    </details>
+    <details class="kb-epoch">
+      <summary><span class="arr">▸</span><span class="rim">II</span><span class="et">Сбор сигналов</span><span class="em">работа с настоящим</span></summary>
+      <div class="kb-body">
+        <div class="kb-row"><div class="kb-lbl">Механика</div><div class="kb-val">1–2 недели ловить всё, что вызывает отклик и «свежесть» — 7–10 сигналов в день, в заметку телефона. Правило: «ТУПО ловишь», анализировать запрещено — анализ включает стереотипы и убивает свежесть</div></div>
+        <div class="kb-row"><div class="kb-lbl">Разбор</div><div class="kb-val">Сессия через 1–2 недели: «Если бы я был мудрой вселенной, которая через эти знаки подсказывает путь — что бы я себе сказал?»</div></div>
+        <div class="kb-row"><div class="kb-lbl">Критерий пути</div><div class="kb-val">Вопрос внутри меняется с «а то ли это? всё ли учёл?» на «КАК ЖЕ Я РАНЬШЕ ЭТОГО НЕ ПОНЯЛ?!»</div></div>
+        <div class="kb-row"><div class="kb-lbl">Сопротивление</div><div class="kb-val">= недораскрытый голос предназначения. Кейс «из воина в короли»: 3 года не запускал бизнес — страх оберегал от старого сценария «жить в самолётах»</div></div>
+      </div>
+    </details>
+    <details class="kb-epoch">
+      <summary><span class="arr">▸</span><span class="rim">III</span><span class="et">Эволюционная цель</span><span class="em">работа с будущим</span></summary>
+      <div class="kb-body">
+        <div class="kb-row"><div class="kb-lbl">Формула</div><div class="kb-val">«Учитывая мою текущую ситуацию, знания, ресурсы, жизненные вызовы — какой максимально ценный ПОДАРОК от меня хочет получить мир в ближайшие 2–3 года?»</div></div>
+        <div class="kb-row"><div class="kb-lbl">Три опоры</div><div class="kb-val">1. Реальность, а не хотелки эго («сейчас не время работы мечты — время хорошей работы, где прокормить ребёнка») · 2. Цели ДАТЬ вместо взять («никому не хочется делать вас успешным») · 3. Горизонт 2–3 года, потом переформулируем</div></div>
+        <div class="kb-row"><div class="kb-lbl">Обещание</div><div class="kb-val">«Деньги, успех, реализация приходят как бесплатное приложение к тому, что ты создаёшь»</div></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="kb-sec">
+    <h3>5 уровней зова</h3>
+    <div class="lead">Та же лестница, что в книге — здесь она родилась. Ось «насколько горит» для квиза</div>
+    <div class="kb-grid">
+      <div class="kb-zov"><div class="num">1</div><div class="t">Флирт мира</div><div class="q">«вот бы мне!» — и этап отказа: «не мой белый кролик»</div></div>
+      <div class="kb-zov"><div class="num">2</div><div class="t">Негативные эмоции</div><div class="q">раздражение, скука, апатия — из жизни уходит радость</div></div>
+      <div class="kb-zov"><div class="num">3</div><div class="t">Неуспехи</div><div class="q">«пропускаешь подачи» на ровном месте</div></div>
+      <div class="kb-zov"><div class="num">4</div><div class="t">Отношения рушатся</div><div class="q">«через вторую половинку жизнь зеркалит»</div></div>
+      <div class="kb-zov"><div class="num">5</div><div class="t">Тело</div><div class="q">соматика — последний способ достучаться</div></div>
+    </div>
+  </div>
+
+  <div class="kb-sec kb-red">
+    <h3>Как он продаёт — механика финала</h3>
+    <div class="lead">25 минут продажи без единой манипуляции. Образец для нашей воронки</div>
+    <div class="kb-qr"><div class="qn">1</div><div class="qt">Честный переход</div><div class="qd">«Расскажу про ЛТР. Кому неинтересно — можете идти, слева анкета» — отсев без давления</div></div>
+    <div class="kb-qr"><div class="qn">2</div><div class="qt">Авторитет-рамка</div><div class="qd">Варданян: «не учишься месяц в году — профнепригоден»</div></div>
+    <div class="kb-qr"><div class="qn">3</div><div class="qt">Вход = диагностика</div><div class="qd">анкета по 7 источникам энергии: смысл · поток · любовь · развитие · игра · оптимизм · влияние. Где потенциал, где «чёрные дыры»</div></div>
+    <div class="kb-qr"><div class="qn">4</div><div class="qt">Антиинтенсив</div><div class="qd">«личный сомелье развития», «акупунктурные практики», против марафонов. «Не делать больше — делать меньше, но точнее»</div></div>
+    <div class="kb-qr"><div class="qn">5</div><div class="qt">Коучи-персонажи</div><div class="qd">Таня «эльф 80-го уровня» для скептиков · Алексей — природа · Оля — драйв · Лена — «хирург» бизнес+MBA · Наташа — тепло. Клиент сам себя квалифицирует</div></div>
+    <div class="kb-qr"><div class="qn">6</div><div class="qt">Цена с якорем</div><div class="qd">обычный формат 60к/3 мес — лично с Филиппом 380к. «Я не очень адекватный консультант, в том числе по ценнику». Дефицит: «беру 1–2 клиентов»</div></div>
+    <div class="kb-qr"><div class="qn">7</div><div class="qt">Отсечка</div><div class="qd">кому НЕ подойдёт: не готов «развернуть пальчик на себя», ждёт волшебных таблеток</div></div>
+    <div class="kb-qr"><div class="qn">8</div><div class="qt">CTA</div><div class="qd">анкета → интервью с консультантом → «поможем решить, стоит ли идти»</div></div>
+  </div>
+
+  <div class="kb-sec">
+    <h3>Что берём в квиз</h3>
+    <div class="kb-steps">
+      <div class="kb-step"><div class="sn">ОСЬ 1</div><div class="st">10 сценариев книги</div><div class="sd">ЧТО у человека — тип ситуации. Вебинар их не использует: книга — более поздняя типология</div></div>
+      <div class="kb-step"><div class="sn">ОСЬ 2</div><div class="st">5 уровней зова</div><div class="sd">НАСКОЛЬКО горит — острота состояния. Обе оси родные для Филиппа</div></div>
+      <div class="kb-step"><div class="sn">ФИНАЛ</div><div class="st">Эволюционная цель</div><div class="sd">Подарок квиза: персональный вопрос «какой подарок от тебя хочет мир?» + «как же я раньше не понял»</div></div>
+    </div>
+    <div class="kb-row"><div class="kb-lbl">Блок честности</div><div class="kb-val">«Как я сам себя развожу» — вопросы о самообмане усиливают точность ответов</div></div>
+    <div class="kb-row"><div class="kb-lbl">Прогрев</div><div class="kb-val">Три мифа — готовый контент для лендинга и писем перед квизом</div></div>
+    <div class="kb-row"><div class="kb-lbl">Финал воронки</div><div class="kb-val">Самоквалификация под коуча-персонажа — как он продаёт 5 коучей</div></div>
+    <div class="kb-row"><div class="kb-lbl">Не дублировать</div><div class="kb-val">Анкета «7 источников» уже существует как вход ЛТР — квиз стоит ДО неё</div></div>
+  </div>
+
+  <div class="kb-sec">
+    <h3>Цитаты</h3>
+    <div class="kb-quotes">
+      <div class="kb-quote">«Радость творчества сопровождается муками творчества»<span class="src">миф 3</span></div>
+      <div class="kb-quote">«Если не сомневаешься — бронзовеешь и выходишь в тираж»<span class="src">путь мастера</span></div>
+      <div class="kb-quote">«Знай свой способ стрелять себе в ногу»<span class="src">самообман</span></div>
+      <div class="kb-quote">«Ты уже много раз горел в этом танке»<span class="src">перепросмотр</span></div>
+      <div class="kb-quote">«Предназначение нельзя придумать — его можно найти»<span class="src">зов</span></div>
+      <div class="kb-quote">«Я тебя вижу — и я иду»<span class="src">формула прохождения порога страха</span></div>
+      <div class="kb-quote">«Эгрегору наплевать на тебя — он отжимает тебя как ресурс»<span class="src">миссия vs целостность</span></div>
+      <div class="kb-quote">«Как же я раньше этого не понял?!»<span class="src">критерий найденного пути</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="p-svyaz" class="page">
+  <h1>Связь моделей</h1>
+  <div class="sv-hero">
+    <div class="k">Как устроена диагностика</div>
+    <h2>Связь трёх моделей</h2>
+    <p>У Филиппа три модели, и они не про одно и то же, а дополняют друг друга: вертикаль развития (куда человек растёт), 10 сценариев зова (с чем он пришёл) и 5 уровней зова (насколько остро горит). Вместе они дают полную картину и питают квиз.</p>
+    <div class="warn">Уровень задачи — это НЕ ярлык человека. Диагностируем «какого уровня твоя текущая задача», а не «ты достигатель».</div>
+  </div>
+
+  <div class="sv-layer">
+    <div class="sv-tag">Вертикаль развития</div>
+    <h3>Три логики: куда человек растёт</h3>
+    <div class="lead">Стадии зрелости лидера. Задачи текущего уровня решаются только с переходом на следующий. Между стадиями — зов, который толкает вперёд.</div>
+    <div class="sv-spine">
+      <div class="sv-stage">
+        <div class="n">Эпоха I</div>
+        <div class="t">Достигатель</div>
+        <div class="d">Достичь успеха. «Невозможное возможно». Управляет временем, тащит всё на себе.</div>
+      </div>
+      <div class="sv-zov"><div class="arr">→</div><div class="lbl">Зов</div></div>
+      <div class="sv-stage">
+        <div class="n">Эпоха II</div>
+        <div class="t">Индивидуалист</div>
+        <div class="d">Найти себя. Выдерживает неопределённость, выбирает из сути, а не из страха.</div>
+      </div>
+      <div class="sv-zov"><div class="arr">→</div><div class="lbl">Зов</div></div>
+      <div class="sv-stage">
+        <div class="n">Эпоха III</div>
+        <div class="t">Стратег</div>
+        <div class="d">Оставить наследие. Мыслит поколениями, люди — сотворцы, энергия вместо времени.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sv-layer">
+    <div class="sv-tag">Две линзы на зов</div>
+    <h3>Зов раскладывается на два вопроса</h3>
+    <div class="lead">Зов — сигнал, что пора на следующую стадию. Его смотрим с двух сторон: ЧТО за ситуация и НАСКОЛЬКО остро она горит.</div>
+    <div class="sv-lens">
+      <div class="sv-what">
+        <div class="h">Линза 1 · ЧТО</div>
+        <div class="big">10 сценариев зова</div>
+        <div class="q">Тип ситуации, с которой человек пришёл. Из книги, формулировки — прямые цитаты состояний.</div>
+        <div class="sv-chips">
+          <span class="sv-chip">1 · Большая игра</span>
+          <span class="sv-chip">2 · В меня не помещается</span>
+          <span class="sv-chip">3 · Кризис</span>
+          <span class="sv-chip">4 · Золотая клетка</span>
+          <span class="sv-chip">5 · Витязь на распутье</span>
+          <span class="sv-chip">6 · Трудоголизм</span>
+          <span class="sv-chip">7 · Новая эпоха</span>
+          <span class="sv-chip">8 · Творческий импульс</span>
+          <span class="sv-chip">9 · Что-то упускаю</span>
+          <span class="sv-chip">10 · Поиск себя</span>
+        </div>
+      </div>
+      <div class="sv-what">
+        <div class="h">Линза 2 · НАСКОЛЬКО</div>
+        <div class="big">5 уровней зова</div>
+        <div class="q">Острота состояния — как сильно горит. Лестница исчерпания из главы «Белый кролик». Замечаем обычно на 4–5.</div>
+        <div class="sv-ladder">
+          <div class="sv-rung"><div class="bar" style="width:20%"></div><div class="rt">1 · Тянет к «не-работе» (глушим работой)</div></div>
+          <div class="sv-rung"><div class="bar" style="width:40%"></div><div class="rt">2 · Негативные эмоции: апатия, скука, вина</div></div>
+          <div class="sv-rung"><div class="bar" style="width:60%"></div><div class="rt">3 · Неуспехи на ровном месте</div></div>
+          <div class="sv-rung"><div class="bar" style="width:80%"></div><div class="rt">4 · Разрушение отношений</div></div>
+          <div class="sv-rung"><div class="bar" style="width:100%"></div><div class="rt">5 · Соматика (тело выключает)</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sv-take">
+    <h3>Как это работает в квизе</h3>
+    <div class="sv-row"><div class="w">ЧТО</div><div class="x">Сценарий (1 из 10) — с какой ситуацией человек пришёл. Первый шаг квиза.</div></div>
+    <div class="sv-row"><div class="w">НАСКОЛЬКО</div><div class="x">Уровень зова (1–5) — насколько остро горит. Вторая ось, усиливает диагностику.</div></div>
+    <div class="sv-row"><div class="w">КУДА</div><div class="x">Вертикаль (Достигатель → Индивидуалист → Стратег) — на каком этапе стоит и куда следующий шаг.</div></div>
+    <div class="sv-row"><div class="w">Выход</div><div class="x">Не ярлык, а уровень задачи + приглашение построить личную стратегию → запись на аудит ЛС.</div></div>
+  </div>
+</div>
+
+<div id="p-tirazh" class="page">
+  <h1>Источники книг · калькулятор тиража</h1>
+  <div class="sub">Вписывай цифры по мере сбора — итог считается сам. Из созвона 30.07 + вводных Сони</div>
+
+  <div class="tz-cols">
+    <div class="tz-card">
+      <h3>Подарки</h3>
+      <div class="lead">Кому дарим — не продажа, но эти книги надо напечатать</div>
+      <div class="tz-line"><div class="tz-name">Земля Стратега<span class="sub">HR + клиенты (Оля: в базе 137, ориентир 200)</span></div><input class="tz-inp" type="number" min="0" data-g="g" value="200"></div>
+      <div class="tz-line"><div class="tz-name">Счастье в деятельности<span class="sub">подтверждено: участники Глубины</span></div><input class="tz-inp" type="number" min="0" data-g="g" value="300"></div>
+      <div class="tz-line"><div class="tz-name">Форум «Стратегируй»<span class="sub">всем участникам, цель 500 (продано ~68)</span></div><input class="tz-inp" type="number" min="0" data-g="g" value="0"></div>
+      <div class="tz-line"><div class="tz-name">VIP-клиенты<span class="sub">не в первый тираж (решено 07.08)</span></div><input class="tz-inp" type="number" min="0" data-g="g" value="0"></div>
+      <div class="tz-line"><div class="tz-name">Форум «Дело года»<span class="sub">январь, дарим участникам</span></div><input class="tz-inp" type="number" min="0" data-g="g" value="500"></div>
+      <div class="tz-line"><div class="tz-name">Корп. библиотеки<span class="sub">Сбер-университет; поймём когда книга на руках</span></div><input class="tz-inp" type="number" min="0" data-g="g" value="0"></div>
+      <div class="tz-line"><div class="tz-name">Бизнес-инфлюенсеры<span class="sub">холодных не трогаем (решено 07.08)</span></div><input class="tz-inp" type="number" min="0" data-g="g" value="0"></div>
+      <div class="tz-sum"><span class="l">Итого подарки</span><span class="v" id="sum-g">200</span></div>
+    </div>
+
+    <div class="tz-card">
+      <h3>Продажи</h3>
+      <div class="lead">Прогноз по каналам — то, что купят</div>
+      <div class="tz-line"><div class="tz-name">Свой сайт (предзаказ)<span class="sub">наш прогноз по своей аудитории (база, ТГ 22,6К, инста 267К)</span></div><input class="tz-inp" type="number" min="0" data-g="s" value="600"></div>
+      <div class="tz-line"><div class="tz-name">Маркетплейсы<span class="sub">ВБ, Озон, Яндекс — прогноз Сони</span></div><input class="tz-inp" type="number" min="0" data-g="s" value="0"></div>
+      <div class="tz-line"><div class="tz-name">Литрес электронная<span class="sub">25% роялти, электронка тираж не ест</span></div><input class="tz-inp" type="number" min="0" data-g="s" value="0"></div>
+      <div class="tz-line"><div class="tz-name">Литрес аудио<span class="sub">25% роялти</span></div><input class="tz-inp" type="number" min="0" data-g="s" value="0"></div>
+      <div class="tz-line"><div class="tz-name">Корпоративные заказы<span class="sub">библиотеки, партии на ресейл</span></div><input class="tz-inp" type="number" min="0" data-g="s" value="0"></div>
+      <div class="tz-line"><div class="tz-name">Мероприятия<span class="sub">продажа со сцены</span></div><input class="tz-inp" type="number" min="0" data-g="s" value="0"></div>
+      <div class="tz-sum"><span class="l">Итого продажи</span><span class="v" id="sum-s">600</span></div>
+    </div>
+  </div>
+
+  <div class="tz-total">
+    <div class="big">Нужно напечатать<b id="sum-all">880</b><span id="sum-note" class="tz-note" style="color:rgba(239,231,213,.5)">подарки + продажи + запас 10%</span></div>
+    <div class="rec" id="tz-rec"></div>
+  </div>
+
+  <div class="ask" style="margin-top:22px">
+    <h4>Что снять, чтобы закрыть цифру</h4>
+    <ol>
+      <li>Подарки СвД — цифра Оксаны (сегодня на созвоне)</li>
+      <li>Форум «Стратегируй» — реальное число участников (сейчас 68, цель 500)</li>
+      <li>VIP, Дело года, библиотеки, инфлюенсеры — сколько хочет Филипп</li>
+      <li>Маркетплейсы и Литрес — прогноз Сони по её каналам</li>
+    </ol>
+  </div>
+</div>
+
+<div id="p-glossary" class="page">
+  <h1>Словарь терминов</h1>
+  <div class="sub">Все понятия из материалов проекта. Поиск ищет и по термину, и по определению.</div>
+  <input class="gl-search" id="glq" type="text" placeholder="Поиск: ТОЖ, канвас, зов…">
+  <div class="gl-count" id="glcount"></div>
+  <div class="sec gl-group">
+    <div class="sec-h"><div class="sec-t">Личная стратегия — база методологии</div></div>
+    <div class="gl-item"><div class="gl-t">ТОЖ (текущий образ жизни)</div><div class="gl-d">Честный взгляд в настоящее: кто я, что происходит в значимых сферах Я — Семья — Дело. Вопросы: «Кто я? От чего иду?». Первый из трёх главных элементов личной стратегии.</div><div class="gl-src">Источник: ЛТР · Гайд</div></div>
+    <div class="gl-item"><div class="gl-t">НОЖ (новый образ жизни)</div><div class="gl-d">Зона целей: яркое целостное понимание целевого состояния на выбранном горизонте (год, 3–5, 10 лет). Вопрос: «К чему иду?»</div><div class="gl-src">Источник: ЛТР · Гайд</div></div>
+    <div class="gl-item"><div class="gl-t">СДВИГ</div><div class="gl-d">Ключевое изменение, за счёт которого происходит переход от ТОЖ к НОЖ: сдвиговые задачи, привычки, проекты, эксперименты. Вопрос: «За счёт чего?». Часто одна маленькая привычка запускает изменения во всех сферах.</div><div class="gl-src">Источник: ЛТР · Гайд</div></div>
+    <div class="gl-item"><div class="gl-t">ДНК</div><div class="gl-d">Код идентичности (человека или компании): миссия + видение + ценности. Внутренний компас, направляющий решения.</div><div class="gl-src">Источник: ЛТР · 25 элементов</div></div>
+    <div class="gl-item"><div class="gl-t">Миссия</div><div class="gl-d">Центральный и высший смысл: зачем я пришёл в эту жизнь / зачем существует компания. Пересечение талантов и потребностей мира. Проявляется здесь и сейчас, а не «результат всей жизни».</div><div class="gl-src">Источник: ЛТР · 25 элементов</div></div>
+    <div class="gl-item"><div class="gl-t">Видение</div><div class="gl-d">Вдохновляющий образ будущего: 5–7 ключевых фактов, описывающих «кто я (какая компания) через X лет».</div><div class="gl-src">Источник: ЛТР · 25 элементов</div></div>
+    <div class="gl-item"><div class="gl-t">Ценности</div><div class="gl-d">Глубоко прожитые ценнейшие состояния жизни, которые наполняют энергией. Фильтры для принятия решений: что «хорошо», что «плохо».</div><div class="gl-src">Источник: ЛТР · 25 элементов</div></div>
+    <div class="gl-item"><div class="gl-t">Личная стратегия</div><div class="gl-d">Ответы на вопросы «от чего к чему я иду?» и «за счёт чего я туда приду?». Траектория, которая помогает достигать успеха в разных сферах жизни с синергией между ними.</div><div class="gl-src">Источник: Гайд</div></div>
+    <div class="gl-item"><div class="gl-t">Стратегирование</div><div class="gl-d">Навык регулярно подниматься над суетой и смотреть на себя и свой путь сверху, из позиции Стратега. Как практика — регулярный пересмотр своей стратегии.</div><div class="gl-src">Источник: ЛТР · Аудит ЛС</div></div>
+    <div class="gl-item"><div class="gl-t">7 элементов личной стратегии</div><div class="gl-d">Миссия · Ценности · Видение · ТОЖ · НОЖ · Сдвиг · Стратегирование. Основа аудита: каждый оценивается по двум шкалам 1–10 (важность / степень проработки).</div><div class="gl-src">Источник: Аудит ЛС · Самоаудит</div></div>
+    <div class="gl-item"><div class="gl-t">Стратегическая суббота</div><div class="gl-d">Практика стратегирования спринтами в режиме agile: 1–10 минут в день + час в неделю. Рекомендация из гайда.</div><div class="gl-src">Источник: Гайд</div></div>
+  </div>
+  <div class="sec gl-group">
+    <div class="sec-h"><div class="sec-t">Диагностика и продукты личного трека</div></div>
+    <div class="gl-item"><div class="gl-t">Аудит ЛС</div><div class="gl-d">Продающая диагностика личной стратегии на живой встрече: оценка 7 элементов по 2 шкалам, разрыв = осознанная боль = продажа программы. Готовый скрипт воронки 1.</div><div class="gl-src">Источник: Аудит ЛС</div></div>
+    <div class="gl-item"><div class="gl-t">Самоаудит ЛС</div><div class="gl-d">DIY-версия аудита в таблице: самооценка, авторасчёт приоритета (важность минус проработка), 5 цветовых статусов, план действий. База квиза воронки 1.</div><div class="gl-src">Источник: Самоаудит (таблица)</div></div>
+    <div class="gl-item"><div class="gl-t">5 статусов зон</div><div class="gl-d">Результат самоаудита по каждому элементу: критическая зона · скрытый резерв · зона силы · слепая зона · избыточный фокус — с интерпретацией и рекомендацией.</div><div class="gl-src">Источник: Самоаудит (таблица)</div></div>
+    <div class="gl-item"><div class="gl-t">ЛТР (Личная траектория развития)</div><div class="gl-d">Коучинговая программа Филиппа по построению личной стратегии, 6 сессий, тарифы 199 500 – 945 000 ₽. Есть корпоративная версия для команд.</div><div class="gl-src">Источник: ЛТР</div></div>
+    <div class="gl-item"><div class="gl-t">Соло</div><div class="gl-d">Премиум-продукт: индивидуальная стратсессия 24 часа в одиночестве на природе (Ладога), без еды, связи и общения. 7 этапов от выбора места до интеграции. Ведущие: Филипп + Анастасия Лебедева.</div><div class="gl-src">Источник: Соло</div></div>
+<div class="gl-item"><div class="gl-t">Глубина</div><div class="gl-d">Флагманская 6-месячная программа развития лидеров: 4 очных модуля по 3 дня, группа до 20 человек, аудитория СЕО/собственники (обороты 1,5–100 млрд). Три уровня: Я · Команда · Бизнес. Цена 2 100 000 ₽. Вход через бесплатное стратегическое интервью с аудитом.</div><div class="gl-src">Источник: сайт happinessinaction.ru/master</div></div>
+  </div>
+  <div class="sec gl-group">
+    <div class="sec-h"><div class="sec-t">Корпоративный трек и форум</div></div>
+    <div class="gl-item"><div class="gl-t">Дисплей стратега</div><div class="gl-d">16-факторный канвас стратегирования компании: 5 блоков, 16 элементов, к каждому готовые диагностические вопросы. Корпоративный аналог Аудита ЛС, основа воронки 2.</div><div class="gl-src">Источник: 25 элементов, стр. 11–27</div></div>
+    <div class="gl-item"><div class="gl-t">5 блоков канваса</div><div class="gl-d">ДНК (миссия, видение, ценности) · Стратегия (вопросы/развилки, ориентиры, инициативы) · Внешняя среда (PESTEL, стейкхолдеры) · Рыночная стратегия (сегменты, ценность, клиентский опыт) · Внутренняя среда (компетенции, управление, культура, команда, лидер).</div><div class="gl-src">Источник: 25 элементов</div></div>
+    <div class="gl-item"><div class="gl-t">PESTEL</div><div class="gl-d">Анализ дальнего окружения компании: политические, экономические, социальные, технологические, экологические и юридические факторы.</div><div class="gl-src">Источник: 25 элементов</div></div>
+    <div class="gl-item"><div class="gl-t">Мульти-стратегия</div><div class="gl-d">Ядро оффера форума: стратегия из 3 векторов — эффективность в текущей модели · поиск новых точек роста (6–12 мес) · новые бизнес-модели (12–36 мес).</div><div class="gl-src">Источник: КП 2027</div></div>
+    <div class="gl-item"><div class="gl-t">Форум «Стратегируй 2027»</div><div class="gl-d">«Адаптивность бизнеса и точки опоры 2027», 20–21 ноября, Москва, кампус СберУниверситета. Организатор «Земля Стратега», ведущий Филипп. Формат «живая стратегическая сессия». Тарифы 85–155к.</div><div class="gl-src">Источник: КП 2027</div></div>
+    <div class="gl-item"><div class="gl-t">Блиц-аудит по 16-факторной модели</div><div class="gl-d">Вход в продажу корпоративного трека: интервью с консультантом, диагностика ситуации компании по канвасу. Существующий CTA «Счастья в деятельности» (контакт: Каролина).</div><div class="gl-src">Источник: 25 элементов</div></div>
+    <div class="gl-item"><div class="gl-t">«Папоротник»</div><div class="gl-d">Модель управления изменениями: стратегические интервью → отчёт «Темы и мемы» → дизайн проекта → kickoff-сессия → команды изменений → спринты → демо-дни → ретро.</div><div class="gl-src">Источник: 25 элементов</div></div>
+    <div class="gl-item"><div class="gl-t">«Темы и мемы»</div><div class="gl-d">Стратегический отчёт после глубинных интервью: обезличенные прямые речи сотрудников, структурированные по темам — сильные стороны и напряжения. Даёт «эффект дисплея».</div><div class="gl-src">Источник: 25 элементов</div></div>
+    <div class="gl-item"><div class="gl-t">Страт-штаб</div><div class="gl-d">Группа 3–5 человек, которая в сотворчестве дизайнит сессию и после становится постоянным стратегирующим органом компании. Без него сессия «протухает» за месяц.</div><div class="gl-src">Источник: 25 элементов</div></div>
+  </div>
+  <div class="sec gl-group">
+    <div class="sec-h"><div class="sec-t">Книга и вертикальное развитие</div></div>
+    <div class="gl-item"><div class="gl-t">Зов</div><div class="gl-d">Состояние «жить по-старому больше нельзя» (первый этап пути героя по Кэмпбеллу). В книге 10 сценариев зова: Большая игра · В меня не помещается · Кризис · Золотая клетка · Витязь на распутье · Трудоголизм · Новая эпоха · Творческий импульс · Я что-то упускаю · Поиск себя. Готовая типология боли для квиза.</div><div class="gl-src">Источник: Вход-выход (книга)</div></div>
+    <div class="gl-item"><div class="gl-t">Вертикальное развитие</div><div class="gl-d">Смена самой логики мышления («новая операционная система»): замечать установки, удерживать противоречия, действовать без готового ответа. В отличие от горизонтального — новые навыки внутри старой логики.</div><div class="gl-src">Источник: Вход-выход (книга)</div></div>
+    <div class="gl-item"><div class="gl-t">Логики действия (ВРЛ)</div><div class="gl-d">7 уровней зрелости лидера по Торберту: оппортунист → дипломат → эксперт → достигатель → индивидуалист → стратег → алхимик. Логика управляет решениями, оставаясь невидимой.</div><div class="gl-src">Источник: Вход-выход (книга)</div></div>
+    <div class="gl-item"><div class="gl-t">Переход достигатель → стратег</div><div class="gl-d">Главный переход современного руководителя и тема книги: слом старой траектории → кризис → пересборка → новые внутренние опоры. Самостоятельно ~7 лет на эпоху, с сопровождением 2–3 года.</div><div class="gl-src">Источник: Вход-выход (книга)</div></div>
+  </div>
+  <div class="sec gl-group">
+    <div class="sec-h"><div class="sec-t">Бренды</div></div>
+    <div class="gl-item"><div class="gl-t">Счастье в деятельности</div><div class="gl-d">Компания/бренд Филиппа (консалтинг): стратсессии, ЛТР, личные стратегии, книги. Сайт happinessinaction.ru. Сторона Оксаны.</div><div class="gl-src">Источник: 25 элементов</div></div>
+    <div class="gl-item"><div class="gl-t">Земля Стратега</div><div class="gl-d">Компания/бренд корпоративного трека Филиппа: форум, канвас, вертикальное развитие лидеров. Сторона Ольги.</div><div class="gl-src">Источник: КП 2027 · Вход-выход</div></div>
+  </div>
+  <div class="sec gl-group">
+    <div class="sec-h"><div class="sec-t">Наш проект</div></div>
+    <div class="gl-item"><div class="gl-t">Воронка 1 (личная стратегия)</div><div class="gl-d">Наша воронка на бренде «Счастье в деятельности»: квиз-самоаудит → карта разрывов → запись на живой аудит → программа ЛТР. Куратор со стороны клиента — Оксана. Дедлайн v1.0 — 11 августа.</div><div class="gl-src">Источник: проект</div></div>
+    <div class="gl-item"><div class="gl-t">Воронка 2 (форум/канвас)</div><div class="gl-d">Наша воронка для форума «Стратегируй 2027»: диагностика по дисплею стратега → блиц-аудит / билет форума. Куратор — Ольга. Финал обеих воронок — 31 августа.</div><div class="gl-src">Источник: проект</div></div>
+    <div class="gl-item"><div class="gl-t">День X</div><div class="gl-d">Дата выхода книги, ориентир 20 октября (слова Ивана). От неё считается вся цепочка: предзаказ X−1,5 мес · инфографика X−1 мес · печать X−2 нед · электронка X+3 мес.</div><div class="gl-src">Источник: созвон 17.07 · Соня</div></div>
+    <div class="gl-item"><div class="gl-t">Предзаказ</div><div class="gl-d">Старт за 1,5 месяца до X через собственный сайт с CRM (делаем мы в рамках воронки). Раньше нельзя: аудитория выгорает.</div><div class="gl-src">Источник: Соня</div></div>
+  </div>
+  <div class="empty" id="glempty" style="display:none">Ничего не нашлось</div>
+</div>
+
+<div id="p-mindmap" class="page">
+  <h1>Майнд-карта методологии</h1>
+  <div class="sub">Клик по узлу или стрелке разворачивает ветку на месте. Никуда не перекидывает</div>
+  <div class="mm-btns"><button id="mm-open">Развернуть всё</button><button id="mm-close">Свернуть всё</button></div>
+  <div class="sec mm">
+    <div class="mm-root">Методология Филиппа</div>
+    <ul>
+      <li><span class="mm-b t1">Личная стратегия · «Счастье в деятельности»</span>
+        <ul>
+          <li><span class="mm-node">Что такое личная стратегия</span><span class="mm-note">ответы на «от чего к чему иду» и «за счёт чего приду»</span>
+            <ul>
+              <li><span class="mm-node">ТОЖ — текущий образ жизни</span><span class="mm-note">честная фотография настоящего: кто я, что происходит в сферах Я-Семья-Дело</span></li>
+              <li><span class="mm-node">НОЖ — новый образ жизни</span><span class="mm-note">целевое состояние на горизонте 1-10 лет, картинка с мурашками</span></li>
+              <li><span class="mm-node">СДВИГ</span><span class="mm-note">ключевые привычки и проекты перехода; одна привычка запускает все сферы</span></li>
+            </ul>
+          </li>
+          <li><span class="mm-node">ДНК личности</span>
+            <ul>
+              <li><span class="mm-node">Миссия</span><span class="mm-note">зачем я пришёл; пересечение талантов и потребностей мира</span></li>
+              <li><span class="mm-node">Видение</span><span class="mm-note">5-7 фактов «кто я через X лет»</span></li>
+              <li><span class="mm-node">Ценности</span><span class="mm-note">прожитые состояния-фильтры для решений</span></li>
+            </ul>
+          </li>
+          <li><span class="mm-node">Диагностика — сердце воронки 1</span><span class="mm-note">разрыв «важно, но не проработано» = осознанная боль = продажа</span>
+            <ul>
+              <li><span class="mm-node">7 элементов аудита</span><span class="mm-note">Миссия · Ценности · Видение · ТОЖ · НОЖ · Сдвиг · Стратегирование</span></li>
+              <li><span class="mm-node">Две шкалы 1-10</span><span class="mm-note">важность / степень проработки; приоритет = разрыв между ними</span></li>
+              <li><span class="mm-node">5 статусов зон</span><span class="mm-note">критическая зона · скрытый резерв · зона силы · слепая зона · избыточный фокус</span></li>
+              <li><span class="mm-node">Аудит ЛС</span><span class="mm-note">живая встреча по скрипту: диагностика → карта разрывов → продажа программы</span></li>
+              <li><span class="mm-node">Самоаудит ЛС</span><span class="mm-note">та же механика таблицей, сам без коуча — база нашего квиза</span></li>
+            </ul>
+          </li>
+          <li><span class="mm-node">Практика стратегирования</span>
+            <ul>
+              <li><span class="mm-node">Стратегическая суббота</span><span class="mm-note">спринтами: 1-10 мин в день + час в неделю</span></li>
+              <li><span class="mm-node">Ритм Кови</span><span class="mm-note">10 мин/день · час/нед · день/мес · выходные/квартал · неделя/год</span></li>
+            </ul>
+          </li>
+          <li><span class="mm-node">Продукты по цене</span>
+            <ul>
+              <li><span class="mm-node">Книга ~3 000 ₽</span><span class="mm-note">выход ~20.10, вход в воронку</span></li>
+              <li><span class="mm-node">ЛТР 199 500 – 945 000 ₽</span><span class="mm-note">6 сессий, 4 тарифа по уровню коуча, верхний — Филипп</span></li>
+              <li><span class="mm-node">Соло (цена не объявлена)</span><span class="mm-note">24 часа одиночества на природе, Ладога</span></li>
+              <li><span class="mm-node">Глубина 2 100 000 ₽</span><span class="mm-note">флагман: 6 мес, 4 очных модуля, группа до 20</span></li>
+              <li><span class="mm-node">События параллельно</span><span class="mm-note">Дело Года (январь) · ретриты · эфиры «Лучшего дня»</span></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><span class="mm-b t1">Корпоративный трек · «Земля Стратега»</span>
+        <ul>
+          <li><span class="mm-node">Форум «Стратегируй 2027»</span><span class="mm-note">20-21 ноября, СберУниверситет, 85-155к, живая стратсессия вместо лекций</span>
+            <ul>
+              <li><span class="mm-node">Мульти-стратегия — 3 вектора</span><span class="mm-note">эффективность текущей модели · нишевой рост 6-12 мес · новые бизнес-модели 12-36 мес</span></li>
+            </ul>
+          </li>
+          <li><span class="mm-node">Дисплей стратега — канвас 16 факторов</span><span class="mm-note">корпоративный аналог аудита ЛС; основа воронки 2</span>
+            <ul>
+              <li><span class="mm-node">Блок 1. ДНК</span><span class="mm-note">миссия · видение · ценности компании</span></li>
+              <li><span class="mm-node">Блок 2. Стратегия</span><span class="mm-note">вопросы и развилки · ориентиры · инициативы и эксперименты</span></li>
+              <li><span class="mm-node">Блок 3. Внешняя среда</span><span class="mm-note">PESTEL · стейкхолдеры</span></li>
+              <li><span class="mm-node">Блок 4. Рыночная стратегия</span><span class="mm-note">сегменты · ценность · клиентский опыт</span></li>
+              <li><span class="mm-node">Блок 5. Внутренняя среда</span><span class="mm-note">компетенции · система управления · культура · команда · лидер</span></li>
+            </ul>
+          </li>
+          <li><span class="mm-node">Вход в продажу: блиц-аудит</span><span class="mm-note">бесплатное интервью с консультантом по 16-факторной модели</span></li>
+          <li><span class="mm-node">Как делают стратсессии</span>
+            <ul>
+              <li><span class="mm-node">«Папоротник»</span><span class="mm-note">интервью → отчёт «Темы и мемы» → дизайн → kickoff → спринты → ретро</span></li>
+              <li><span class="mm-node">«Темы и мемы»</span><span class="mm-note">обезличенные цитаты сотрудников по темам — «эффект дисплея»</span></li>
+              <li><span class="mm-node">Страт-штаб</span><span class="mm-note">3-5 человек, дизайнят сессию и остаются стратегирующим органом</span></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><span class="mm-b t1">Книга · вертикальное развитие (~360 стр, рукопись у нас)</span>
+        <ul>
+          <li><span class="mm-node">Главная идея</span><span class="mm-note">рост = не новые навыки, а новая «операционная система» мышления (вертикальное развитие)</span></li>
+          <li><span class="mm-node">Вход: Зов — 10 сценариев</span><span class="mm-note">готовая типология боли для квиза</span>
+            <ul>
+              <li><span class="mm-node">1. Большая игра</span><span class="mm-note">«я перерос декорации, хочу в Лигу Чемпионов»</span></li>
+              <li><span class="mm-node">2. В меня не помещается</span><span class="mm-note">28 проектов, всё хочу — не вывожу</span></li>
+              <li><span class="mm-node">3. Кризис</span><span class="mm-note">идеальный шторм, всё сыпется разом</span></li>
+              <li><span class="mm-node">4. Золотая клетка</span><span class="mm-note">всё есть, но жизнь потеряла вкус</span></li>
+              <li><span class="mm-node">5. Витязь на распутье</span><span class="mm-note">судьбоносный выбор без гарантий</span></li>
+              <li><span class="mm-node">6. Трудоголизм</span><span class="mm-note">работа сожрала жизнь, плачу собой и семьёй</span></li>
+              <li><span class="mm-node">7. Новая эпоха</span><span class="mm-note">ничего не горит — тянет вперёд, второе дыхание</span></li>
+              <li><span class="mm-node">8. Творческий импульс</span><span class="mm-note">«беременен талантом», пора звучать</span></li>
+              <li><span class="mm-node">9. Что-то упускаю</span><span class="mm-note">инструменты отполированы, а рычага нет</span></li>
+              <li><span class="mm-node">10. Поиск себя</span><span class="mm-note">кризис идентичности: кто я без регалий?</span></li>
+            </ul>
+          </li>
+          <li><span class="mm-node">Каркас: 7 логик действия (Торберт)</span><span class="mm-note">зрелость лидера растёт по ступеням; логика управляет решениями невидимо</span>
+            <ul>
+              <li><span class="mm-node">Оппортунист</span><span class="mm-note">выиграть любой ценой</span></li>
+              <li><span class="mm-node">Дипломат</span><span class="mm-note">командный игрок, хранитель правил</span></li>
+              <li><span class="mm-node">Эксперт</span><span class="mm-note">точное знание, без строгих оснований не решает</span></li>
+              <li><span class="mm-node">Достигатель</span><span class="mm-note">«быстрее-выше-сильнее», волей к успеху</span></li>
+              <li><span class="mm-node">Индивидуалист</span><span class="mm-note">жизнь в моменте, глубокое познание себя</span></li>
+              <li><span class="mm-node">Стратег</span><span class="mm-note">системное мышление, решения на всех уровнях</span></li>
+              <li><span class="mm-node">Алхимик</span><span class="mm-note">редчайшие; трансформации исторического масштаба</span></li>
+            </ul>
+          </li>
+          <li><span class="mm-node">Главный переход: достигатель → стратег</span><span class="mm-note">слом траектории → кризис → пересборка → новые опоры; сам ~7 лет, с сопровождением 2-3 года</span></li>
+          <li><span class="mm-node">Три раздела рукописи</span>
+            <ul>
+              <li><span class="mm-node">Достигатель (19к слов)</span><span class="mm-note">«Impossible is nothing»: самоавторство, точные метрики, отложенное счастье, искусство паузы, голос тела</span></li>
+              <li><span class="mm-node">Индивидуалист (18к слов)</span><span class="mm-note">«найти себя»: от разума к сердцу, эмоции, состояние как ценность, триггеры потока</span></li>
+              <li><span class="mm-node">Стратег (48к слов)</span><span class="mm-note">миссия, мультистратегии, полярности, «Око бури», «Эффект дисплея», тетралемма, синергия трёх доменов</span></li>
+            </ul>
+          </li>
+          <li><span class="mm-node">Формат: книга-практикум</span><span class="mm-note">в каждой главе практики; читатель собирает «личный трек» по ходу чтения</span></li>
+          <li><span class="mm-node">Выход: нить Ариадны → личный трек</span><span class="mm-note">«напишите нам — поможем спроектировать трек». CTA не спроектирован: наша зона, успеть до макета</span></li>
+        </ul>
+      </li>
+      <li><span class="mm-b t1">Наш проект</span>
+        <ul>
+          <li><span class="mm-node">Воронка 1 (Оксана)</span><span class="mm-note">книга/контент → квиз-самоаудит → карта разрывов → живой аудит → ЛТР → Глубина</span></li>
+          <li><span class="mm-node">Воронка 2 (Оля)</span><span class="mm-note">контент форума → квиз по канвасу → блиц-аудит → форум 85-155к</span></li>
+          <li><span class="mm-node">Календарь от Дня X = 20.10</span><span class="mm-note">предзаказ ~5.09 → инфографика ~20.09 → печать ~6.10 → выход 20.10 → форум 20-21.11 → Дело Года янв → электронка ~20.01</span></li>
+          <li><span class="mm-node">Дедлайны наши</span><span class="mm-note">воронка v1.0 — 11.08 · обе воронки — 31.08 · CTA в книгу — до макета</span></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div id="p-notes" class="page">
+  <h1>Заметки</h1>
+  <div class="sub">Свободные заметки — сохраняются автоматически</div>
+  <div class="sec">
+    <textarea id="freenotes" style="width:100%;min-height:60vh;border:none;background:none;resize:vertical;font-family:inherit;font-size:15px;line-height:1.6;color:var(--ink);outline:none" placeholder="Пиши что угодно: мысли по воронке, вопросы к Филиппу, идеи, наблюдения из материалов..."></textarea>
+  </div>
+</div>
+
+</div>
+
+<div class="foot">
+  <span>Отмечено: <b id="cnt">0</b> / <span id="tot">0</span></span>
+  <button class="reset" onclick="if(confirm('Сбросить все отметки и заметки?')){localStorage.removeItem(KEY);location.reload()}">Сбросить</button>
+</div>
+
+<script>
+const KEY='plan-guzenuk-v3';
+const boxes=[...document.querySelectorAll('.item input[type=checkbox]')];
+const notes=[...document.querySelectorAll('.note')];
+document.getElementById('tot').textContent=boxes.length;
+function save(){const d={c:boxes.map(b=>b.checked),n:notes.map(n=>n.value)};localStorage.setItem(KEY,JSON.stringify(d))}
+function upd(){const n=boxes.filter(b=>b.checked).length;document.getElementById('cnt').textContent=n;boxes.forEach(b=>b.closest('.item').classList.toggle('done',b.checked))}
+try{const d=JSON.parse(localStorage.getItem(KEY));if(d){d.c.forEach((v,i)=>boxes[i]&&(boxes[i].checked=v));d.n.forEach((v,i)=>notes[i]&&(notes[i].value=v))}}catch(e){}
+boxes.forEach(b=>b.addEventListener('change',()=>{upd();save()}));
+notes.forEach(n=>n.addEventListener('input',save));
+upd();
+const MKEY=KEY+'-mats';
+const mats=[...document.querySelectorAll('.mat input.vg')];
+let msaved={};try{msaved=JSON.parse(localStorage.getItem(MKEY))||{}}catch(e){}
+function msave(){const d={};mats.forEach(m=>d[m.dataset.mid]=m.checked);localStorage.setItem(MKEY,JSON.stringify(d))}
+mats.forEach(m=>{
+  if(msaved[m.dataset.mid])m.checked=true;
+  m.closest('.mat').classList.toggle('done',m.checked);
+  m.addEventListener('change',()=>{m.closest('.mat').classList.toggle('done',m.checked);msave()});
+});
+
+document.querySelectorAll('.mat').forEach(row=>{
+  const btn=row.querySelector('.cok[data-kn]');
+  row.addEventListener('click',e=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='A')return;
+    if(btn){
+      const panel=document.getElementById(btn.dataset.kn);
+      const willOpen=!panel.classList.contains('open');
+      panel.classList.toggle('open',willOpen);
+      btn.classList.toggle('open',willOpen);
+      btn.textContent=willOpen?'Скрыть конспект':'Конспект';
+    }
+  });
+});
+
+const pd=document.getElementById('pubdate');
+const MONTHS=['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+const LABELS={'-45':'— 1,5 мес','-30':'— 1 мес','-14':'— 2 недели','0':'День X','90':'+ 3 мес'};
+function calcDates(){
+  const v=pd.value;
+  document.querySelectorAll('.sdate').forEach(el=>{
+    const off=parseInt(el.dataset.off,10);
+    if(!v){el.textContent=LABELS[el.dataset.off];el.classList.add('pending');return}
+    const d=new Date(v);d.setDate(d.getDate()+off);
+    el.textContent=d.getDate()+' '+MONTHS[d.getMonth()];
+    el.classList.remove('pending');
+  });
+  localStorage.setItem(KEY+'-pubdate',v);
+}
+pd.value=localStorage.getItem(KEY+'-pubdate')||'';
+pd.addEventListener('input',calcDates);
+calcDates();
+
+const fn=document.getElementById('freenotes');
+fn.value=localStorage.getItem(KEY+'-notes')||'';
+fn.addEventListener('input',()=>localStorage.setItem(KEY+'-notes',fn.value));
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  if(!t.dataset.p)return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById(t.dataset.p).classList.add('active');
+  document.querySelector('.wrap').classList.toggle('wide',['p-products','p-kniga','p-funnel','p-zov','p-svyaz','p-infog'].includes(t.dataset.p));
+}));
+
+const glq=document.getElementById('glq');
+if(glq){const glitems=[...document.querySelectorAll('.gl-item')];const glgroups=[...document.querySelectorAll('.gl-group')];const glcount=document.getElementById('glcount');const glempty=document.getElementById('glempty');
+function glfilter(){const q=glq.value.trim().toLowerCase();let n=0;glitems.forEach(it=>{const hit=!q||it.textContent.toLowerCase().includes(q);it.style.display=hit?'':'none';if(hit)n++});glgroups.forEach(g=>{const any=[...g.querySelectorAll('.gl-item')].some(i=>i.style.display!=='none');g.style.display=any?'':'none'});glcount.textContent=q?('Найдено: '+n+' из '+glitems.length):('Терминов: '+glitems.length);glempty.style.display=n?'none':'';}
+glq.addEventListener('input',glfilter);glfilter();}
+
+document.querySelectorAll('#p-mindmap .mm li, #p-kniga .mm li').forEach(li=>{
+  const ul=li.querySelector(':scope > ul');
+  const tg=document.createElement('span');
+  tg.className='mm-tg'+(ul?'':' leaf');
+  tg.textContent=ul?'▸':'·';
+  li.insertBefore(tg,li.firstChild);
+  if(ul){
+    li.classList.add('closed');
+    const flip=()=>{const c=li.classList.toggle('closed');tg.textContent=c?'▸':'▾';};
+    tg.addEventListener('click',flip);
+    const chip=li.querySelector(':scope > .mm-node, :scope > .mm-b');
+    if(chip)chip.addEventListener('click',flip);
+  }
+});
+function mmAll(open){document.querySelectorAll('#p-mindmap .mm li, #p-kniga .mm li').forEach(li=>{const ul=li.querySelector(':scope > ul');if(!ul)return;li.classList.toggle('closed',!open);li.querySelector(':scope > .mm-tg').textContent=open?'▾':'▸';});}
+document.getElementById('mm-open').addEventListener('click',()=>mmAll(true));
+document.getElementById('kb-open').addEventListener('click',()=>mmAll(true,'#p-kniga'));
+document.getElementById('kb-close').addEventListener('click',()=>mmAll(false,'#p-kniga'));
+document.getElementById('mm-close').addEventListener('click',()=>mmAll(false));
+
+document.querySelectorAll('.subtabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.subtabs button').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.pl-pane').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  document.getElementById(b.dataset.pl).classList.add('active');
+}));
+document.getElementById('side-toggle').addEventListener('click',()=>document.body.classList.toggle('nomenu'));
+document.getElementById('side-collapse').addEventListener('click',()=>document.body.classList.add('nomenu'));
+
+(function(){
+  function recalc(){
+    var inp=document.querySelectorAll('#p-tirazh .tz-inp');
+    if(!inp.length)return;
+    var g=0,sv=0;
+    inp.forEach(function(i){var v=parseInt(i.value,10)||0; if(i.getAttribute('data-g')==='g')g+=v; else sv+=v;});
+    document.getElementById('sum-g').textContent=g;
+    document.getElementById('sum-s').textContent=sv;
+    var zap=Math.round((g+sv)*0.1);
+    var all=g+sv+zap;
+    document.getElementById('sum-all').textContent=all.toLocaleString('ru');
+    document.getElementById('sum-note').textContent=g+' подарки + '+sv+' продажи + '+zap+' запас 10%';
+    var r='';
+    if(all<=1200) r='При таком объёме тираж <b>2000</b> с запасом покрывает всё (725 ₽/шт, 1,45 млн).';
+    else if(all<=2200) r='Объём тянет к <b>2000–2500</b>. Решить: 2000 + допечатка или сразу 2500.';
+    else r='Объём за 2000 → <b>3000</b> выгоднее по себестоимости (607 ₽/шт против 725).';
+    document.getElementById('tz-rec').innerHTML=r+' <span style="color:rgba(239,231,213,.55)">Соня: 2000 — 1,45 млн · 3000 — 1,82 млн.</span>';
+  }
+  document.addEventListener('input',function(e){if(e.target.classList&&e.target.classList.contains('tz-inp'))recalc();});
+  document.querySelectorAll('.side .tab').forEach(function(b){b.addEventListener('click',function(){if(b.getAttribute('data-p')==='p-tirazh')setTimeout(recalc,0);});});
+  recalc();
+})();
+</script>
+<script>
+/* аккордеон боковых групп */
+(function(){
+  document.querySelectorAll('.side-grp').forEach(function(g){
+    var cap=g.querySelector('.side-cap');
+    if(!cap) return;
+    cap.insertAdjacentHTML('beforeend','<span class="chev">▾</span>');
+    if(!g.querySelector('.tab.active')) g.classList.add('collapsed');
+    cap.addEventListener('click',function(){ g.classList.toggle('collapsed'); });
+  });
+  /* при выборе вкладки — держим её группу раскрытой */
+  document.querySelectorAll('.side-grp .tab').forEach(function(b){
+    b.addEventListener('click',function(){
+      var g=b.closest('.side-grp'); if(g) g.classList.remove('collapsed');
+    });
+  });
+})();
+</script>
+</body>
+</html>
