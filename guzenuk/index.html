@@ -1675,7 +1675,11 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   t.classList.add('active');
   document.getElementById(t.dataset.p).classList.add('active');
   document.querySelector('.wrap').classList.toggle('wide',['p-products','p-kniga','p-funnel','p-zov','p-svyaz','p-infog'].includes(t.dataset.p));
+  if(history.replaceState)history.replaceState(null,'','#'+t.dataset.p);
 }));
+function openByHash(){var h=(location.hash||'').replace('#','');if(!h)return;var b=document.querySelector('.tab[data-p="'+h+'"]');if(b){var g=b.closest('.side-grp');if(g)g.classList.remove('collapsed');b.click();}}
+window.addEventListener('hashchange',openByHash);
+openByHash();
 
 const glq=document.getElementById('glq');
 if(glq){const glitems=[...document.querySelectorAll('.gl-item')];const glgroups=[...document.querySelectorAll('.gl-group')];const glcount=document.getElementById('glcount');const glempty=document.getElementById('glempty');
