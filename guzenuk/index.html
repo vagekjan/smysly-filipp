@@ -429,6 +429,13 @@
   .gt tr.gsec.has-children:hover .gtog{background:var(--accent);border-color:var(--accent-ink)}
   .gt tr.gsec.collapsed .gchev{transform:rotate(-90deg)}
   .gt tbody tr:not(.gsec):hover .gname{background:#FBF6EE}
+  .wk-plan{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:6px}
+  .wk-block{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff}
+  .wk-h{font-family:var(--disp);font-weight:600;text-transform:uppercase;font-size:13px;letter-spacing:.03em;color:var(--accent-ink);margin-bottom:8px}
+  .wk-block ul{margin:0;padding-left:18px}
+  .wk-block li{font-size:13px;color:var(--ink2);line-height:1.5;margin-bottom:3px}
+  .wk-block li b{color:var(--ink);font-weight:600}
+  .wk-tag{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent-ink);background:#FCF6DC;border-radius:3px;padding:1px 5px;margin-left:3px}
 </style>
 </head>
 <body>
@@ -471,54 +478,28 @@
 
 <div id="p-plan" class="page">
   <h1>План работы</h1>
-  <div class="sub">По итогам созвона с Оксаной и Ольгой</div>
-
-  <div class="block-h">Оргвопросы · зафиксировано</div>
-  <div class="sec">
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Общий чат в Telegram на четверых: ты, Оля, Мага, Филипп</div><div class="hint">Создаёт Ольга</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Регулярные встречи — пятница, 13:00, на июль</div><div class="hint">Дальше по необходимости, реже или чаще</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Следующая встреча — 17 июля</div></div></div>
-    <div class="item"><div class="q"><div class="txt">Отпуска: Оксана 20.07–02.08, Ольга 03–16.08</div><div class="hint">Взаимно подменяют друг друга</div></div></div>
-    <div class="item"><div class="q"><div class="txt">Схема согласований</div><div class="hint">Финальное решение всегда за Филиппом. Оксана — воронка личной стратегии, Ольга — форум «Стратегируй» и канвас стратегирования. Обе снимают промежуточные согласования, чтобы не грузить Филиппа</div></div></div>
+  <div class="sub">Понедельный план по Ганту</div>
+  <div class="block-h">Сентябрь · 1-я неделя</div>
+  <div class="sec"><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Воронка</b> · Собрать в презентацию: цепочка + визуальные элементы + поиск формы (вся цепочка легко читается по слайдам, смысл понятен)</div><div class="hint">старт</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Воронка</b> · Разложить все цепочки смыслов по элементам</div><div class="hint">старт</div></div></div></div>
+  <div class="block-h">Сентябрь · 2-я неделя</div>
+  <div class="sec"><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Сайт</b> · Утверждена логика смыслов и блоков</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Воронка</b> · Собрать в презентацию: цепочка + визуальные элементы + поиск формы (вся цепочка легко читается по слайдам, смысл понятен)</div><div class="hint">финиш</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Воронка</b> · Разложить все цепочки смыслов по элементам</div><div class="hint">финиш</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Воронка</b> · Черновая сборка всех элементов воронки</div><div class="hint">старт</div></div></div></div>
+  <div class="block-h">Сентябрь · 3-я неделя</div>
+  <div class="sec"><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Сайт</b> · Утверждены тексты</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Сайт</b> · Утверждён визуал</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Вкладыш</b> · Согласована логика</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Воронка</b> · Черновая сборка всех элементов воронки</div><div class="hint">финиш</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Воронка</b> · Утверждение дизайн-кода и визуала</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Воронка</b> · Написание всех текстов воронки</div></div></div></div>
+  <div class="block-h">Сентябрь · 4-я неделя</div>
+  <div class="sec"><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Сайт</b> · Политика конфиденциальности и прочее</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Сайт</b> · Платёжные системы</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Сайт</b> · Утверждённый сайт готов к посетителям</div><div class="hint">старт</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Вкладыш</b> · Согласованы тексты</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Воронка</b> · Сборка чистовая</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Воронка</b> · Утверждение с Филиппом, сдача воронки</div><div class="hint">старт</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Книга</b> · Отдать книгу в печать (30.09)</div></div></div></div>
+  <div class="block-h">Октябрь · 1-я неделя</div>
+  <div class="sec"><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Сайт</b> · Утверждённый сайт готов к посетителям</div><div class="hint">финиш</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Вкладыш</b> · Согласован визуал</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Воронка</b> · Утверждение с Филиппом, сдача воронки</div></div></div></div>
+  <div class="block-h">Октябрь · 2-я неделя</div>
+  <div class="sec"><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Прогрев</b> · Старт прогрева в ресурсах Филиппа</div><div class="hint">старт</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Вкладыш</b> · Отдан в печать</div></div></div><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Воронка</b> · Утверждение с Филиппом, сдача воронки</div><div class="hint">финиш</div></div></div></div>
+  <div class="block-h">Октябрь · 3-я неделя</div>
+  <div class="sec"><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Прогрев</b> · Старт прогрева в ресурсах Филиппа</div><div class="hint">финиш</div></div></div></div>
+  <div class="block-h">Ноябрь · 1-я неделя</div>
+  <div class="sec"><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Вкладыш</b> · Вкладыш на руках</div></div></div></div>
+  <div class="block-h">Ноябрь · 2-я неделя</div>
+  <div class="sec"><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Книга</b> · Книга на руках / выход (15.11)</div><div class="hint">старт</div></div></div></div>
+  <div class="block-h">Ноябрь · 3-я неделя</div>
+  <div class="sec"><div class="item"><input type="checkbox"><div class="q"><div class="txt"><b>Книга</b> · Книга на руках / выход (15.11)</div><div class="hint">финиш</div></div></div></div>
   </div>
-
-  <div class="block-h">Воронка · личная стратегия (Оксана)</div>
-  <div class="sec">
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Распаковка и изучение материалов</div><div class="hint">До 21 июля</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Встреча с Филиппом на распаковку</div><div class="hint">Ставит Ольга, ориентир 23–24 июля (16-го у него ДР, 17–21 без связи)</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Возможный доп. носитель экспертизы — Лена Нестерова</div><div class="hint">Под вопросом, уточняет Оксана</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Свести и обработать материалы в проработанную схему (этапы, элементы, логика)</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Согласовать схему с Филиппом</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Версия 1.0 воронки</div><div class="hint">Сдвинуто с 4 на 11 августа, ориентир не финал</div></div></div>
-  </div>
-
-  <div class="block-h">Воронка · канвас стратегирования (Ольга)</div>
-  <div class="sec">
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Носители экспертизы: Филипп, Илья, Евгений</div><div class="hint">Пишут книгу про дисплей стратега, есть презентация ~500 слайдов</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Финал: держим ориентир — обе воронки готовы до 31 августа</div><div class="hint">Филипп предупредил, что сроки могут скорректироваться после встреч</div></div></div>
-  </div>
-
-  <div class="block-h">Форум «Стратегируй» (Ольга)</div>
-  <div class="sec">
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Портрет инфлюенсера</div><div class="hint">Оля асинхронно выгрузит критерии в чат: соответствие ценностям, политическая нейтральность</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Финальное утверждение инфлюенсеров — за Филиппом</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Цена билета: 85–86к базовый, VIP ~100+</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Дать экспресс-оценку по сайту и воронке форума</div><div class="hint">В течение недели</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Первая партия инфлюенсеров (~10 человек) — 21 июля</div></div></div>
-  </div>
-
-  <div class="block-h">Предзаказ и дистрибуция</div>
-  <div class="sec">
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Оплата по дистрибуции — от нас, чтобы стартовали</div></div></div>
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Созвон с отделом дистрибуции на этой неделе</div><div class="hint">К следующему вторнику — таймлайн по этому блоку</div></div></div>
-  </div>
-
-  <div class="block-h">Договор</div>
-  <div class="sec">
-    <div class="item"><input type="checkbox"><div class="q"><div class="txt">Оксана возвращается с комментариями юриста</div></div></div>
-  </div>
-
-</div>
 
 <div id="p-home" class="page active">
   <div class="cover">
